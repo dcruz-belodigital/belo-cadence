@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
+use App\Enums\ColorScheme;
+use App\Enums\Locale;
+use App\Enums\Theme;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -10,16 +15,18 @@ use Illuminate\Support\Str;
 /**
  * @extends Factory<User>
  */
-class UserFactory extends Factory
+final class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
+    protected $model = User::class;
 
     /**
-     * Define the model's default state.
-     *
+     * The password every generated user signs in with, hashed once per run.
+     */
+    public const PASSWORD = 'password';
+
+    protected static ?string $hashedPassword = null;
+
+    /**
      * @return array<string, mixed>
      */
     public function definition(): array
@@ -27,19 +34,33 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => self::$hashedPassword ??= Hash::make(self::PASSWORD),
+            'is_active' => true,
+            'color_scheme' => ColorScheme::System,
+            'theme' => null,
+            'locale' => Locale::English,
+            'timezone' => 'UTC',
             'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
+    public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(fn (array $attributes): array => ['is_active' => false]);
+    }
+
+    public function colorScheme(ColorScheme $colorScheme): static
+    {
+        return $this->state(fn (array $attributes): array => ['color_scheme' => $colorScheme]);
+    }
+
+    public function theme(?Theme $theme): static
+    {
+        return $this->state(fn (array $attributes): array => ['theme' => $theme]);
+    }
+
+    public function timezone(string $timezone): static
+    {
+        return $this->state(fn (array $attributes): array => ['timezone' => $timezone]);
     }
 }

@@ -1,58 +1,96 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Belo Cadence
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Recurring client email, kept honest. Belo Cadence tracks which of your clients should
+receive which message and when, sends it on schedule, and keeps a permanent record of
+exactly what went out — the recipient, the sender, the subject and the message itself,
+frozen at the moment of sending.
 
-## About Laravel
+Built with Laravel 13, Tailwind CSS 4 and Alpine. English and European Portuguese.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Clients** — the organisations you send to.
+- **Schedules** — one-time, monthly or yearly, anchored to a first send date.
+- **Delivery history** — every attempt, successful or not, and why it failed.
+- **Templates** — source-controlled, so wording is reviewed like any other change.
+- **Users, roles and audit log** — 36 permissions, and a record of who changed what.
+- **Themes** — five, each drawn in light and dark, set per installation or per person.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+`APP_RESUME.md` covers what is working in more detail, including what has to be switched
+on before real email is delivered.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Requirements
 
-## Learning Laravel
+PHP 8.3+, Composer, Node 22+ and npm. SQLite by default; any database Laravel supports
+will do.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Installation
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repository-url> belo-cadence
+cd belo-cadence
+composer setup
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+That is the whole installation. `composer setup` installs the PHP and JS dependencies,
+creates `.env` from `.env.example`, generates the application key, runs the migrations —
+creating the SQLite file if it is not there — and builds the front end.
 
-## Contributing
+Then seed. Pick one:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan db:seed                      # permissions, roles, an administrator, settings
+php artisan db:seed --class=DemoSeeder   # the above plus clients, schedules and history
+```
 
-## Code of Conduct
+`DemoSeeder` is the one to use for a look around: it creates clients, schedules,
+delivery history, notifications and audit entries, and accounts at every permission
+level. Every demo account signs in with `demo-password-123`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+The first administrator's password comes from `CADENCE_ADMIN_PASSWORD` in `.env`. Leave
+it empty and a strong one is generated and printed once during seeding.
 
-## Security Vulnerabilities
+## Running it
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+composer dev
+```
 
-## License
+That starts the web server, the queue worker, the log viewer and Vite together. Visit
+the URL it prints.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Testing
+
+```bash
+composer test
+```
+
+Clears the config cache first, then runs the suite — 634 tests, all passing. Add
+arguments as usual, for example `composer test -- --filter=ThemeTest`.
+
+## Sending email for real
+
+Out of the box `MAIL_MAILER=log`, so messages are written to `storage/logs/laravel.log`
+rather than delivered. To send properly:
+
+1. Point the `MAIL_*` variables at a real SMTP service.
+2. Run the scheduler, which is what actually sends. In production, one cron entry:
+   ```
+   * * * * * cd /path/to/belo-cadence && php artisan schedule:run >> /dev/null 2>&1
+   ```
+   Locally, `php artisan schedule:work` — or just `composer dev`, which includes it.
+3. Set the sender name and address under **Settings** in the application. Those win over
+   `.env` for client email.
+
+Due notifications are processed hourly, so a message goes out in the hour it falls due.
+Each occurrence is sent once, even if two runs overlap.
+
+## Working on it
+
+- `vendor/bin/pint` — formats PHP to the project's style. Run it before committing.
+- `npm run build` — rebuilds the front end after changing CSS or Blade views.
+- `.ai/rules/` — the settled decisions and standing constraints for this codebase,
+  grouped by the paths they apply to. Read the ones matching what you are about to
+  change; several are load-bearing.
+
+Themes live in `resources/css/themes.css`, one block of variables each. Translations live
+in `lang/<locale>`, and the guide and changelog in `resources/docs/<locale>`; a key or a
+document present in one language and missing in another fails the test suite.

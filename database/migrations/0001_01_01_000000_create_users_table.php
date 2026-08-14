@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,8 +17,16 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('is_active')->default(true);
+            $table->string('color_scheme')->default('system');
+            /*
+            | Null means "whichever theme the application is set to", so a reader who
+            | never chooses one follows the administrator's default as it changes.
+            */
+            $table->string('theme')->nullable();
+            $table->string('locale')->default('en');
+            $table->string('timezone')->default('UTC');
             $table->rememberToken();
             $table->timestamps();
         });

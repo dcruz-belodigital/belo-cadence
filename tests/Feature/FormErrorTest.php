@@ -1,0 +1,188 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\Client;
+use App\Models\ClientNotificationSchedule;
+use App\Models\DefaultClientNotification;
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\post;
+
+/**
+ * Validation messages are shown in exactly one way: `x-form.error`, under the thing that is
+ * wrong. There is no summary box repeating them all in a second style.
+ *
+ * That only works if every message a form can produce has somewhere to appear. A rule on a
+ * key with no field would fail silently — the form would come back unchanged with nothing
+ * explaining why — so these tests put a message under every rule key each page can produce
+ * and insist the page shows it. The keys come from the `rules()` of the Form Request that
+ * receives each form.
+ */
+function guardMessage(string $key): string
+{
+    return "Cadence guard message for {$key}";
+}
+
+/**
+ * Renders a page as though every one of these keys had failed validation.
+ *
+ * The bag is handed to the views directly. Seeding it through the session does not survive
+ * the round trip, and a real failing submission cannot reach the keys that only a tampered
+ * payload would trip.
+ *
+ * @param  list<string>  $keys
+ */
+function assertShowsEveryMessage(string $url, array $keys, ?User $actor = null): void
+{
+    $messages = [];
+
+    foreach ($keys as $key) {
+        $messages[$key] = [guardMessage($key)];
+    }
+
+    $bag = (new ViewErrorBag)->put('default', new MessageBag($messages));
+
+    View::composer('*', fn ($view) => $view->with('errors', $bag));
+
+    $response = ($actor === null ? test() : actingAs($actor))->get($url);
+
+    $response->assertOk();
+
+    $content = (string) $response->getContent();
+
+    foreach ($keys as $key) {
+        expect(str_contains($content, guardMessage($key)))->toBeTrue(
+            "The [{$key}] message has nowhere to appear on {$url}, so that failure would be invisible."
+        );
+    }
+}
+
+it('shows every message the guest forms can produce', function (string $route, array $parameters, array $keys): void {
+    assertShowsEveryMessage(route($route, $parameters), $keys);
+})->with([
+    'login' => ['login', [], ['email', 'password', 'remember']],
+    'forgot password' => ['password.request', [], ['email']],
+    'reset password' => ['password.reset', ['token' => 'a-token'], ['token', 'email', 'password']],
+]);
+
+it('shows every message the client forms can produce', function (): void {
+    $administrator = administrator();
+    $client = Client::factory()->create();
+    DefaultClientNotification::factory()->create();
+
+    assertShowsEveryMessage(route('clients.create'), [
+        'name', 'email', 'status', 'notes',
+        'schedules', 'schedules.0.default_id', 'schedules.0.starts_at', 'schedules.0.is_enabled',
+    ], $administrator);
+
+    assertShowsEveryMessage(route('clients.edit', $client), ['name', 'email', 'status', 'notes'], $administrator);
+});
+
+it('shows every message the schedule forms can produce', function (): void {
+    $administrator = administrator();
+    $client = Client::factory()->create();
+    $schedule = ClientNotificationSchedule::factory()->for($client)->create();
+
+    $keys = ['template', 'frequency', 'starts_at', 'is_enabled'];
+
+    assertShowsEveryMessage(route('clients.schedules.create', $client), $keys, $administrator);
+    assertShowsEveryMessage(route('cadence.schedules.edit', $schedule), $keys, $administrator);
+});
+
+it('shows every message the user and role forms can produce', function (): void {
+    $administrator = administrator();
+    $user = User::factory()->create();
+    $role = Role::factory()->create();
+
+    assertShowsEveryMessage(route('admin.users.create'), [
+        'name', 'email', 'password', 'is_active', 'roles', 'roles.0',
+    ], $administrator);
+
+    assertShowsEveryMessage(route('admin.users.edit', $user), [
+        'name', 'email', 'password', 'roles', 'roles.0',
+    ], $administrator);
+
+    assertShowsEveryMessage(route('admin.roles.create'), ['name', 'permissions', 'permissions.0'], $administrator);
+    assertShowsEveryMessage(route('admin.roles.edit', $role), ['name', 'permissions', 'permissions.0'], $administrator);
+});
+
+it('shows every message the settings forms can produce', function (): void {
+    $administrator = administrator();
+
+    assertShowsEveryMessage(route('admin.settings.edit'), [
+        'application_name', 'default_locale', 'default_timezone',
+        'client_email_sender_name', 'client_email_sender_email',
+    ], $administrator);
+
+    assertShowsEveryMessage(route('admin.settings.edit'), [
+        'entries', 'entries.0.template', 'entries.0.frequency', 'entries.0.is_enabled_by_default',
+    ], $administrator);
+});
+
+it('shows every message the profile forms can produce', function (): void {
+    assertShowsEveryMessage(route('profile.edit'), [
+        'name', 'current_password', 'password', 'color_scheme', 'locale', 'timezone',
+    ], administrator());
+});
+
+it('shows every message the upload step can produce', function (): void {
+    Storage::fake('local');
+
+    $administrator = administrator();
+
+    assertShowsEveryMessage(route('clients.import.create'), ['file'], $administrator);
+    assertShowsEveryMessage(route('admin.users.import.create'), ['file'], $administrator);
+});
+
+it('shows every message the mapping step can produce', function (): void {
+    Storage::fake('local');
+
+    $administrator = administrator();
+
+    actingAs($administrator);
+
+    post(route('clients.import.store'), [
+        'file' => UploadedFile::fake()->createWithContent(
+            'clients.csv',
+            "Client name,Email address,Status\nMapped Studio,mapped@example.test,active\n"
+        ),
+    ])->assertRedirect(route('clients.import.mapping'));
+
+    assertShowsEveryMessage(route('clients.import.mapping'), ['mapping', 'mapping.name'], $administrator);
+});
+
+it('renders validation state only through the shared components', function (): void {
+    $offenders = [];
+
+    $directory = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(resource_path('views')));
+
+    /** @var SplFileInfo $file */
+    foreach ($directory as $file) {
+        if (! str_ends_with($file->getFilename(), '.blade.php')) {
+            continue;
+        }
+
+        $contents = (string) file_get_contents($file->getPathname());
+
+        // Only the form components may touch validation state: `x-form.error` renders the
+        // message, and the field components mark themselves invalid for assistive software.
+        // Anywhere else means a second, divergent style.
+        $touchesErrors = preg_match('/@error\b|\$errors\b/', $contents) === 1;
+        $isFormComponent = str_contains($contents, 'aria-describedby')
+            || str_ends_with($file->getPathname(), 'components/form/error.blade.php');
+
+        if ($touchesErrors && ! $isFormComponent) {
+            $offenders[] = str_replace(resource_path('views').'/', '', $file->getPathname());
+        }
+    }
+
+    expect($offenders)->toBe([], 'These views render validation state themselves instead of using <x-form.error>: '.implode(', ', $offenders));
+});

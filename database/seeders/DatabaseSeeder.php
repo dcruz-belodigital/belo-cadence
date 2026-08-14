@@ -1,25 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+/**
+ * Everything a fresh environment needs, and nothing more.
+ *
+ * This seeder is safe to run against a real installation: it creates no clients,
+ * schedules, deliveries, notifications or demo users. Demo data lives in DemoSeeder
+ * and is never called from here.
+ */
+final class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            InitialAdministratorSeeder::class,
+            ApplicationSettingsSeeder::class,
         ]);
     }
 }

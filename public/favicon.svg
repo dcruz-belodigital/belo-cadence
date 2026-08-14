@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1.3 0.6 20.9 20.9" width="32" height="32">
+    <!--
+        The Belo Cadence mark for the browser tab: the same folded paper plane as
+        resources/views/components/logo.blade.php, kept in step by hand.
+
+        Two things differ from the in-application logo, both because a tab is 16 pixels
+        of someone else's chrome rather than a tile of ours. The view box is cropped to
+        the mark so it fills the space instead of floating in it, and the ink is a fixed
+        neutral that inverts with the browser's appearance, so it is never dark on dark.
+    -->
+    <style>
+        .mark { fill: #2f2b3a; stroke: #2f2b3a; }
+        .trail { stroke: #2f2b3a; }
+
+        @media (prefers-color-scheme: dark) {
+            .mark { fill: #f2f0f7; stroke: #f2f0f7; }
+            .trail { stroke: #f2f0f7; }
+        }
+    </style>
+
+    <g class="trail" stroke-width="2.1" stroke-linecap="round" opacity="0.45" fill="none">
+        <path d="M2.1 15.5h3" />
+        <path d="M4.7 19.2h3.8" />
+    </g>
+
+    <path class="mark" d="M21.4 2.6 4.2 9.4l6.8 3.2z" stroke-width="1.7" stroke-linejoin="round" />
+    <path class="mark" d="M21.4 2.6 11 12.6l3.2 6.8z" stroke-width="1.7" stroke-linejoin="round" opacity="0.55" />
+</svg>

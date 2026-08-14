@@ -1,9 +1,767 @@
-@import 'tailwindcss';
+/*
+| Automatic content detection is switched off and the sources are named explicitly, so a
+| build depends only on the application's own markup — never on which pages happen to be
+| in the compiled-view cache, and never on class names that appear in documentation.
+*/
+@import 'tailwindcss' source(none);
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@source '../views';
+@source '../../app';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+/*
+| The alternative themes. Each one outranks the default below on specificity, not on
+| source order, because CSS pins `@import` to the top of the file.
+*/
+@import './themes.css';
+
+/*
+| Belo Cadence design system
+|
+| Every visual decision lives here as a semantic token. Components consume tokens
+| such as `bg-surface` or `text-foreground-muted` and never raw palette colours, so
+| the whole product can be restyled from this file alone.
+|
+| The `--cadence-*` layer below is that single point of control. `@theme inline`
+| never holds a literal value: it points every Tailwind utility at a `--cadence-*`
+| variable, which is what lets a theme repaint, reshape and re-set the whole
+| application by redeclaring that layer and nothing else. Themes live in themes.css.
+*/
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+| The palette is a single violet family, from the periwinkle reference: medium slate
+| blue for anything that acts, thistle for anything that is merely selected, and a
+| long run of near-white lavenders for the surfaces.
+|
+| Everything is one temperature on purpose. An earlier version put a warm blush on
+| the chrome and cool violets on the page; the two halves read as a mistake rather
+| than as a decision, so the whole interface now sits on the same hue and separates
+| by lightness alone.
+*/
+
+/* Light theme ------------------------------------------------------------- */
+:root {
+    --cadence-background: oklch(0.973 0.009 300);
+    --cadence-surface: oklch(0.997 0.003 300);
+    --cadence-surface-elevated: oklch(1 0 0);
+    --cadence-surface-sunken: oklch(0.958 0.013 300);
+    --cadence-surface-muted: oklch(0.955 0.014 300);
+    --cadence-surface-hover: oklch(0.965 0.012 300);
+
+    /* The chrome is the same violet, one step deeper than the page it frames. */
+    --cadence-sidebar: oklch(0.951 0.016 300);
+    --cadence-sidebar-border: oklch(0.897 0.019 300);
+
+    --cadence-foreground: oklch(0.225 0.032 292);
+    --cadence-foreground-muted: oklch(0.495 0.028 294);
+    --cadence-foreground-subtle: oklch(0.625 0.024 296);
+
+    --cadence-border: oklch(0.898 0.016 300);
+    --cadence-border-strong: oklch(0.808 0.028 298);
+
+    /*
+    | Medium slate blue, taken down in lightness until white text on it is legible.
+    | The reference value itself lives on as the focus ring.
+    */
+    --cadence-primary: oklch(0.535 0.205 285);
+    --cadence-primary-hover: oklch(0.465 0.195 284);
+    --cadence-primary-foreground: oklch(0.995 0.003 300);
+    --cadence-primary-soft: oklch(0.93 0.05 297);
+    --cadence-primary-soft-foreground: oklch(0.445 0.185 284);
+
+    --cadence-success: oklch(0.51 0.105 158);
+    --cadence-success-soft: oklch(0.945 0.036 158);
+    --cadence-success-soft-foreground: oklch(0.415 0.09 158);
+
+    --cadence-warning: oklch(0.635 0.125 70);
+    --cadence-warning-soft: oklch(0.95 0.045 74);
+    --cadence-warning-soft-foreground: oklch(0.455 0.098 66);
+
+    --cadence-danger: oklch(0.53 0.195 16);
+    --cadence-danger-hover: oklch(0.46 0.185 16);
+    --cadence-danger-foreground: oklch(0.995 0.003 300);
+    --cadence-danger-soft: oklch(0.947 0.038 16);
+    --cadence-danger-soft-foreground: oklch(0.46 0.175 16);
+
+    /* Teal, so an informational note is never mistaken for the violet primary. */
+    --cadence-info: oklch(0.55 0.09 212);
+    --cadence-info-soft: oklch(0.945 0.032 212);
+    --cadence-info-soft-foreground: oklch(0.45 0.078 212);
+
+    --cadence-neutral-soft: oklch(0.945 0.014 300);
+    --cadence-neutral-soft-foreground: oklch(0.42 0.028 296);
+
+    --cadence-ring: oklch(0.6 0.19 284);
+    --cadence-overlay: oklch(0.2 0.045 295 / 0.5);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 18px 44px -22px oklch(0.2 0.06 295 / 0.38), 0 2px 8px -4px oklch(0.2 0.06 295 / 0.16);
+
+    /*
+    | Shape and lettering belong to the theme just as much as colour does, so they sit
+    | in the same layer. A theme that only wants a new palette simply leaves these alone.
+    */
+    --cadence-font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --cadence-font-display: var(--cadence-font-sans);
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+
+    --cadence-radius-control: 0.625rem;
+    --cadence-radius-card: 1rem;
+
+    --cadence-tracking-title: -0.025em;
+    --cadence-tracking-overline: 0.1em;
+    --cadence-weight-title: 700;
+    --cadence-overline-transform: uppercase;
+}
+
+/* Dark theme -------------------------------------------------------------- */
+.dark {
+    --cadence-background: oklch(0.178 0.018 295);
+    --cadence-surface: oklch(0.219 0.021 295);
+    --cadence-surface-elevated: oklch(0.251 0.023 295);
+    --cadence-surface-sunken: oklch(0.166 0.017 295);
+    --cadence-surface-muted: oklch(0.259 0.023 295);
+    --cadence-surface-hover: oklch(0.285 0.025 295);
+
+    /* The chrome recedes into violet ink, the same hue the whole theme is built on. */
+    --cadence-sidebar: oklch(0.142 0.016 295);
+    --cadence-sidebar-border: oklch(0.248 0.022 295);
+
+    --cadence-foreground: oklch(0.958 0.008 300);
+    --cadence-foreground-muted: oklch(0.728 0.022 298);
+    --cadence-foreground-subtle: oklch(0.608 0.024 297);
+
+    --cadence-border: oklch(0.305 0.024 295);
+    --cadence-border-strong: oklch(0.418 0.03 294);
+
+    /*
+    | Soft periwinkle. On a dark ground the accent is taken up in lightness so it
+    | still reads as the loudest thing on the page, which means its own label has to
+    | go dark.
+    */
+    --cadence-primary: oklch(0.715 0.155 285);
+    --cadence-primary-hover: oklch(0.775 0.135 287);
+    --cadence-primary-foreground: oklch(0.168 0.04 287);
+    --cadence-primary-soft: oklch(0.318 0.068 289);
+    --cadence-primary-soft-foreground: oklch(0.865 0.085 293);
+
+    --cadence-success: oklch(0.67 0.12 158);
+    --cadence-success-soft: oklch(0.298 0.05 158);
+    --cadence-success-soft-foreground: oklch(0.855 0.085 158);
+
+    --cadence-warning: oklch(0.765 0.13 74);
+    --cadence-warning-soft: oklch(0.312 0.055 72);
+    --cadence-warning-soft-foreground: oklch(0.878 0.1 78);
+
+    --cadence-danger: oklch(0.638 0.2 18);
+    --cadence-danger-hover: oklch(0.695 0.185 20);
+    --cadence-danger-foreground: oklch(0.168 0.04 18);
+    --cadence-danger-soft: oklch(0.318 0.078 18);
+    --cadence-danger-soft-foreground: oklch(0.868 0.095 20);
+
+    --cadence-info: oklch(0.715 0.095 212);
+    --cadence-info-soft: oklch(0.302 0.045 212);
+    --cadence-info-soft-foreground: oklch(0.858 0.065 212);
+
+    --cadence-neutral-soft: oklch(0.285 0.023 295);
+    --cadence-neutral-soft-foreground: oklch(0.838 0.018 298);
+
+    --cadence-ring: oklch(0.745 0.145 285);
+    --cadence-overlay: oklch(0.09 0.02 295 / 0.65);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 18px 44px -20px oklch(0 0 0 / 0.7), 0 2px 8px -4px oklch(0 0 0 / 0.5);
+}
+
+@theme inline {
+    --font-sans: var(--cadence-font-sans);
+
+    /* Headings, so a theme can set them in a face of their own. */
+    --font-display: var(--cadence-font-display);
+
+    /*
+    | Figures — counts, dates, identifiers — are set in mono so columns of them line
+    | up and so the product reads as an instrument rather than a brochure.
+    */
+    --font-mono: var(--cadence-font-mono);
+
+    --color-background: var(--cadence-background);
+    --color-surface: var(--cadence-surface);
+    --color-surface-elevated: var(--cadence-surface-elevated);
+    --color-surface-sunken: var(--cadence-surface-sunken);
+    --color-surface-muted: var(--cadence-surface-muted);
+    --color-surface-hover: var(--cadence-surface-hover);
+
+    --color-sidebar: var(--cadence-sidebar);
+    --color-sidebar-border: var(--cadence-sidebar-border);
+
+    --color-foreground: var(--cadence-foreground);
+    --color-foreground-muted: var(--cadence-foreground-muted);
+    --color-foreground-subtle: var(--cadence-foreground-subtle);
+
+    --color-border: var(--cadence-border);
+    --color-border-strong: var(--cadence-border-strong);
+
+    --color-primary: var(--cadence-primary);
+    --color-primary-hover: var(--cadence-primary-hover);
+    --color-primary-foreground: var(--cadence-primary-foreground);
+    --color-primary-soft: var(--cadence-primary-soft);
+    --color-primary-soft-foreground: var(--cadence-primary-soft-foreground);
+
+    --color-success: var(--cadence-success);
+    --color-success-soft: var(--cadence-success-soft);
+    --color-success-soft-foreground: var(--cadence-success-soft-foreground);
+
+    --color-warning: var(--cadence-warning);
+    --color-warning-soft: var(--cadence-warning-soft);
+    --color-warning-soft-foreground: var(--cadence-warning-soft-foreground);
+
+    --color-danger: var(--cadence-danger);
+    --color-danger-hover: var(--cadence-danger-hover);
+    --color-danger-foreground: var(--cadence-danger-foreground);
+    --color-danger-soft: var(--cadence-danger-soft);
+    --color-danger-soft-foreground: var(--cadence-danger-soft-foreground);
+
+    --color-info: var(--cadence-info);
+    --color-info-soft: var(--cadence-info-soft);
+    --color-info-soft-foreground: var(--cadence-info-soft-foreground);
+
+    --color-neutral-soft: var(--cadence-neutral-soft);
+    --color-neutral-soft-foreground: var(--cadence-neutral-soft-foreground);
+
+    --color-ring: var(--cadence-ring);
+    --color-overlay: var(--cadence-overlay);
+
+    --shadow-card: var(--cadence-shadow-card);
+    --shadow-popover: var(--cadence-shadow-popover);
+
+    /*
+    | Typography scale. Headings are set tight and heavy, and the overline — small,
+    | uppercase, widely tracked — is the recurring label of the system: it names
+    | sections, table columns and detail fields alike.
+    */
+    --text-page-title: 1.5rem;
+    --text-page-title--line-height: 2rem;
+    --text-page-title--font-weight: var(--cadence-weight-title);
+    --text-page-title--letter-spacing: var(--cadence-tracking-title);
+
+    --text-section-title: 0.9375rem;
+    --text-section-title--line-height: 1.5rem;
+    --text-section-title--font-weight: 600;
+    --text-section-title--letter-spacing: var(--cadence-tracking-title);
+
+    --text-metric: 2rem;
+    --text-metric--line-height: 2.25rem;
+    --text-metric--font-weight: 500;
+    --text-metric--letter-spacing: -0.035em;
+
+    --text-body: 0.875rem;
+    --text-body--line-height: 1.375rem;
+
+    --text-meta: 0.8125rem;
+    --text-meta--line-height: 1.25rem;
+
+    --text-label: 0.8125rem;
+    --text-label--line-height: 1.25rem;
+    --text-label--font-weight: 500;
+
+    --text-overline: 0.6875rem;
+    --text-overline--line-height: 1rem;
+    --text-overline--font-weight: 600;
+    --text-overline--letter-spacing: var(--cadence-tracking-overline);
+
+    /*
+    | Shape and rhythm. Corners are eased rather than rounded — enough to soften the
+    | grid, not enough to turn panels into lozenges — and cards carry no shadow, so
+    | depth is drawn entirely with hairlines and the surface tones.
+    */
+    --radius-control: var(--cadence-radius-control);
+    --radius-card: var(--cadence-radius-card);
+    --radius-pill: 9999px;
+
+    --spacing-control: 2.25rem;
+    --spacing-control-sm: 2rem;
+    --spacing-sidebar: 16rem;
+
+    /*
+    | A page is one of exactly two widths, chosen by the `width` prop on the app
+    | layout and applied by the layout itself. Anything that sets its own max width
+    | drifts out of alignment with the page description above it.
+    |
+    | wide   — tables, index pages and dashboards, which earn the room.
+    | narrow — forms and reading pages, held to a comfortable measure.
+    */
+    --container-wide: 90rem;
+    --container-narrow: 48rem;
+
+    --default-transition-duration: 150ms;
+}
+
+@layer base {
+    html {
+        color-scheme: light;
+    }
+
+    html.dark {
+        color-scheme: dark;
+    }
+
+    body {
+        background-color: var(--color-background);
+        color: var(--color-foreground);
+        font-size: var(--text-body);
+        line-height: var(--text-body--line-height);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /*
+    | Headings take the theme's display face without every heading in the application
+    | having to ask for it, which is what lets a theme change its lettering by
+    | redeclaring one variable.
+    */
+    h1,
+    h2,
+    h3 {
+        font-family: var(--cadence-font-display);
+    }
+
+    /*
+    | Tailwind's reset leaves buttons on the default arrow, so anything that submits or
+    | toggles looked unclickable. Restored here once rather than per component.
+    */
+    button:not(:disabled),
+    [role='button']:not([aria-disabled='true']),
+    summary {
+        cursor: pointer;
+    }
+
+    ::selection {
+        background-color: var(--color-primary-soft);
+        color: var(--color-primary-soft-foreground);
+    }
+
+    [hidden],
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+/*
+| Shared interaction utilities. Keeping focus and form-control styling here is what
+| makes every button, input and select behave identically across the application.
+*/
+@utility focus-ring {
+    &:focus-visible {
+        outline: 2px solid var(--color-ring);
+        outline-offset: 2px;
+    }
+}
+
+@utility btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    border-radius: var(--radius-control);
+    font-weight: 500;
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-duration: var(--default-transition-duration);
+
+    &:focus-visible {
+        outline: 2px solid var(--color-ring);
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        pointer-events: none;
+        opacity: 0.6;
+    }
+}
+
+@utility btn-md {
+    height: var(--spacing-control);
+    padding-inline: 0.875rem;
+    font-size: var(--text-body);
+}
+
+@utility btn-sm {
+    height: var(--spacing-control-sm);
+    padding-inline: 0.75rem;
+    font-size: var(--text-meta);
+}
+
+@utility btn-icon {
+    height: var(--spacing-control-sm);
+    width: var(--spacing-control-sm);
+}
+
+@utility btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+
+    &:hover {
+        background-color: var(--color-primary-hover);
+    }
+}
+
+@utility btn-secondary {
+    border: 1px solid var(--color-border-strong);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+
+    &:hover {
+        border-color: var(--color-foreground-subtle);
+        background-color: var(--color-surface-hover);
+    }
+}
+
+@utility btn-danger {
+    background-color: var(--color-danger);
+    color: var(--color-danger-foreground);
+
+    &:hover {
+        background-color: var(--color-danger-hover);
+    }
+}
+
+@utility btn-ghost {
+    color: var(--color-foreground-muted);
+
+    &:hover {
+        background-color: var(--color-surface-muted);
+        color: var(--color-foreground);
+    }
+}
+
+/*
+| The rust tick. One short vertical bar in the primary colour, set against the start
+| of a heading or a navigation entry. It is the product's only ornament, and it always
+| means the same thing: this is the thing you are looking at.
+*/
+@utility tick {
+    display: inline-block;
+    height: 0.875rem;
+    width: 3px;
+    flex-shrink: 0;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-primary);
+}
+
+/*
+| Navigation entries. The chrome around the page is the sunken surface, so the current
+| page is drawn by lifting it onto the ordinary card surface — a raised tab — rather
+| than by tinting it. The tick reaches out to sit flush against the sidebar edge.
+*/
+@utility nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: var(--radius-control);
+    padding-inline: 0.625rem;
+    padding-block: 0.5rem;
+    color: var(--color-foreground-muted);
+    font-size: var(--text-body);
+    transition-property: color, background-color;
+    transition-duration: var(--default-transition-duration);
+
+    &:hover {
+        background-color: var(--color-surface-hover);
+        color: var(--color-foreground);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-ring);
+        outline-offset: 2px;
+    }
+}
+
+@utility nav-link-active {
+    background-color: var(--color-primary-soft);
+    color: var(--color-primary-soft-foreground);
+    font-weight: 500;
+
+    &:hover {
+        background-color: var(--color-primary-soft);
+        color: var(--color-primary-soft-foreground);
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -0.75rem;
+        height: 1.125rem;
+        width: 3px;
+        transform: translateY(-50%);
+        border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+        background-color: var(--color-primary);
+    }
+}
+
+/*
+| Status chips. Square-cut and outlined rather than filled pills, so a row of them
+| reads as a column of values instead of a row of buttons.
+*/
+@utility badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    white-space: nowrap;
+    border-radius: var(--radius-control);
+    border: 1px solid transparent;
+    padding-inline: 0.5rem;
+    padding-block: 0.125rem;
+    font-size: var(--text-meta);
+    font-weight: 500;
+}
+
+/* Figures that sit in a column and must line up digit for digit. */
+@utility numeric {
+    font-variant-numeric: tabular-nums;
+}
+
+/*
+| The account button in the top bar: a pill wide enough for an avatar, a name and a
+| chevron, rather than the fixed square an icon button is.
+*/
+@utility user-menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: var(--spacing-control);
+    padding-inline: 0.25rem 0.625rem;
+    border-radius: var(--radius-control);
+    color: var(--color-foreground);
+    font-size: var(--text-body);
+    font-weight: 500;
+    transition-property: color, background-color;
+    transition-duration: var(--default-transition-duration);
+
+    &:hover {
+        background-color: var(--color-surface-muted);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-ring);
+        outline-offset: 2px;
+    }
+}
+
+/*
+| Prose rendered from a markdown document. Written here rather than as classes on the
+| output, because the HTML comes from a file and carries no classes of its own.
+*/
+@utility markdown {
+    color: var(--color-foreground-muted);
+    font-size: var(--text-body);
+    line-height: 1.65;
+
+    & > * + * {
+        margin-top: 1rem;
+    }
+
+    & h3 {
+        margin-top: 1.75rem;
+        color: var(--color-foreground);
+        font-size: var(--text-section-title);
+        font-weight: 600;
+    }
+
+    & h4 {
+        margin-top: 1.5rem;
+        color: var(--color-foreground);
+        font-size: var(--text-body);
+        font-weight: 600;
+    }
+
+    & strong {
+        color: var(--color-foreground);
+        font-weight: 600;
+    }
+
+    & a {
+        color: var(--color-primary);
+        text-decoration-line: underline;
+        text-underline-offset: 2px;
+    }
+
+    & ul,
+    & ol {
+        padding-inline-start: 1.25rem;
+    }
+
+    & ul {
+        list-style-type: disc;
+    }
+
+    & ol {
+        list-style-type: decimal;
+    }
+
+    & li + li {
+        margin-top: 0.375rem;
+    }
+
+    & li::marker {
+        color: var(--color-foreground-subtle);
+    }
+
+    & code {
+        border-radius: 0.25rem;
+        background-color: var(--color-surface-muted);
+        padding: 0.1rem 0.3rem;
+        color: var(--color-foreground);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.8125rem;
+    }
+
+    & pre {
+        overflow-x: auto;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-control);
+        background-color: var(--color-surface-muted);
+        padding: 0.75rem 1rem;
+    }
+
+    & pre code {
+        background-color: transparent;
+        padding: 0;
+    }
+
+    & blockquote {
+        border-inline-start: 2px solid var(--color-border-strong);
+        padding-inline-start: 1rem;
+        font-style: italic;
+    }
+
+    & hr {
+        border-color: var(--color-border);
+    }
+
+    & table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: start;
+    }
+
+    & th,
+    & td {
+        border-bottom: 1px solid var(--color-border);
+        padding: 0.5rem 0.75rem;
+    }
+
+    & th {
+        color: var(--color-foreground);
+        font-weight: 600;
+    }
+}
+
+/*
+| The focus indicator for rows inside a panel that clips its content, where an outset
+| ring would be cut off.
+*/
+@utility focus-ring-inset {
+    &:focus-visible {
+        outline: 2px solid var(--color-ring);
+        outline-offset: -2px;
+    }
+}
+
+/*
+| A file input is two things: a button that opens the picker and a label saying what is
+| chosen. Boxing the pair inside a `form-control` made them read as one sentence, so the
+| box is dropped and the browser's own button is dressed as a secondary button instead —
+| which is what tells the reader that only the left half is clickable.
+*/
+@utility form-file {
+    display: block;
+    width: 100%;
+    color: var(--color-foreground-muted);
+    font-size: var(--text-body);
+    line-height: var(--spacing-control);
+
+    /*
+    | Sized by its padding rather than by a fixed height, so the label sits in the middle
+    | of the button instead of being pushed down by the line height it inherits, and
+    | aligned on the middle of the line rather than on its baseline, so the button and
+    | the file name beside it read as one row.
+    */
+    &::file-selector-button {
+        margin-inline-end: 0.75rem;
+        border-radius: var(--radius-control);
+        border: 1px solid var(--color-border-strong);
+        background-color: var(--color-surface);
+        padding-inline: 0.75rem;
+        padding-block: 0.375rem;
+        vertical-align: middle;
+        color: var(--color-foreground);
+        font-family: inherit;
+        font-size: var(--text-meta);
+        font-weight: 500;
+        line-height: var(--text-meta--line-height);
+        cursor: pointer;
+        transition-property: color, background-color, border-color;
+        transition-duration: var(--default-transition-duration);
+    }
+
+    &::file-selector-button:hover {
+        border-color: var(--color-foreground-subtle);
+        background-color: var(--color-surface-hover);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-ring);
+        outline-offset: 2px;
+    }
+
+    &[aria-invalid='true']::file-selector-button {
+        border-color: var(--color-danger);
+        color: var(--color-danger);
+    }
+}
+
+@utility form-control {
+    display: block;
+    width: 100%;
+    min-height: var(--spacing-control);
+    border-radius: var(--radius-control);
+    border: 1px solid var(--color-border-strong);
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    padding-inline: 0.6875rem;
+    padding-block: 0.4375rem;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-duration: var(--default-transition-duration);
+
+    &::placeholder {
+        color: var(--color-foreground-subtle);
+    }
+
+    &:focus {
+        border-color: var(--color-ring);
+        outline: 2px solid var(--color-ring);
+        outline-offset: -1px;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        background-color: var(--color-surface-muted);
+        color: var(--color-foreground-muted);
+    }
+
+    /*
+    | The focus ring is rust, and rust is close enough to the danger red that a
+    | one-pixel red border would no longer read as louder than being focused. So an
+    | invalid field doubles its border instead of only recolouring it.
+    */
+    &[aria-invalid='true'] {
+        border-color: var(--color-danger);
+        box-shadow: inset 0 0 0 1px var(--color-danger);
+    }
 }

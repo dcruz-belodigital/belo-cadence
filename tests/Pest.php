@@ -1,50 +1,82 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Enums\PermissionName;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "pest()" function to bind different classes or traits.
-|
-*/
-
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+pest()->extend(TestCase::class)->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
-| Functions
+| Helpers
 |--------------------------------------------------------------------------
 |
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
+| Permissions are only ever granted through roles, so tests build a throwaway
+| role holding exactly the permissions the case is about. That keeps every
+| authorisation test honest about what it is really exercising.
 |
 */
 
-function something()
+/**
+ * @param  list<PermissionName|string>  $permissions
+ * @param  array<string, mixed>  $attributes
+ */
+function userWithPermissions(array $permissions, array $attributes = []): User
 {
-    // ..
+    $user = User::factory()->create($attributes);
+
+    $role = Role::create([
+        'name' => 'Test role '.Str::random(8),
+        'guard_name' => 'web',
+    ]);
+
+    foreach ($permissions as $permission) {
+        $role->givePermissionTo(Permission::findOrCreate(
+            $permission instanceof PermissionName ? $permission->value : $permission,
+            'web',
+        ));
+    }
+
+    $user->assignRole($role);
+
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+    return $user;
+}
+
+/**
+ * A user holding every permission the application declares.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function administrator(array $attributes = []): User
+{
+    return userWithPermissions(PermissionName::cases(), $attributes);
+}
+
+/**
+ * A user holding every permission except the ones given, for negative authorisation tests.
+ *
+ * @param  list<PermissionName>  $except
+ * @param  array<string, mixed>  $attributes
+ */
+function administratorWithout(array $except, array $attributes = []): User
+{
+    $permissions = array_values(array_filter(
+        PermissionName::cases(),
+        static fn (PermissionName $permission): bool => ! in_array($permission, $except, true),
+    ));
+
+    return userWithPermissions($permissions, $attributes);
 }
