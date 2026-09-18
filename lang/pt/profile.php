@@ -32,7 +32,7 @@ return [
     'hints' => [
         'email' => 'Peça a um administrador para alterar o seu endereço de email.',
         'theme' => 'Só você vê isto. Deixe por definir para seguir a aplicação, que está atualmente em :theme.',
-        'timezone' => 'Todas as datas e horas da aplicação são mostradas neste fuso horário.',
+        'timezone' => 'Todas as datas e horas da aplicação são mostradas, e introduzidas, neste fuso horário.',
     ],
 
     'theme_default' => 'Usar o tema da aplicação',

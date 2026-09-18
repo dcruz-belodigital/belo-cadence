@@ -28,7 +28,7 @@ return [
     'form' => [
         'optional' => 'Optional',
         'required' => '(required)',
-        'timezone_hint' => 'Times are shown and entered in your timezone (:timezone).',
+        'timezone_hint' => 'Dates and times are shown and entered in your timezone (:timezone).',
     ],
 
     'formats' => [

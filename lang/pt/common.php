@@ -28,7 +28,7 @@ return [
     'form' => [
         'optional' => 'Opcional',
         'required' => '(obrigatório)',
-        'timezone_hint' => 'As horas são mostradas e introduzidas no seu fuso horário (:timezone).',
+        'timezone_hint' => 'As datas e horas são mostradas e introduzidas no seu fuso horário (:timezone).',
     ],
 
     /*

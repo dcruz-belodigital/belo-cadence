@@ -24,6 +24,7 @@ final class AuditController extends Controller
 
         return view('admin.audit.index', [
             'filters' => $filters,
+            'viewerTimezone' => $viewerTimezone->current()->value,
             'audits' => Audit::query()
                 ->filtered($filters)
                 ->with('user')

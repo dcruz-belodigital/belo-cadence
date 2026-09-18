@@ -148,6 +148,31 @@ describe('reading the audit log', function (): void {
             ->assertDontSee('Older Actor');
     });
 
+    it('reads the typed date range as days in the reader timezone', function (): void {
+        // 01:00 UTC on 1 May is still 21:00 on 30 April in New York.
+        Audit::factory()->create([
+            'created_at' => CarbonImmutable::parse('2026-05-01 01:00', 'UTC'),
+            'user_id' => User::factory()->create(['name' => 'Boundary Actor']),
+        ]);
+
+        actingAs(administrator(['timezone' => 'America/New_York']))
+            ->get(route('admin.audit-log.index', ['from' => '2026-05-01']))
+            ->assertOk()
+            ->assertDontSee('Boundary Actor');
+
+        actingAs(administrator(['timezone' => 'UTC']))
+            ->get(route('admin.audit-log.index', ['from' => '2026-05-01']))
+            ->assertOk()
+            ->assertSee('Boundary Actor');
+    });
+
+    it('names the reader timezone under the date filters', function (): void {
+        actingAs(administrator(['timezone' => 'America/New_York']))
+            ->get(route('admin.audit-log.index'))
+            ->assertOk()
+            ->assertSee(__('common.form.timezone_hint', ['timezone' => 'America/New_York']));
+    });
+
     it('opens a single entry with its recorded values', function (): void {
         $audit = Audit::factory()->create([
             'action' => AuditAction::ClientUpdated,

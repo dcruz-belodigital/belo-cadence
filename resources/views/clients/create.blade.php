@@ -47,7 +47,7 @@
                         <x-form.field :name="$startsAtField"
                                       :error-key="$startsAtKey"
                                       :label="__('cadence.fields.starts_at')"
-                                      :hint="__('cadence.hints.starts_at', ['timezone' => $viewerTimezone])"
+                                      :hint="__('common.form.timezone_hint', ['timezone' => $viewerTimezone])"
                                       required>
                             <x-form.input :name="$startsAtField"
                                           :id="'schedules-'.$index.'-starts-at'"

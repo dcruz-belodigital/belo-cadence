@@ -32,7 +32,7 @@ return [
     'hints' => [
         'email' => 'Ask an administrator to change your email address.',
         'theme' => 'Only you see this. Leave it unset to follow the application, which is currently :theme.',
-        'timezone' => 'All dates and times in the application are shown in this timezone.',
+        'timezone' => 'All dates and times in the application are shown, and entered, in this timezone.',
     ],
 
     'theme_default' => 'Use the application theme',

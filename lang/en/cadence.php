@@ -69,7 +69,6 @@ return [
         'target' => 'A client schedule sends to that client and is tracked under them. A recipient list sends to the addresses you give it.',
         'frequency' => 'A one-time notification is sent once and then closes itself.',
         'is_enabled' => 'A disabled schedule keeps its settings but sends nothing.',
-        'starts_at' => 'Times are shown and entered in your timezone (:timezone).',
         'starts_at_anchor' => 'This date and time is the anchor of the recurrence. A monthly schedule anchored on the 31st falls back to the last day of shorter months.',
         'template' => 'Templates are part of the application and cannot be edited here.',
     ],

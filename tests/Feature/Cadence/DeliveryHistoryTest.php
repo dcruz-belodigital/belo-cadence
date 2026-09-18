@@ -111,6 +111,31 @@ describe('the history table', function (): void {
             ->assertSee('Within range')
             ->assertDontSee('Outside range');
     });
+
+    it('reads the typed date range as days in the reader timezone', function (): void {
+        // 01:00 UTC on 1 May is still 21:00 on 30 April in New York.
+        NotificationDelivery::factory()->create([
+            'subject' => 'On the boundary',
+            'scheduled_for' => CarbonImmutable::parse('2026-05-01 01:00', 'UTC'),
+        ]);
+
+        actingAs(administrator(['timezone' => 'America/New_York']))
+            ->get(route('cadence.deliveries.index', ['from' => '2026-05-01']))
+            ->assertOk()
+            ->assertDontSee('On the boundary');
+
+        actingAs(administrator(['timezone' => 'UTC']))
+            ->get(route('cadence.deliveries.index', ['from' => '2026-05-01']))
+            ->assertOk()
+            ->assertSee('On the boundary');
+    });
+
+    it('names the reader timezone under the date filters', function (): void {
+        actingAs(administrator(['timezone' => 'America/New_York']))
+            ->get(route('cadence.deliveries.index'))
+            ->assertOk()
+            ->assertSee(__('common.form.timezone_hint', ['timezone' => 'America/New_York']));
+    });
 });
 
 describe('a single delivery', function (): void {

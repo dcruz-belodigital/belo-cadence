@@ -139,7 +139,7 @@
 
         <x-form.field name="starts_at"
                       :label="__('cadence.fields.starts_at')"
-                      :hint="__('cadence.hints.starts_at', ['timezone' => $viewerTimezone])"
+                      :hint="__('common.form.timezone_hint', ['timezone' => $viewerTimezone])"
                       required>
             <x-form.input name="starts_at" type="datetime-local" :value="old('starts_at', $startsAtValue)" required />
         </x-form.field>

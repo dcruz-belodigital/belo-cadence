@@ -51,11 +51,15 @@
                            :placeholder="__('common.placeholders.all')" />
         </x-form.field>
 
-        <x-form.field name="from" :label="__('deliveries.filters.from')">
+        <x-form.field name="from"
+                      :label="__('deliveries.filters.from')"
+                      :hint="__('common.form.timezone_hint', ['timezone' => $viewerTimezone])">
             <x-form.input name="from" type="date" :value="$filters->fromDate" />
         </x-form.field>
 
-        <x-form.field name="to" :label="__('deliveries.filters.to')">
+        <x-form.field name="to"
+                      :label="__('deliveries.filters.to')"
+                      :hint="__('common.form.timezone_hint', ['timezone' => $viewerTimezone])">
             <x-form.input name="to" type="date" :value="$filters->toDate" />
         </x-form.field>
     </x-filter-bar>

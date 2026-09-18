@@ -35,6 +35,15 @@ it('gives a rejected date back to the person in the form, in their own timezone'
     expect($form->getContent())->toContain('value="'.$typed.'"');
 });
 
+it('names the reader timezone under the first send field', function (): void {
+    $client = Client::factory()->create();
+
+    actingAs(administrator(['timezone' => 'Asia/Tokyo']))
+        ->get(route('clients.schedules.create', $client))
+        ->assertOk()
+        ->assertSee(__('common.form.timezone_hint', ['timezone' => 'Asia/Tokyo']));
+});
+
 it('shows an existing anchor in the reader timezone when editing', function (): void {
     // 23:30 UTC is 08:30 the next morning in Tokyo.
     $schedule = NotificationSchedule::factory()

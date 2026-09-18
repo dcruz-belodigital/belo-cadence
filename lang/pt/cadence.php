@@ -69,7 +69,6 @@ return [
         'target' => 'Um agendamento de cliente envia para esse cliente e fica registado nele. Uma lista de destinatários envia para os endereços que indicar.',
         'frequency' => 'Uma notificação de uma só vez é enviada uma vez e depois fecha-se sozinha.',
         'is_enabled' => 'Um agendamento desativado mantém as suas definições mas não envia nada.',
-        'starts_at' => 'As horas são mostradas e introduzidas no seu fuso horário (:timezone).',
         'starts_at_anchor' => 'Esta data e hora são a âncora da recorrência. Um agendamento mensal ancorado no dia 31 recua para o último dia dos meses mais curtos.',
         'template' => 'Os modelos fazem parte da aplicação e não podem ser editados aqui.',
     ],

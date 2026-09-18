@@ -25,6 +25,7 @@ final class NotificationDeliveryController extends Controller
 
         return view('cadence.deliveries.index', [
             'filters' => $filters,
+            'viewerTimezone' => $viewerTimezone->current()->value,
             'deliveries' => NotificationDelivery::query()
                 ->filtered($filters)
                 ->with('client')
