@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationFrequency;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationFrequency;
 use App\Models\DefaultClientNotification;
 use Illuminate\Database\Seeder;
 
@@ -17,9 +17,9 @@ final class DemoDefaultClientNotificationSeeder extends Seeder
     public function run(): void
     {
         $defaults = [
-            [ClientEmailTemplate::MonthlyReminder, ClientNotificationFrequency::Monthly, true],
-            [ClientEmailTemplate::AnnualReminder, ClientNotificationFrequency::Yearly, true],
-            [ClientEmailTemplate::GeneralReminder, ClientNotificationFrequency::OneTime, false],
+            [EmailTemplate::MonthlyReminder, NotificationFrequency::Monthly, true],
+            [EmailTemplate::AnnualReminder, NotificationFrequency::Yearly, true],
+            [EmailTemplate::GeneralReminder, NotificationFrequency::OneTime, false],
         ];
 
         foreach ($defaults as [$template, $frequency, $enabled]) {

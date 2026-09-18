@@ -4,6 +4,59 @@ Todas as versões do Belo Cadence, da mais recente para a mais antiga. Para cada
 acrescente um título `##` com a data da versão e agrupe as entradas em **Novidades**,
 **Alterações** ou **Correções**.
 
+## 21 de agosto de 2026
+
+### Novidades
+
+- **As notificações já não têm de ser sobre um cliente.** Um agendamento passa a enviar ou
+  para um cliente, como antes, ou para uma **lista de destinatários**: dá um nome à
+  notificação e indica os endereços para onde vai, e ela não pertence a nenhum cliente. É
+  assim que se agenda tudo o que não é sobre um cliente — um resumo interno, uma nota a um
+  fornecedor, um lembrete para a sua equipa. Crie qualquer um dos dois em Cadence →
+  Agendamentos de notificação → Nova notificação, ou um de cliente na página do próprio
+  cliente. Um agendamento nunca muda o que envia.
+- **Os modelos passam a dizer para quem foram escritos.** Cada modelo é para um cliente,
+  para uma lista de destinatários, ou para qualquer agendamento, e um formulário só oferece
+  os que servem para o que está a enviar — por isso um cliente nunca recebe texto escrito
+  para uma lista. Chegam com isto dois modelos novos para listas: **Atualização de estado**
+  e **Ação necessária**.
+- **Um modelo Em branco**, utilizável por ambos os tipos, em que escreve o assunto e a
+  mensagem no próprio agendamento. É texto simples, enviado exatamente como o escrever,
+  dentro da moldura normal do email. O texto de todos os outros modelos continua na
+  aplicação, revisto como qualquer outra alteração.
+- **Envie qualquer notificação a qualquer pessoa, a qualquer momento.** O Enviar agora de
+  qualquer agendamento envia de imediato a mensagem desse agendamento para os seus
+  destinatários, sem mexer na recorrência. O formulário de Enviar agora passa também a
+  aceitar um nome e endereços escritos na hora, por isso um aviso pontual não precisa de
+  nenhum agendamento. Ambos ficam registados como envios manuais, com o nome de quem os
+  enviou.
+- **Um endereço, um envio.** Uma notificação que vai para cinco pessoas passa a ser cinco
+  entradas no histórico de envios em vez de uma, para que um único endereço rejeitado
+  apareça sozinho em vez de se esconder atrás dos quatro que chegaram. Cada envio registra
+  para onde foi — um cliente, ou o nome que a lista tinha na altura — guardado como tudo o
+  resto.
+
+### Alterações
+
+- **"Notificação a cliente" passa a ser apenas "notificação"** em toda a aplicação, porque
+  uma notificação já não tem de envolver um cliente. Os agendamentos, o histórico de
+  envios, as suas permissões e o registo de auditoria acompanham. As entradas de auditoria,
+  as permissões atribuídas e o histórico existentes são migrados, por isso nada se perde e
+  nenhum perfil perde acessos — mas uma permissão chamada `client-notifications.*` em
+  qualquer integração externa passa a ser `notifications.*`.
+- **Um filtro Envia para** na lista de agendamentos e nos Próximos, para ver só
+  agendamentos de cliente ou só listas de destinatários. As duas exportações levam a
+  distinção.
+- **A lista de agendamentos e os Próximos passam a nomear a notificação** e não apenas o
+  seu cliente, para que uma lista de destinatários se leia corretamente.
+
+- **Um filtro de origem no histórico de envios**, para ver só os envios que alguém pediu
+  ou só os do agendador. As duas exportações levam a distinção.
+- **O envio manual tem uma permissão própria**, por isso pode ser concedido separadamente
+  da gestão de agendamentos. Só são oferecidos clientes ativos: marcar um cliente como
+  inativo continua a significar "deixem de lhe enviar email", e isso também vale para o
+  Enviar agora.
+
 ## 14 de agosto de 2026
 
 ### Novidades
@@ -39,7 +92,7 @@ acrescente um título `##` com a data da versão e agrupe as entradas em **Novid
   e o agendamento passa à ocorrência seguinte.
 - **Modelos de email como código.** O texto de um email a clientes é revisto como
   qualquer outra alteração, em vez de ser editado no navegador, e cada modelo pode ser
-  lido exatamente como um cliente o recebe em Cadência → Modelos de email.
+  lido exatamente como um cliente o recebe em Cadence → Modelos de email.
 - **Notificações predefinidas.** Os agendamentos que a sua equipa costuma aplicar a um
   novo cliente são oferecidos durante a criação. Aplicar uma predefinição cria uma cópia,
   por isso alterar a lista mais tarde nunca altera um agendamento que já exista.

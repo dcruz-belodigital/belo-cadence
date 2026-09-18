@@ -7,8 +7,8 @@ use App\Enums\ClientStatus;
 use App\Enums\PermissionName;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -111,7 +111,7 @@ describe('client exports', function (): void {
 
 describe('schedule exports', function (): void {
     it('writes raw and table shapes', function (): void {
-        $schedule = ClientNotificationSchedule::factory()
+        $schedule = NotificationSchedule::factory()
             ->for(Client::factory()->create(['name' => 'Northwind Studio']))
             ->create();
 
@@ -121,23 +121,23 @@ describe('schedule exports', function (): void {
             ->get(route('cadence.schedules.export', ['mode' => 'raw']))
             ->assertOk());
 
-        expect($raw[0])->toContain('client_id', 'template', 'frequency', 'next_send_at')
-            ->and($raw[1][2])->toBe($schedule->template->value);
+        expect($raw[0])->toContain('client_id', 'name', 'recipients', 'template', 'frequency', 'next_send_at')
+            ->and($raw[1][array_search('template', $raw[0], true)])->toBe($schedule->template->value);
 
         $table = csvRows(actingAs($administrator)
             ->get(route('cadence.schedules.export', ['mode' => 'table']))
             ->assertOk());
 
-        expect($table[0][0])->toBe(__('cadence.columns.client'))
+        expect($table[0][0])->toBe(__('cadence.columns.name'))
             ->and($table[1][0])->toBe('Northwind Studio');
     });
 
     it('exports only scheduled rows when it comes from the upcoming overview', function (): void {
-        ClientNotificationSchedule::factory()
+        NotificationSchedule::factory()
             ->for(Client::factory()->create(['name' => 'Scheduled Client']))
             ->create();
 
-        ClientNotificationSchedule::factory()
+        NotificationSchedule::factory()
             ->for(Client::factory()->create(['name' => 'Disabled Client']))
             ->disabled()
             ->create();
@@ -151,7 +151,7 @@ describe('schedule exports', function (): void {
     });
 
     it('offers an export link from the upcoming overview that keeps working', function (): void {
-        ClientNotificationSchedule::factory()->for(Client::factory())->create();
+        NotificationSchedule::factory()->for(Client::factory())->create();
 
         $response = actingAs(administrator())
             ->get(route('cadence.upcoming', ['range' => 'next_30_days']))
@@ -163,7 +163,7 @@ describe('schedule exports', function (): void {
     });
 
     it('refuses a user without the export permission', function (): void {
-        actingAs(administratorWithout([PermissionName::ClientNotificationsExport]))
+        actingAs(administratorWithout([PermissionName::NotificationsExport]))
             ->get(route('cadence.schedules.export'))
             ->assertForbidden();
     });
@@ -171,7 +171,7 @@ describe('schedule exports', function (): void {
 
 describe('delivery exports', function (): void {
     it('writes raw and table shapes without the message body', function (): void {
-        ClientNotificationDelivery::factory()->failed()->create(['subject' => 'Annual reminder']);
+        NotificationDelivery::factory()->failed()->create(['subject' => 'Annual reminder']);
 
         $administrator = administrator();
 
@@ -179,7 +179,7 @@ describe('delivery exports', function (): void {
             ->get(route('cadence.deliveries.export', ['mode' => 'raw']))
             ->assertOk());
 
-        expect($raw[0])->toContain('status', 'failure_message', 'scheduled_for')
+        expect($raw[0])->toContain('status', 'failure_message', 'scheduled_for', 'is_manual', 'triggered_by_user_id')
             ->and($raw[0])->not->toContain('body_html');
 
         $table = csvRows(actingAs($administrator)
@@ -189,9 +189,35 @@ describe('delivery exports', function (): void {
         expect($table[1])->toContain('Annual reminder');
     });
 
+    it('names where each delivery came from', function (): void {
+        NotificationDelivery::factory()->manual()->create(['subject' => 'Sent by hand']);
+        NotificationDelivery::factory()->create(['subject' => 'Sent by the scheduler']);
+
+        $rows = csvRows(actingAs(administrator())
+            ->get(route('cadence.deliveries.export', ['mode' => 'table']))
+            ->assertOk());
+
+        expect($rows[0])->toContain(__('deliveries.columns.source'))
+            ->and(collect($rows)->flatten()->all())
+            ->toContain(__('enums.notification_delivery_source.manual'))
+            ->toContain(__('enums.notification_delivery_source.scheduled'));
+    });
+
+    it('exports only manual sends when history is filtered to them', function (): void {
+        NotificationDelivery::factory()->manual()->create(['subject' => 'Sent by hand']);
+        NotificationDelivery::factory()->create(['subject' => 'Sent by the scheduler']);
+
+        $rows = csvRows(actingAs(administrator())
+            ->get(route('cadence.deliveries.export', ['mode' => 'table', 'source' => 'manual']))
+            ->assertOk());
+
+        expect($rows)->toHaveCount(2)
+            ->and($rows[1])->toContain('Sent by hand');
+    });
+
     it('respects the status filter', function (): void {
-        ClientNotificationDelivery::factory()->failed()->create(['subject' => 'Failed one']);
-        ClientNotificationDelivery::factory()->sent()->create(['subject' => 'Sent one']);
+        NotificationDelivery::factory()->failed()->create(['subject' => 'Failed one']);
+        NotificationDelivery::factory()->sent()->create(['subject' => 'Sent one']);
 
         $rows = csvRows(actingAs(administrator())
             ->get(route('cadence.deliveries.export', ['mode' => 'table', 'status' => 'failed']))

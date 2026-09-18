@@ -36,3 +36,8 @@ Every validation message is rendered by `x-form.error` and nothing else: a plain
 Because nothing repeats the whole bag any more, every rule key needs a home or its failure is invisible — the form just returns unchanged. Keys belonging to no single field (a whole array such as `entries`/`mapping`/`schedules`, or rows a script renders client side) are covered by passing a list to `x-form.error`, which understands wildcards: `:name="['entries', 'entries.*']"`. A checkbox whose submitted name differs from its message key needs `error-key` (`schedules[0][is_enabled]` submits, `schedules.0.is_enabled` fails).
 
 `tests/Feature/FormErrorTest.php` enforces this: it renders every form page with a message under every rule key of the Form Request behind it, and fails if one has nowhere to appear. Add the keys there when you add a rule.
+
+## A card clips its contents, so anything that pops out must grow inward
+`x-card` carries `overflow-hidden` so the header tint, flush rows and footer follow the radius. That also clips any hover label, tooltip or menu drawn inside it — there is no z-index that escapes it.
+
+So position a popout against the edge it hangs off rather than centring it on its trigger: `field-action-label` uses `inset-inline-end: 0` because the action sits at the trailing edge of a field against the card's padding, and a centred label was cut in half. Do not "fix" a clipped popout by removing the card's `overflow-hidden`.

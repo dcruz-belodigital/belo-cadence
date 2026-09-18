@@ -66,6 +66,12 @@ return [
         'inactive_notice' => 'Esta conta está desativada e não pode iniciar sessão.',
     ],
 
+    'activate' => [
+        'title' => 'Ativar esta conta?',
+        'message' => 'A pessoa volta a conseguir iniciar sessão, com os perfis de acesso que já tem.',
+        'confirm' => 'Ativar',
+    ],
+
     'deactivate' => [
         'title' => 'Desativar esta conta?',
         'message' => 'A pessoa deixa de conseguir iniciar sessão. Nada do que fez é removido e a conta pode ser reativada mais tarde.',

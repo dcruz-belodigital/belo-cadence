@@ -49,8 +49,9 @@
                             @foreach ($upcoming as $schedule)
                                 <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                                     <div class="min-w-0">
-                                        <a href="{{ route('clients.show', $schedule->client) }}" class="focus-ring block truncate rounded-control text-label transition hover:text-primary">
-                                            {{ $schedule->client->name }}
+                                        <a href="{{ $schedule->client !== null ? route('clients.show', $schedule->client) : route('cadence.schedules.show', $schedule) }}"
+                                           class="focus-ring block truncate rounded-control text-label transition hover:text-primary">
+                                            {{ $schedule->displayName() }}
                                         </a>
                                         <p class="truncate text-meta text-foreground-muted">{{ $schedule->template->label() }}</p>
                                     </div>
@@ -83,7 +84,7 @@
                                 <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                                     <div class="min-w-0">
                                         <a href="{{ route('cadence.deliveries.show', $delivery) }}" class="focus-ring block truncate rounded-control text-label transition hover:text-primary">
-                                            {{ $delivery->client->name }}
+                                            {{ $delivery->target_name ?? $delivery->client?->name }}
                                         </a>
                                         <p class="truncate text-meta text-foreground-muted">{{ $delivery->subject }}</p>
                                     </div>
@@ -108,7 +109,7 @@
                                 <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                                     <div class="min-w-0">
                                         <a href="{{ route('cadence.deliveries.show', $delivery) }}" class="focus-ring block truncate rounded-control text-label transition hover:text-primary">
-                                            {{ $delivery->client->name }}
+                                            {{ $delivery->target_name ?? $delivery->client?->name }}
                                         </a>
                                         <p class="truncate text-meta text-foreground-muted">{{ $delivery->subject }}</p>
                                     </div>

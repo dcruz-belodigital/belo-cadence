@@ -16,13 +16,15 @@ use App\Http\Controllers\Admin\UserImportController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Cadence\ClientEmailTemplateController;
-use App\Http\Controllers\Cadence\ClientNotificationDeliveryController;
-use App\Http\Controllers\Cadence\ClientNotificationDeliveryExportController;
-use App\Http\Controllers\Cadence\ClientNotificationScheduleController;
-use App\Http\Controllers\Cadence\ClientNotificationScheduleExportController;
-use App\Http\Controllers\Cadence\DisableClientNotificationScheduleController;
-use App\Http\Controllers\Cadence\EnableClientNotificationScheduleController;
+use App\Http\Controllers\Cadence\DisableNotificationScheduleController;
+use App\Http\Controllers\Cadence\EmailTemplateController;
+use App\Http\Controllers\Cadence\EnableNotificationScheduleController;
+use App\Http\Controllers\Cadence\ManualNotificationController;
+use App\Http\Controllers\Cadence\NotificationDeliveryController;
+use App\Http\Controllers\Cadence\NotificationDeliveryExportController;
+use App\Http\Controllers\Cadence\NotificationScheduleController;
+use App\Http\Controllers\Cadence\NotificationScheduleExportController;
+use App\Http\Controllers\Cadence\SendNotificationScheduleController;
 use App\Http\Controllers\Cadence\UpcomingNotificationController;
 use App\Http\Controllers\Clients\ClientController;
 use App\Http\Controllers\Clients\ClientExportController;
@@ -80,29 +82,39 @@ Route::middleware(['auth', 'active'])->group(function (): void {
     Route::resource('clients', ClientController::class)->withTrashed(['show']);
     Route::post('clients/{client}/restore', RestoreClientController::class)->withTrashed()->name('clients.restore');
 
-    // A schedule is always created in the context of one client.
-    Route::get('clients/{client}/schedules/create', [ClientNotificationScheduleController::class, 'create'])
+    // Creating a schedule in the context of one client, which fixes it to that client.
+    Route::get('clients/{client}/schedules/create', [NotificationScheduleController::class, 'createForClient'])
         ->name('clients.schedules.create');
-    Route::post('clients/{client}/schedules', [ClientNotificationScheduleController::class, 'store'])
+    Route::post('clients/{client}/schedules', [NotificationScheduleController::class, 'storeForClient'])
         ->name('clients.schedules.store');
 
     Route::prefix('cadence')->name('cadence.')->group(function (): void {
         Route::get('upcoming', UpcomingNotificationController::class)->name('upcoming');
 
-        Route::get('schedules/export', ClientNotificationScheduleExportController::class)->name('schedules.export');
-        Route::get('schedules', [ClientNotificationScheduleController::class, 'index'])->name('schedules.index');
-        Route::get('schedules/{schedule}', [ClientNotificationScheduleController::class, 'show'])->name('schedules.show');
-        Route::get('schedules/{schedule}/edit', [ClientNotificationScheduleController::class, 'edit'])->name('schedules.edit');
-        Route::put('schedules/{schedule}', [ClientNotificationScheduleController::class, 'update'])->name('schedules.update');
-        Route::delete('schedules/{schedule}', [ClientNotificationScheduleController::class, 'destroy'])->name('schedules.destroy');
-        Route::post('schedules/{schedule}/enable', EnableClientNotificationScheduleController::class)->name('schedules.enable');
-        Route::post('schedules/{schedule}/disable', DisableClientNotificationScheduleController::class)->name('schedules.disable');
+        Route::get('schedules/export', NotificationScheduleExportController::class)->name('schedules.export');
+        // A schedule may also be created without a client, for a named list of addresses.
+        Route::get('schedules/create', [NotificationScheduleController::class, 'create'])->name('schedules.create');
+        Route::post('schedules', [NotificationScheduleController::class, 'store'])->name('schedules.store');
+        Route::get('schedules', [NotificationScheduleController::class, 'index'])->name('schedules.index');
+        Route::get('schedules/{schedule}', [NotificationScheduleController::class, 'show'])->name('schedules.show');
+        Route::get('schedules/{schedule}/edit', [NotificationScheduleController::class, 'edit'])->name('schedules.edit');
+        Route::put('schedules/{schedule}', [NotificationScheduleController::class, 'update'])->name('schedules.update');
+        Route::delete('schedules/{schedule}', [NotificationScheduleController::class, 'destroy'])->name('schedules.destroy');
+        Route::post('schedules/{schedule}/enable', EnableNotificationScheduleController::class)->name('schedules.enable');
+        Route::post('schedules/{schedule}/disable', DisableNotificationScheduleController::class)->name('schedules.disable');
+        // Sends the schedule's own message now, leaving its recurrence untouched.
+        Route::post('schedules/{schedule}/send', SendNotificationScheduleController::class)->name('schedules.send');
 
-        Route::get('email-templates', ClientEmailTemplateController::class)->name('email-templates');
+        Route::get('email-templates', EmailTemplateController::class)->name('email-templates');
 
-        Route::get('deliveries/export', ClientNotificationDeliveryExportController::class)->name('deliveries.export');
-        Route::get('deliveries', [ClientNotificationDeliveryController::class, 'index'])->name('deliveries.index');
-        Route::get('deliveries/{delivery}', [ClientNotificationDeliveryController::class, 'show'])->name('deliveries.show');
+        Route::get('deliveries/export', NotificationDeliveryExportController::class)->name('deliveries.export');
+        // Sending by hand: declared before the delivery routes so "send" is not read as an
+        // identifier. It creates delivery history rather than editing it, which is why
+        // history itself still has no store, update or destroy.
+        Route::get('deliveries/send', [ManualNotificationController::class, 'create'])->name('deliveries.send');
+        Route::post('deliveries/send', [ManualNotificationController::class, 'store'])->name('deliveries.send.store');
+        Route::get('deliveries', [NotificationDeliveryController::class, 'index'])->name('deliveries.index');
+        Route::get('deliveries/{delivery}', [NotificationDeliveryController::class, 'show'])->name('deliveries.show');
     });
 
     Route::get('notifications', NotificationController::class)->name('notifications.index');

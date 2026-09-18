@@ -33,10 +33,10 @@
                     <tr>
                         <td style="padding:16px 28px 24px 28px; border-top:1px solid #e4e6eb;">
                             <p style="margin:0; font-size:12px; line-height:18px; color:#6b7280;">
-                                {{ __('mail.client_notifications.footer', ['application' => $data->applicationName]) }}
+                                {{ __('mail.notifications.footer', ['application' => $data->applicationName]) }}
                             </p>
                             <p style="margin:8px 0 0 0; font-size:12px; line-height:18px; color:#9ca3af;">
-                                {{ __('mail.client_notifications.scheduled_for', ['date' => $data->scheduledForLabel]) }}
+                                {{ __('mail.notifications.scheduled_for', ['date' => $data->scheduledForLabel]) }}
                             </p>
                         </td>
                     </tr>

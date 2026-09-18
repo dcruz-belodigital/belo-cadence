@@ -14,7 +14,7 @@ return [
     'groups' => [
         'application-settings' => 'Definições da aplicação',
         'audit-log' => 'Registo de auditoria',
-        'client-notifications' => 'Agendamentos de notificação',
+        'notifications' => 'Agendamentos de notificação',
         'clients' => 'Clientes',
         'dashboard' => 'Painel',
         'default-client-notifications' => 'Notificações predefinidas',
@@ -39,12 +39,13 @@ return [
             'export' => 'Exportar clientes para CSV',
         ],
 
-        'client-notifications' => [
+        'notifications' => [
             'viewAny' => 'Listar agendamentos de notificação',
             'view' => 'Ver um agendamento de notificação',
             'create' => 'Criar agendamentos de notificação',
             'update' => 'Atualizar, ativar e desativar agendamentos',
             'delete' => 'Eliminar agendamentos de notificação',
+            'send' => 'Enviar um email manualmente',
             'export' => 'Exportar agendamentos de notificação para CSV',
         ],
 

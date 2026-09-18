@@ -1,6 +1,7 @@
 @php
-    use App\Enums\ClientEmailTemplate;
-    use App\Enums\ClientNotificationFrequency;
+    use App\Enums\EmailTemplate;
+    use App\Enums\NotificationFrequency;
+    use App\Enums\NotificationTarget;
     use App\Enums\NotificationTimeRange;
 
     $withRange ??= false;
@@ -11,16 +12,23 @@
         <x-form.input name="search" type="search" :value="$filters->search" :placeholder="__('common.placeholders.search')" />
     </x-form.field>
 
+    <x-form.field name="target" :label="__('cadence.filters.target')">
+        <x-form.select name="target"
+                       :options="collect(NotificationTarget::cases())->mapWithKeys(fn (NotificationTarget $target) => [$target->value => $target->label()])"
+                       :selected="$filters->target?->value"
+                       :placeholder="__('common.placeholders.all')" />
+    </x-form.field>
+
     <x-form.field name="template" :label="__('cadence.filters.template')">
         <x-form.select name="template"
-                       :options="collect(ClientEmailTemplate::cases())->mapWithKeys(fn (ClientEmailTemplate $template) => [$template->value => $template->label()])"
+                       :options="collect(EmailTemplate::cases())->mapWithKeys(fn (EmailTemplate $template) => [$template->value => $template->label()])"
                        :selected="$filters->template?->value"
                        :placeholder="__('common.placeholders.all')" />
     </x-form.field>
 
     <x-form.field name="frequency" :label="__('cadence.filters.frequency')">
         <x-form.select name="frequency"
-                       :options="collect(ClientNotificationFrequency::cases())->mapWithKeys(fn (ClientNotificationFrequency $frequency) => [$frequency->value => $frequency->label()])"
+                       :options="collect(NotificationFrequency::cases())->mapWithKeys(fn (NotificationFrequency $frequency) => [$frequency->value => $frequency->label()])"
                        :selected="$filters->frequency?->value"
                        :placeholder="__('common.placeholders.all')" />
     </x-form.field>

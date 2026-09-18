@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Console\Commands\ProcessDueClientNotificationsCommand;
+use App\Console\Commands\ProcessDueNotificationsCommand;
 use App\Console\Commands\PruneAbandonedImportFilesCommand;
 use Illuminate\Support\Facades\Schedule;
 
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Schedule;
 | at once; the unique index on (schedule, occurrence) is the second line of defence
 | behind it.
 */
-Schedule::command(ProcessDueClientNotificationsCommand::class)
+Schedule::command(ProcessDueNotificationsCommand::class)
     ->hourly()
     ->withoutOverlapping();
 

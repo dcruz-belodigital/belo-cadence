@@ -5,6 +5,7 @@
     'message',
     'confirm' => null,
     'variant' => 'danger',
+    'triggerAs' => 'button',
     'triggerVariant' => 'ghost',
     'triggerSize' => 'sm',
     'icon' => null,
@@ -12,13 +13,27 @@
 
 @php
     $dialogId = 'confirm-dialog-'.substr(md5($action.$title), 0, 10);
+
+    /*
+    | The same question asked from two places: a button of its own on a record's page,
+    | or a row in an `x-table.actions` menu. Only the trigger changes — a menu entry has
+    | to look like the entries around it, and `contents` keeps this wrapper out of the
+    | panel's layout while still holding the dialog's state.
+    */
+    $isMenuItem = $triggerAs === 'menu-item';
 @endphp
 
 {{-- One dialog for every irreversible-looking action, so confirmation always behaves the same. --}}
-<div x-data="{ open: false }" class="inline-flex">
-    <x-button type="button" :variant="$triggerVariant" :size="$triggerSize" :icon="$icon" x-on:click="open = true">
-        {{ $trigger }}
-    </x-button>
+<div x-data="{ open: false }" class="{{ $isMenuItem ? 'contents' : 'inline-flex' }}">
+    @if ($isMenuItem)
+        <x-dropdown.item type="button" :icon="$icon" :variant="$variant" x-on:click="open = true">
+            {{ $trigger }}
+        </x-dropdown.item>
+    @else
+        <x-button type="button" :variant="$triggerVariant" :size="$triggerSize" :icon="$icon" x-on:click="open = true">
+            {{ $trigger }}
+        </x-button>
+    @endif
 
     <template x-teleport="body">
         <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">

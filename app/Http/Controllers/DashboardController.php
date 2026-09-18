@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Enums\ClientNotificationDeliveryStatus;
+use App\Enums\NotificationDeliveryStatus;
 use App\Enums\PermissionName;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 use App\Support\ViewerTimezone;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
@@ -36,24 +36,24 @@ final class DashboardController extends Controller
         $startOfMonth = $now->startOfMonth()->setTimezone('UTC');
 
         $user = $request->user();
-        $canSeeSchedules = $user->can(PermissionName::ClientNotificationsViewAny->value);
+        $canSeeSchedules = $user->can(PermissionName::NotificationsViewAny->value);
         $canSeeDeliveries = $user->can(PermissionName::NotificationDeliveriesViewAny->value);
 
         return view('dashboard.index', [
             'dueToday' => $canSeeSchedules
-                ? ClientNotificationSchedule::query()->due($endOfToday)->count()
+                ? NotificationSchedule::query()->due($endOfToday)->count()
                 : null,
             'dueThisWeek' => $canSeeSchedules
-                ? ClientNotificationSchedule::query()->due($endOfWeek)->count()
+                ? NotificationSchedule::query()->due($endOfWeek)->count()
                 : null,
             'sentThisMonth' => $canSeeDeliveries
-                ? ClientNotificationDelivery::query()->sent()->where('sent_at', '>=', $startOfMonth)->count()
+                ? NotificationDelivery::query()->sent()->where('sent_at', '>=', $startOfMonth)->count()
                 : null,
             'failedThisMonth' => $canSeeDeliveries
-                ? ClientNotificationDelivery::query()->failed()->where('attempted_at', '>=', $startOfMonth)->count()
+                ? NotificationDelivery::query()->failed()->where('attempted_at', '>=', $startOfMonth)->count()
                 : null,
             'upcoming' => $canSeeSchedules
-                ? ClientNotificationSchedule::query()
+                ? NotificationSchedule::query()
                     ->where('is_enabled', true)
                     ->whereNotNull('next_send_at')
                     ->with('client')
@@ -62,7 +62,7 @@ final class DashboardController extends Controller
                     ->get()
                 : null,
             'recentFailures' => $canSeeDeliveries
-                ? ClientNotificationDelivery::query()
+                ? NotificationDelivery::query()
                     ->failed()
                     ->with('client')
                     ->latest('attempted_at')
@@ -70,8 +70,8 @@ final class DashboardController extends Controller
                     ->get()
                 : null,
             'recentDeliveries' => $canSeeDeliveries
-                ? ClientNotificationDelivery::query()
-                    ->where('status', ClientNotificationDeliveryStatus::Sent)
+                ? NotificationDelivery::query()
+                    ->where('status', NotificationDeliveryStatus::Sent)
                     ->with('client')
                     ->latest('sent_at')
                     ->limit(self::RECENT_LIMIT)

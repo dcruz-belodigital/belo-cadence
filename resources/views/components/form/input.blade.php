@@ -25,7 +25,7 @@
                id="{{ $id ?? $name }}"
                @error($name)
                    aria-invalid="true"
-                   aria-describedby="{{ $name }}-error"
+                   aria-describedby="{{ $id ?? $name }}-error"
                @enderror
                {{ $attributes->merge(['class' => 'form-control pr-11']) }}>
 
@@ -44,7 +44,7 @@
            id="{{ $id ?? $name }}"
            @error($name)
                aria-invalid="true"
-               aria-describedby="{{ $name }}-error"
+               aria-describedby="{{ $id ?? $name }}-error"
            @enderror
            {{ $attributes->merge(['class' => $class]) }}>
 @endif

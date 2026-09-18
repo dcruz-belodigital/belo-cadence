@@ -5,8 +5,8 @@ declare(strict_types=1);
 use App\Models\ApplicationSettings;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationSchedule;
 use App\Models\DefaultClientNotification;
+use App\Models\NotificationSchedule;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +27,7 @@ it('opens an audit entry for every kind of record it can refer to', function (Mo
 })->with([
     'client' => [fn (): Model => Client::factory()->create()],
     'archived client' => [fn (): Model => Client::factory()->archived()->create()],
-    'schedule' => [fn (): Model => ClientNotificationSchedule::factory()->for(Client::factory())->create()],
+    'schedule' => [fn (): Model => NotificationSchedule::factory()->for(Client::factory())->create()],
     'user' => [fn (): Model => User::factory()->create()],
     'role' => [fn (): Model => Role::factory()->create()],
     'application settings' => [function (): Model {

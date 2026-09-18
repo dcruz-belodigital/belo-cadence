@@ -1,0 +1,15 @@
+---
+paths:
+  - 'app/Actions/Notifications/**'
+---
+
+# Client Notifications
+
+## Sending invariants: claim before send, never recompute history
+`SendScheduledNotificationAction` renders the message first (so the body can be snapshotted even when delivery fails), then claims the occurrence inside a transaction that locks the schedule and advances `next_send_at`, and only then hands the mail to the mailer outside any transaction. Never move the send inside the transaction: a rollback would erase the record of a message that already left. The unique index on `(notification_schedule_id, scheduled_for)` is the real duplicate guard; a `UniqueConstraintViolationException` means another process already handled that occurrence and must be swallowed. A failed send still advances the schedule (deterministic, no retry storms) and a one-time schedule closes when its occurrence is claimed, not when the send succeeds. Deliveries are snapshots: never recompute recipient, sender, subject or body from current data.
+
+## Manual sends: no schedule, flagged, no claim
+An email can also be sent by hand (`SendManualNotificationAction`), either ad hoc or as "send this schedule now". Manual deliveries carry `is_manual = true`, a null `notification_schedule_id` and `triggered_by_user_id`; `is_manual` is the flag everything reads, never "the schedule is null" (a schedule can also be deleted, and a list delivery has no client either). Anything that renders or filters the distinction goes through `NotificationDeliverySource`, derived from the flag rather than stored. Sending is authorised two ways: `ClientPolicy::notifyAny`/`notify` for the ad-hoc form, and `NotificationSchedulePolicy::send` for a schedule — both behind `PermissionName::NotificationsSend`, and both refuse an archived or inactive client, so no manual path can override "stop emailing them". A list schedule has no client to refuse. No audit entry is written for a send: delivery history is the record, and it names the person.
+
+## One delivery per recipient, and one dispatch shape for both send paths
+Both send paths build a `NotificationDispatch` (template, clientId, targetName, recipients, subject, message) and then send one email per recipient, so one occurrence of a list schedule is several deliveries. The occurrence guard is the unique index on (notification_schedule_id, scheduled_for, recipient_email). `SendScheduledNotificationAction` returns null when the occurrence was already claimed and an empty collection when it was claimed but there were no recipients — it still advances the schedule in that case, or the scheduler would retry forever. `SendManualNotificationAction` takes a dispatch and has no claim step at all; it serves both the ad-hoc form and "send this schedule now", and never touches a recurrence. Rendering goes through `NotificationMailBuilder::prepare()` (renders before anything is written, so a body can be snapshotted even when it fails), and every outcome lands in `DeliverNotificationAction` → `RecordFailedNotificationDeliveryAction`. Deliveries snapshot `target_name`, so renaming a client or a list never rewrites history.

@@ -66,6 +66,12 @@ return [
         'inactive_notice' => 'This account is deactivated and cannot sign in.',
     ],
 
+    'activate' => [
+        'title' => 'Activate this account?',
+        'message' => 'The person will be able to sign in again, with the roles they already have.',
+        'confirm' => 'Activate',
+    ],
+
     'deactivate' => [
         'title' => 'Deactivate this account?',
         'message' => 'The person will no longer be able to sign in. Nothing they did is removed, and the account can be activated again later.',

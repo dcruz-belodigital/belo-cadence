@@ -3,19 +3,32 @@
         The Belo Cadence mark for the browser tab: the same folded paper plane as
         resources/views/components/logo.blade.php, kept in step by hand.
 
-        Two things differ from the in-application logo, both because a tab is 16 pixels
-        of someone else's chrome rather than a tile of ours. The view box is cropped to
-        the mark so it fills the space instead of floating in it, and the ink is a fixed
-        neutral that inverts with the browser's appearance, so it is never dark on dark.
+        One thing differs from the in-application logo, because a tab is 16 pixels of
+        someone else's chrome rather than a tile of ours: the view box is cropped to the
+        mark so it fills the space instead of floating in it.
+
+        Every stroke and fill inks from the root `color`, so one declaration recolours
+        the whole mark — that is what lets resources/js/favicon.js append the current
+        theme's own primary, read off the live document, without repeating the shape or
+        the palette here. The neutral below is what is seen before that runs, or without
+        it: a fixed ink that inverts with the browser's appearance, so the mark is never
+        dark on dark.
+
+        Nothing here may contain a double hyphen, which is why the token above is named
+        without its leading dashes: a favicon is parsed as strict XML rather than as
+        HTML, and a double hyphen inside a comment stops the whole document rendering.
+        The browser then falls back to favicon-32.png and the theme silently stops
+        reaching the tab. tests/Feature/BrandingTest.php parses this file to catch that.
     -->
     <style>
-        .mark { fill: #2f2b3a; stroke: #2f2b3a; }
-        .trail { stroke: #2f2b3a; }
+        svg { color: #2f2b3a; }
 
         @media (prefers-color-scheme: dark) {
-            .mark { fill: #f2f0f7; stroke: #f2f0f7; }
-            .trail { stroke: #f2f0f7; }
+            svg { color: #f2f0f7; }
         }
+
+        .mark { fill: currentColor; stroke: currentColor; }
+        .trail { stroke: currentColor; }
     </style>
 
     <g class="trail" stroke-width="2.1" stroke-linecap="round" opacity="0.45" fill="none">

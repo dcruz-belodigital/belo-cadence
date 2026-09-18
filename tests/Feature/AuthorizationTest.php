@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Enums\PermissionName;
 use App\Models\Client;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 use App\Models\Role;
 use App\Models\User;
 
@@ -22,11 +22,13 @@ describe('permission-protected pages', function (): void {
         'client create' => ['clients.create', PermissionName::ClientsCreate],
         'client import' => ['clients.import.create', PermissionName::ClientsImport],
         'client export' => ['clients.export', PermissionName::ClientsExport],
-        'upcoming' => ['cadence.upcoming', PermissionName::ClientNotificationsViewAny],
-        'schedules' => ['cadence.schedules.index', PermissionName::ClientNotificationsViewAny],
-        'schedule export' => ['cadence.schedules.export', PermissionName::ClientNotificationsExport],
+        'upcoming' => ['cadence.upcoming', PermissionName::NotificationsViewAny],
+        'schedules' => ['cadence.schedules.index', PermissionName::NotificationsViewAny],
+        'schedule export' => ['cadence.schedules.export', PermissionName::NotificationsExport],
         'deliveries' => ['cadence.deliveries.index', PermissionName::NotificationDeliveriesViewAny],
         'delivery export' => ['cadence.deliveries.export', PermissionName::NotificationDeliveriesExport],
+        'manual send' => ['cadence.deliveries.send', PermissionName::NotificationsSend],
+        'schedule create' => ['cadence.schedules.create', PermissionName::NotificationsCreate],
         'users' => ['admin.users.index', PermissionName::UsersViewAny],
         'user create' => ['admin.users.create', PermissionName::UsersCreate],
         'user import' => ['admin.users.import.create', PermissionName::UsersImport],
@@ -79,6 +81,8 @@ describe('permission-protected pages', function (): void {
         'cadence.upcoming',
         'cadence.schedules.index',
         'cadence.deliveries.index',
+        'cadence.deliveries.send',
+        'cadence.schedules.create',
         'admin.users.index',
         'admin.users.create',
         'admin.users.import.create',
@@ -101,15 +105,15 @@ describe('record pages', function (): void {
     });
 
     it('refuses viewing a schedule without the view permission', function (): void {
-        $schedule = ClientNotificationSchedule::factory()->create();
+        $schedule = NotificationSchedule::factory()->create();
 
-        actingAs(administratorWithout([PermissionName::ClientNotificationsView]))
+        actingAs(administratorWithout([PermissionName::NotificationsView]))
             ->get(route('cadence.schedules.show', $schedule))
             ->assertForbidden();
     });
 
     it('refuses viewing a delivery without the view permission', function (): void {
-        $delivery = ClientNotificationDelivery::factory()->create();
+        $delivery = NotificationDelivery::factory()->create();
 
         actingAs(administratorWithout([PermissionName::NotificationDeliveriesView]))
             ->get(route('cadence.deliveries.show', $delivery))

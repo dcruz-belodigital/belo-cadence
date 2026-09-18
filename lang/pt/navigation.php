@@ -26,7 +26,7 @@ return [
 
     'sections' => [
         'administration' => 'Administração',
-        'cadence' => 'Cadência',
+        'cadence' => 'Cadence',
         'support' => 'Apoio',
     ],
 

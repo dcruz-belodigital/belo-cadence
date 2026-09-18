@@ -6,8 +6,8 @@ namespace App\Http\Requests\Settings;
 
 use App\Data\Settings\DefaultClientNotificationData;
 use App\Data\Settings\UpdateDefaultClientNotificationsData;
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationFrequency;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationFrequency;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,8 +20,8 @@ final class UpdateDefaultClientNotificationsRequest extends FormRequest
     {
         return [
             'entries' => ['array'],
-            'entries.*.template' => ['required', Rule::enum(ClientEmailTemplate::class)],
-            'entries.*.frequency' => ['required', Rule::enum(ClientNotificationFrequency::class)],
+            'entries.*.template' => ['required', Rule::enum(EmailTemplate::class)],
+            'entries.*.frequency' => ['required', Rule::enum(NotificationFrequency::class)],
             'entries.*.is_enabled_by_default' => ['boolean'],
         ];
     }
@@ -35,8 +35,8 @@ final class UpdateDefaultClientNotificationsRequest extends FormRequest
         $seen = [];
 
         foreach ($entries as $entry) {
-            $template = ClientEmailTemplate::from((string) $entry['template']);
-            $frequency = ClientNotificationFrequency::from((string) $entry['frequency']);
+            $template = EmailTemplate::from((string) $entry['template']);
+            $frequency = NotificationFrequency::from((string) $entry['frequency']);
             $key = $template->value.'|'.$frequency->value;
 
             // The same template and frequency can only be offered once.

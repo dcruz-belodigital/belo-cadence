@@ -1,12 +1,12 @@
 @php
-    use App\Enums\ClientEmailTemplate;
-    use App\Enums\ClientNotificationFrequency;
+    use App\Enums\EmailTemplate;
+    use App\Enums\NotificationFrequency;
 
-    $templateOptions = collect(ClientEmailTemplate::cases())
-        ->mapWithKeys(fn (ClientEmailTemplate $template) => [$template->value => $template->label()]);
+    $templateOptions = collect(EmailTemplate::cases())
+        ->mapWithKeys(fn (EmailTemplate $template) => [$template->value => $template->label()]);
 
-    $frequencyOptions = collect(ClientNotificationFrequency::cases())
-        ->mapWithKeys(fn (ClientNotificationFrequency $frequency) => [$frequency->value => $frequency->label()]);
+    $frequencyOptions = collect(NotificationFrequency::cases())
+        ->mapWithKeys(fn (NotificationFrequency $frequency) => [$frequency->value => $frequency->label()]);
 
     $existing = $defaults->map(fn ($default) => [
         'template' => $default->template->value,
@@ -35,7 +35,7 @@
       x-data="{
           rows: {{ Js::from($rows) }},
           add() {
-              this.rows.push({ template: '{{ ClientEmailTemplate::cases()[0]->value }}', frequency: '{{ ClientNotificationFrequency::Monthly->value }}', is_enabled_by_default: true });
+              this.rows.push({ template: '{{ EmailTemplate::cases()[0]->value }}', frequency: '{{ NotificationFrequency::Monthly->value }}', is_enabled_by_default: true });
           },
           remove(index) {
               this.rows.splice(index, 1);
@@ -63,7 +63,7 @@
                             {{ __('settings.defaults.columns.template') }}
                         </label>
 
-                        <div class="flex items-center gap-2">
+                        <x-template-preview-action preview="row.template">
                             <select class="form-control"
                                     x-bind:id="'entry-template-' + index"
                                     x-bind:name="'entries[' + index + '][template]'"
@@ -72,14 +72,7 @@
                                     <option value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
                             </select>
-
-                            <button type="button"
-                                    class="btn btn-secondary btn-md shrink-0"
-                                    x-on:click="$dispatch('preview-template', { template: row.template })">
-                                <x-icon name="eye" size="size-4" />
-                                <span class="sr-only">{{ __('cadence.templates.preview') }}</span>
-                            </button>
-                        </div>
+                        </x-template-preview-action>
                     </div>
 
                     <div class="space-y-1.5">

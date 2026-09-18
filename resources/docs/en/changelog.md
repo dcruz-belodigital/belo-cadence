@@ -3,6 +3,53 @@
 Every release of Belo Cadence, newest first. Add a new `##` heading with the release date
 for each one, and group the entries under **New features**, **Changes** or **Fixes**.
 
+## 21 August 2026
+
+### New features
+
+- **Notifications no longer have to be about a client.** A schedule now sends either to a
+  client, as before, or to a **recipient list**: you give the notification a name and the
+  addresses it goes to, and it belongs to no client at all. That is how anything which is
+  not about one client gets scheduled — an internal digest, a note to a supplier, a
+  reminder for your own team. Create either kind from Cadence → Notification schedules →
+  New notification, or a client one from the client's own page. A schedule never changes
+  what it sends to.
+- **Templates now say who they are written for.** Each template is for a client, for a
+  recipient list, or for any schedule, and a form only offers the ones that suit what you
+  are sending to — so a client can never be sent wording written for a mailing list. Two
+  new recipient-list templates ship with it: **Status update** and **Action required**.
+- **A Blank template**, usable by either kind, where you write the subject and the message
+  on the schedule itself. It is plain text, sent exactly as typed, inside the normal email
+  frame. Every other template's wording stays in the application, reviewed like any other
+  change.
+- **Send any notification to anyone, at any time.** Send now on any schedule sends that
+  schedule's own message to its own recipients immediately, without touching its
+  recurrence. The ad-hoc Send now form additionally lets you type a name and addresses on
+  the spot, so a one-off notice needs no schedule to exist first. Both are recorded as
+  manual sends, naming the person who sent them.
+- **One address, one delivery.** A notification going to five people is now five entries in
+  delivery history rather than one, so a single rejected address shows up on its own
+  instead of hiding behind the four that arrived. Each delivery records what it was sent to
+  — a client, or the name the list had at the time — snapshotted like everything else.
+
+### Changes
+
+- **"Client notification" is now just "notification"** throughout the application, because
+  a notification need not involve a client any more. Schedules, delivery history, their
+  permissions and the audit log all follow. Existing audit entries, permission grants and
+  history are migrated, so nothing is lost and no role loses access — but a permission
+  named `client-notifications.*` in any external integration is now `notifications.*`.
+- **A Sends to filter** on the schedules list and Upcoming, to look at only client
+  schedules or only recipient lists. Both exports carry the distinction.
+- **The schedules list and Upcoming name the notification** rather than only its client, so
+  a recipient list reads properly there.
+
+- **A source filter on delivery history**, to look at only the sends a person asked for or
+  only the scheduler's own. Both exports carry the distinction.
+- **Sending by hand needs its own permission**, so it can be granted separately from
+  managing schedules. Only active clients are ever offered: marking a client inactive still
+  means "stop emailing them", and that holds for Send now too.
+
 ## 14 August 2026
 
 ### New features

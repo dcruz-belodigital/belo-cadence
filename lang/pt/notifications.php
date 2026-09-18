@@ -8,7 +8,7 @@ return [
     'description' => 'O que a aplicação lhe quer dar a conhecer.',
 
     'empty' => 'Nada a comunicar',
-    'empty_description' => 'As notificações sobre email de clientes que falhou aparecem aqui.',
+    'empty_description' => 'As notificações sobre emails que falharam aparecem aqui.',
     'fallback_title' => 'Notificação',
     'mark_all_read' => 'Marcar todas como lidas',
     'unread' => 'Por ler',
@@ -24,8 +24,8 @@ return [
     ],
 
     'delivery_failed' => [
-        'title' => 'Falhou o envio de um email a cliente',
-        'message' => 'Não foi possível entregar :template para :client.',
+        'title' => 'Falhou o envio de um email',
+        'message' => 'Não foi possível entregar :template para :target.',
     ],
 
 ];

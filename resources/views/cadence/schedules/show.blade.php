@@ -1,23 +1,57 @@
-<x-app-layout :heading="$schedule->template->label()"
-               :back="route('clients.show', $schedule->client)"
-               :back-label="$schedule->client->name">
-    <x-page-header :description="$schedule->client->name">
+@php
+    use App\Enums\NotificationTarget;
+
+    $isClientSchedule = $schedule->target === NotificationTarget::Client;
+@endphp
+
+<x-app-layout :heading="$schedule->displayName()"
+               :back="$isClientSchedule ? route('clients.show', $schedule->client) : route('cadence.schedules.index')"
+               :back-label="$isClientSchedule ? $schedule->client->name : __('cadence.title')">
+    <x-page-header :description="$schedule->template->label()">
         <x-slot:actions>
+            @can('send', $schedule)
+                <x-confirm-form :action="route('cadence.schedules.send', $schedule)"
+                                method="POST"
+                                :title="__('cadence.send.title')"
+                                :message="__('cadence.send.message')"
+                                :confirm="__('cadence.send.confirm')"
+                                variant="primary"
+                                trigger-variant="secondary"
+                                trigger-size="md"
+                                icon="send">
+                    <x-slot:trigger>{{ __('cadence.actions.send') }}</x-slot:trigger>
+                </x-confirm-form>
+            @endcan
+
             @can('update', $schedule)
                 <x-button :href="route('cadence.schedules.edit', $schedule)" variant="secondary" icon="pencil">
                     {{ __('common.actions.edit') }}
                 </x-button>
 
                 @if ($schedule->is_enabled)
-                    <form method="POST" action="{{ route('cadence.schedules.disable', $schedule) }}">
-                        @csrf
-                        <x-button type="submit" variant="secondary">{{ __('cadence.actions.disable') }}</x-button>
-                    </form>
+                    <x-confirm-form :action="route('cadence.schedules.disable', $schedule)"
+                                    method="POST"
+                                    :title="__('cadence.disable.title')"
+                                    :message="__('cadence.disable.message')"
+                                    :confirm="__('cadence.disable.confirm')"
+                                    variant="primary"
+                                    trigger-variant="secondary"
+                                    trigger-size="md"
+                                    icon="x-circle">
+                        <x-slot:trigger>{{ __('cadence.actions.disable') }}</x-slot:trigger>
+                    </x-confirm-form>
                 @else
-                    <form method="POST" action="{{ route('cadence.schedules.enable', $schedule) }}">
-                        @csrf
-                        <x-button type="submit" variant="secondary">{{ __('cadence.actions.enable') }}</x-button>
-                    </form>
+                    <x-confirm-form :action="route('cadence.schedules.enable', $schedule)"
+                                    method="POST"
+                                    :title="__('cadence.enable.title')"
+                                    :message="__('cadence.enable.message')"
+                                    :confirm="__('cadence.enable.confirm')"
+                                    variant="primary"
+                                    trigger-variant="secondary"
+                                    trigger-size="md"
+                                    icon="check-circle">
+                        <x-slot:trigger>{{ __('cadence.actions.enable') }}</x-slot:trigger>
+                    </x-confirm-form>
                 @endif
             @endcan
 
@@ -39,15 +73,41 @@
     <div class="space-y-6">
         <x-card :title="__('cadence.show.details')">
             <x-detail-list>
-                <x-detail-item :label="__('cadence.columns.client')">
-                    <a href="{{ route('clients.show', $schedule->client) }}" class="focus-ring rounded-control text-primary transition hover:underline">
-                        {{ $schedule->client->name }}
-                    </a>
+                <x-detail-item :label="__('cadence.columns.target')">
+                    <x-badge :variant="$schedule->target->badgeVariant()">{{ $schedule->target->label() }}</x-badge>
                 </x-detail-item>
 
-                <x-detail-item :label="__('cadence.columns.recipient')">{{ $schedule->client->email }}</x-detail-item>
+                @if ($isClientSchedule)
+                    <x-detail-item :label="__('cadence.columns.client')">
+                        <a href="{{ route('clients.show', $schedule->client) }}" class="focus-ring rounded-control text-primary transition hover:underline">
+                            {{ $schedule->client->name }}
+                        </a>
+                    </x-detail-item>
+
+                    <x-detail-item :label="__('cadence.columns.recipient')">{{ $schedule->client->email }}</x-detail-item>
+                @else
+                    <x-detail-item :label="__('cadence.fields.name')">{{ $schedule->name }}</x-detail-item>
+
+                    <x-detail-item :label="__('cadence.show.recipients')" wide>
+                        {{-- Every address gets its own copy, and its own line in delivery history. --}}
+                        <ul class="space-y-0.5">
+                            @foreach ($schedule->recipients ?? [] as $recipient)
+                                <li class="font-mono text-meta">{{ $recipient }}</li>
+                            @endforeach
+                        </ul>
+                    </x-detail-item>
+                @endif
+
                 <x-detail-item :label="__('cadence.columns.template')">{{ $schedule->template->label() }}</x-detail-item>
                 <x-detail-item :label="__('cadence.columns.frequency')">{{ $schedule->frequency->label() }}</x-detail-item>
+
+                @unless ($schedule->template->hasOwnCopy())
+                    <x-detail-item :label="__('cadence.show.subject')" wide>{{ $schedule->subject }}</x-detail-item>
+
+                    <x-detail-item :label="__('cadence.show.message')" wide>
+                        <p class="whitespace-pre-line">{{ $schedule->message }}</p>
+                    </x-detail-item>
+                @endunless
 
                 <x-detail-item :label="__('cadence.columns.starts_at')">
                     <x-datetime :value="$schedule->starts_at" with-timezone />
@@ -77,9 +137,10 @@
                             <thead class="border-b border-border bg-surface-sunken/50">
                                 <tr>
                                     <x-table.heading>{{ __('deliveries.columns.scheduled_for') }}</x-table.heading>
+                                    <x-table.heading>{{ __('deliveries.columns.recipient') }}</x-table.heading>
                                     <x-table.heading>{{ __('deliveries.columns.subject') }}</x-table.heading>
                                     <x-table.heading>{{ __('deliveries.columns.status') }}</x-table.heading>
-                                    <x-table.heading align="right"><span class="sr-only">{{ __('common.actions.view') }}</span></x-table.heading>
+                                    <x-table.heading align="right"><span class="sr-only">{{ __('common.columns.actions') }}</span></x-table.heading>
                                 </tr>
                             </thead>
 
@@ -87,6 +148,7 @@
                                 @foreach ($deliveries as $delivery)
                                     <x-table.row>
                                         <x-table.cell><x-datetime :value="$delivery->scheduled_for" /></x-table.cell>
+                                        <x-table.cell muted>{{ $delivery->recipient_email }}</x-table.cell>
                                         <x-table.cell muted>{{ $delivery->subject }}</x-table.cell>
 
                                         <x-table.cell>
@@ -97,9 +159,11 @@
 
                                         <x-table.cell align="right">
                                             @can('view', $delivery)
-                                                <x-button :href="route('cadence.deliveries.show', $delivery)" variant="ghost" size="sm" icon="eye">
-                                                    {{ __('common.actions.view') }}
-                                                </x-button>
+                                                <x-table.actions>
+                                                    <x-dropdown.item :href="route('cadence.deliveries.show', $delivery)" icon="eye">
+                                                        {{ __('common.actions.view') }}
+                                                    </x-dropdown.item>
+                                                </x-table.actions>
                                             @endcan
                                         </x-table.cell>
                                     </x-table.row>

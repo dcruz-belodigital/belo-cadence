@@ -14,12 +14,34 @@ return [
     |
     */
 
-    'client_notifications' => [
+    'notifications' => [
 
         'greeting' => 'Olá :name,',
         'closing' => 'Com os melhores cumprimentos,',
         'footer' => 'Está a receber esta mensagem porque a :application a envia no âmbito de um calendário acordado.',
         'scheduled_for' => 'Agendado para :date',
+
+        'greeting_all' => 'Olá,',
+
+        'status_update' => [
+            'subject' => ':name — atualização de :application',
+            'lines' => [
+                'Esta é a atualização agendada de :name.',
+                'Não é preciso responder, a não ser que algo lhe pareça errado.',
+            ],
+        ],
+
+        'action_required' => [
+            'subject' => ':name precisa de atenção — :application',
+            'lines' => [
+                'Esta é a nota agendada de :name e precisa que alguém a trate.',
+                'Verifique, por favor, e responda quando estiver resolvido.',
+            ],
+        ],
+
+        'blank' => [
+            'empty' => 'Esta notificação foi enviada sem mensagem.',
+        ],
 
         'general_reminder' => [
             'subject' => 'Um lembrete da :application',

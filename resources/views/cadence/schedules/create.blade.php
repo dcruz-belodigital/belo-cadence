@@ -1,10 +1,24 @@
+@php
+    /*
+    | The same page serves both ways in: reached through a client it posts to that
+    | client's route and cannot become anything else, reached from the schedules list it
+    | asks what the notification is for.
+    */
+    $action = $client !== null
+        ? route('clients.schedules.store', $client)
+        : route('cadence.schedules.store');
+
+    $cancel = $client !== null
+        ? route('clients.show', $client)
+        : route('cadence.schedules.index');
+@endphp
+
 <x-app-layout :heading="__('cadence.create.title')"
-               :back="route('clients.show', $client)"
-               :back-label="$client->name" width="narrow">
-    <x-page-header :description="__('cadence.create.description', ['client' => $client->name])" />
+               :back="$cancel"
+               :back-label="$client?->name ?? __('cadence.title')" width="narrow">
+    <x-page-header :description="__('cadence.create.description')" />
 
-
-    <form method="POST" action="{{ route('clients.schedules.store', $client) }}" class="space-y-6">
+    <form method="POST" action="{{ $action }}" class="space-y-6">
         @csrf
 
         <x-card :title="__('cadence.show.details')">
@@ -12,7 +26,7 @@
         </x-card>
 
         <x-form.actions>
-            <x-button :href="route('clients.show', $client)" variant="secondary" type="button">
+            <x-button :href="$cancel" variant="secondary" type="button">
                 {{ __('common.actions.cancel') }}
             </x-button>
 

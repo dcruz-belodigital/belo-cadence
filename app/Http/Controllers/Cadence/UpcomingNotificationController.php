@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Cadence;
 
-use App\Data\ClientNotifications\ClientNotificationScheduleFilters;
+use App\Data\Notifications\NotificationScheduleFilters;
 use App\Http\Controllers\Controller;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationSchedule;
 use App\Support\ViewerTimezone;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,9 +18,9 @@ final class UpcomingNotificationController extends Controller
 {
     public function __invoke(Request $request, ViewerTimezone $viewerTimezone): View
     {
-        $this->authorize('viewAny', ClientNotificationSchedule::class);
+        $this->authorize('viewAny', NotificationSchedule::class);
 
-        $filters = ClientNotificationScheduleFilters::fromRequest(
+        $filters = NotificationScheduleFilters::fromRequest(
             $request,
             $viewerTimezone->current(),
             scheduledOnly: true,
@@ -28,7 +28,7 @@ final class UpcomingNotificationController extends Controller
 
         return view('cadence.upcoming', [
             'filters' => $filters,
-            'schedules' => ClientNotificationSchedule::query()
+            'schedules' => NotificationSchedule::query()
                 ->filtered($filters)
                 ->with('client')
                 ->paginate(20)

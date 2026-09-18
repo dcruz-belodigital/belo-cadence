@@ -39,7 +39,20 @@ arquivado.
 
 ## Agendamentos de notificação
 
-Um **agendamento** responde a: que email recebe este cliente, e quando?
+Um **agendamento** responde a: que email sai, para quem, e quando?
+
+Cada agendamento envia para uma de duas coisas, decidida no momento em que o cria:
+
+- **Um cliente.** O email vai para o endereço desse cliente e o agendamento fica
+  registado nele, na sua própria página.
+- **Uma lista de destinatários.** Dá um nome à notificação e indica os endereços para
+  onde vai. Não pertence a nenhum cliente, e é assim que se agenda tudo o que não é sobre
+  um cliente — um resumo interno, uma nota a um fornecedor, um lembrete para a sua equipa.
+
+Crie um agendamento de cliente a partir da página do cliente, e qualquer um dos dois em
+**Cadence → Agendamentos de notificação → Nova notificação**. Um agendamento nunca muda
+o que envia: ao editá-lo pode mudar o nome, os endereços, o modelo e as datas, mas um
+agendamento de cliente continua a ser de cliente.
 
 Escolhe um dos modelos de email, uma frequência e a data e hora do primeiro envio. Daí em
 diante o Belo Cadence calcula sozinho cada ocorrência seguinte.
@@ -64,6 +77,14 @@ futura — as ocorrências perdidas enquanto esteve desligado não são enviadas
 **Eliminar** um agendamento retira-o das listas de trabalho e mantém tudo o que já
 enviou.
 
+**Enviar agora**, em qualquer agendamento, envia de imediato a mensagem desse agendamento
+para os seus próprios destinatários. A recorrência fica intacta: nada é reagendado e
+nenhuma ocorrência é gasta. Fica registado como envio manual.
+
+Um agendamento de cliente só envia enquanto o cliente estiver ativo e não arquivado — o
+que também se aplica ao Enviar agora. Uma lista de destinatários não depende do estado de
+ninguém.
+
 ## Próximos
 
 **Próximos** é a resposta a "o que sai a seguir?", do mais próximo para o mais distante.
@@ -73,15 +94,58 @@ modelo, frequência e estado. O que estiver a ver pode ser exportado tal como es
 ## Modelos de email
 
 Os modelos fazem parte da aplicação e não são algo que se edite no navegador. Isso é
-deliberado: significa que o texto de um email a clientes é revisto como qualquer outra
-alteração e não pode ser mudado por acidente.
+deliberado: significa que o texto de um email é revisto como qualquer outra alteração e
+não pode ser mudado por acidente.
 
-Abra **Cadência → Modelos de email** para ler cada um exatamente como um cliente o
-recebe, com um cliente de exemplo preenchido. Também pode pré-visualizar um modelo a
-partir do formulário de agendamento enquanto o escolhe.
+Cada modelo é escrito para um leitor em particular, e isso decide onde pode ser usado:
 
-Acrescentar um modelo é uma pequena tarefa de desenvolvimento: uma entrada no catálogo,
-uma vista, o texto e um teste.
+- **Para um cliente** — o texto dirige-se ao cliente de que trata. Só os agendamentos de
+  cliente os podem usar.
+- **Para uma lista de destinatários** — o texto dirige-se a quem foi colocado na lista. Só
+  os agendamentos de lista os podem usar.
+- **Para qualquer agendamento** — o modelo **Em branco**, que ambos podem usar.
+
+O formulário de agendamento só oferece os modelos que servem para o que está a enviar, por
+isso um cliente nunca recebe texto escrito para uma lista.
+
+**Em branco** é a única exceção à regra de o texto viver na aplicação: não traz texto
+nenhum, e é você que escreve o assunto e a mensagem no próprio agendamento. É texto
+simples — deixe uma linha em branco entre parágrafos — e é enviado exatamente como o
+escrever, dentro da moldura normal do email. Use-o para o caso pontual que nenhum modelo
+cobre; para o que envia repetidamente use um modelo a sério, porque esse texto é revisto.
+
+Abra **Cadence → Modelos de email** para ler cada um exatamente como chega, com um nome
+de exemplo preenchido e a indicação de para quem foi escrito. Também pode pré-visualizar
+um modelo a partir do formulário de agendamento enquanto o escolhe.
+
+Acrescentar um modelo é uma pequena tarefa de desenvolvimento: uma entrada no catálogo, o
+seu público, uma vista, o texto e um teste.
+
+## Enviar manualmente
+
+Às vezes algo tem de sair agora e não há agendamento que o cubra. Há duas maneiras.
+
+**A partir de um agendamento.** Abra o agendamento e prima **Enviar agora**. Envia a
+mensagem desse agendamento para os seus destinatários e não muda nada na recorrência.
+
+**Sem agendamento.** Abra **Cadence → Histórico de envios → Enviar agora**, ou use
+**Enviar agora** na página de um cliente. Escolha um cliente ou escreva você mesmo os
+endereços, escolha um modelo e confirme — não é preciso que exista um agendamento. O email
+sai de imediato.
+
+Só são oferecidos clientes **ativos**. Marcar um cliente como inativo, ou arquivá-lo, é a
+forma de dizer "deixem de lhe enviar email", por isso um envio manual não contorna essa
+decisão. Os endereços que escreve são da sua responsabilidade; nada os verifica além de
+serem endereços válidos.
+
+Um envio manual fica registado no histórico de envios exatamente como um agendado,
+marcado como **Manual** e com o nome de quem o enviou. Nada muda em nenhum agendamento:
+nenhuma âncora se mexe, nenhuma ocorrência é gasta. Enviar duas vezes envia duas
+vezes — não há ocorrência que possa ser duplicada, por isso pedir outra vez é pedir outra
+vez.
+
+Pode restringir o histórico de envios a envios manuais ou agendados com o filtro
+**Origem**, e a distinção acompanha as duas exportações.
 
 ## Histórico de envios
 
@@ -91,13 +155,22 @@ nada disso é alguma vez recalculado. Se o nome ou o endereço de um cliente mud
 ou se o remetente mudar, ou se um modelo for reescrito, um envio antigo continua a
 mostrar o que realmente saiu.
 
+**Um endereço, um envio.** Uma notificação que vai para cinco pessoas são cinco envios, um
+por endereço. É isso que permite que um único endereço rejeitado apareça sozinho em vez de
+se esconder atrás dos quatro que chegaram, e é por isso que uma lista de destinatários
+produz várias linhas para a mesma ocorrência.
+
+Cada envio regista **para onde foi** — um cliente, ou o nome que a lista tinha na altura —
+e esse nome é guardado como tudo o resto, por isso mudar o nome de uma lista nunca reescreve
+o seu histórico.
+
 Abra um envio para ver a mensagem tal como foi enviada, quando foi agendada, quando foi
 tentada e — se falhou — porquê.
 
 O histórico de envios não pode ser editado nem importado, por princípio. Pode ser
 pesquisado, filtrado e exportado.
 
-Cada ocorrência é enviada **uma só vez**. Correr o agendador duas vezes, ou manualmente
+Cada ocorrência é enviada **uma só vez por endereço**. Correr o agendador duas vezes, ou manualmente
 enquanto já está a correr, não consegue produzir um segundo email para a mesma
 ocorrência.
 

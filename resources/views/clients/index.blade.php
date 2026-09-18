@@ -46,7 +46,7 @@
             <x-table.sort-heading column="status">{{ __('clients.columns.status') }}</x-table.sort-heading>
             <x-table.heading align="right">{{ __('clients.columns.schedules') }}</x-table.heading>
             <x-table.sort-heading column="created_at">{{ __('clients.columns.created') }}</x-table.sort-heading>
-            <x-table.heading align="right"><span class="sr-only">{{ __('common.actions.view') }}</span></x-table.heading>
+            <x-table.heading align="right"><span class="sr-only">{{ __('common.columns.actions') }}</span></x-table.heading>
         </x-slot:head>
 
         @forelse ($clients as $client)
@@ -74,19 +74,19 @@
                 <x-table.cell muted><x-datetime :value="$client->created_at" format="date" /></x-table.cell>
 
                 <x-table.cell align="right">
-                    <div class="flex items-center justify-end gap-1">
-                        <x-button :href="route('clients.show', $client)" variant="ghost" size="sm" icon="eye">
+                    <x-table.actions>
+                        <x-dropdown.item :href="route('clients.show', $client)" icon="eye">
                             {{ __('common.actions.view') }}
-                        </x-button>
+                        </x-dropdown.item>
 
                         @can('update', $client)
                             @unless ($client->trashed())
-                                <x-button :href="route('clients.edit', $client)" variant="ghost" size="sm" icon="pencil">
+                                <x-dropdown.item :href="route('clients.edit', $client)" icon="pencil">
                                     {{ __('common.actions.edit') }}
-                                </x-button>
+                                </x-dropdown.item>
                             @endunless
                         @endcan
-                    </div>
+                    </x-table.actions>
                 </x-table.cell>
             </x-table.row>
         @empty

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Clients;
 
-use App\Data\ClientNotifications\ClientNotificationScheduleData;
 use App\Data\Clients\CreateClientData;
+use App\Data\Notifications\NotificationScheduleData;
 use App\Enums\ClientStatus;
 use App\Http\Requests\Concerns\ConvertsViewerDateTimes;
 use App\Models\DefaultClientNotification;
@@ -86,7 +86,7 @@ final class StoreClientRequest extends FormRequest
      * The template and frequency of an applied schedule always come from the stored
      * default, never from the submitted form.
      *
-     * @return list<ClientNotificationScheduleData>
+     * @return list<NotificationScheduleData>
      */
     private function notificationSchedules(): array
     {
@@ -110,7 +110,7 @@ final class StoreClientRequest extends FormRequest
                 continue;
             }
 
-            $data[] = new ClientNotificationScheduleData(
+            $data[] = new NotificationScheduleData(
                 template: $default->template,
                 frequency: $default->frequency,
                 startsAt: CarbonImmutable::parse((string) $schedule['starts_at'])->setTimezone('UTC'),

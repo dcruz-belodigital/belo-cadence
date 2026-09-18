@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Actions\Clients;
 
 use App\Actions\Audits\RecordAuditAction;
-use App\Actions\ClientNotifications\CreateClientNotificationScheduleAction;
+use App\Actions\Notifications\CreateNotificationScheduleAction;
 use App\Data\Audits\RecordAuditData;
-use App\Data\ClientNotifications\ClientNotificationScheduleData;
 use App\Data\Clients\CreateClientData;
+use App\Data\Notifications\NotificationScheduleData;
 use App\Enums\AuditAction;
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 final class CreateClientAction
 {
     public function __construct(
-        private readonly CreateClientNotificationScheduleAction $createSchedule,
+        private readonly CreateNotificationScheduleAction $createSchedule,
         private readonly RecordAuditAction $recordAudit,
     ) {}
 
@@ -34,8 +34,15 @@ final class CreateClientAction
                 'notes' => $data->notes,
             ]);
 
+            // The client exists only now, so each default's target is filled in here.
             foreach ($data->notificationSchedules as $schedule) {
-                ($this->createSchedule)($client, $schedule);
+                ($this->createSchedule)(new NotificationScheduleData(
+                    template: $schedule->template,
+                    frequency: $schedule->frequency,
+                    startsAt: $schedule->startsAt,
+                    isEnabled: $schedule->isEnabled,
+                    clientId: $client->getKey(),
+                ));
             }
 
             ($this->recordAudit)(new RecordAuditData(
@@ -49,7 +56,7 @@ final class CreateClientAction
                 ],
                 metadata: [
                     'notification_schedules' => array_map(
-                        static fn (ClientNotificationScheduleData $schedule): string => $schedule->template->value,
+                        static fn (NotificationScheduleData $schedule): string => $schedule->template->value,
                         $data->notificationSchedules,
                     ),
                 ],

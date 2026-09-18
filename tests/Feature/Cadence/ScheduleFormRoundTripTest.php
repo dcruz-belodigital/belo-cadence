@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationFrequency;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationFrequency;
 use App\Models\Client;
-use App\Models\ClientNotificationSchedule;
 use App\Models\DefaultClientNotification;
+use App\Models\NotificationSchedule;
 use Carbon\CarbonImmutable;
 
 use function Pest\Laravel\actingAs;
@@ -24,8 +24,8 @@ it('gives a rejected date back to the person in the form, in their own timezone'
     $typed = CarbonImmutable::now('Asia/Tokyo')->subDays(3)->setTime(9, 30)->format('Y-m-d\TH:i');
 
     actingAs($user)->post(route('clients.schedules.store', $client), [
-        'template' => ClientEmailTemplate::MonthlyReminder->value,
-        'frequency' => ClientNotificationFrequency::Monthly->value,
+        'template' => EmailTemplate::MonthlyReminder->value,
+        'frequency' => NotificationFrequency::Monthly->value,
         'starts_at' => $typed,
         'is_enabled' => '1',
     ])->assertSessionHasErrors('starts_at');
@@ -37,7 +37,7 @@ it('gives a rejected date back to the person in the form, in their own timezone'
 
 it('shows an existing anchor in the reader timezone when editing', function (): void {
     // 23:30 UTC is 08:30 the next morning in Tokyo.
-    $schedule = ClientNotificationSchedule::factory()
+    $schedule = NotificationSchedule::factory()
         ->for(Client::factory())
         ->monthly()
         ->scheduledFor(CarbonImmutable::parse('2026-06-01 23:30', 'UTC'))
@@ -60,13 +60,13 @@ it('stores what the person meant, whatever timezone they are in', function (): v
     $typed = CarbonImmutable::now('America/New_York')->addDays(4)->setTime(14, 15);
 
     actingAs($user)->post(route('clients.schedules.store', $client), [
-        'template' => ClientEmailTemplate::MonthlyReminder->value,
-        'frequency' => ClientNotificationFrequency::Monthly->value,
+        'template' => EmailTemplate::MonthlyReminder->value,
+        'frequency' => NotificationFrequency::Monthly->value,
         'starts_at' => $typed->format('Y-m-d\TH:i'),
         'is_enabled' => '1',
     ])->assertSessionHasNoErrors();
 
-    $schedule = ClientNotificationSchedule::query()->firstOrFail();
+    $schedule = NotificationSchedule::query()->firstOrFail();
 
     expect($schedule->starts_at->setTimezone('America/New_York')->format('Y-m-d H:i'))
         ->toBe($typed->format('Y-m-d H:i'))

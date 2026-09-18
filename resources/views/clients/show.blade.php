@@ -1,5 +1,5 @@
 @php
-    use App\Models\ClientNotificationSchedule;
+    use App\Models\NotificationSchedule;
 @endphp
 
 <x-app-layout :heading="$client->name"
@@ -7,7 +7,14 @@
                :back-label="__('clients.title')">
     <x-page-header :description="(string) $client->email">
         <x-slot:actions>
-            @can('create', ClientNotificationSchedule::class)
+            {{-- The policy already refuses an archived or inactive client, so no guard is repeated here. --}}
+            @can('notify', $client)
+                <x-button :href="route('cadence.deliveries.send', ['client' => $client->getKey()])" variant="secondary" icon="send">
+                    {{ __('deliveries.actions.send') }}
+                </x-button>
+            @endcan
+
+            @can('create', NotificationSchedule::class)
                 @unless ($client->trashed())
                     <x-button :href="route('clients.schedules.create', $client)" variant="secondary" icon="plus">
                         {{ __('cadence.actions.create') }}
@@ -87,7 +94,7 @@
                 <x-empty-state :title="__('clients.show.schedules_empty')"
                                :description="__('clients.show.schedules_empty_description')"
                                icon="calendar">
-                    @can('create', ClientNotificationSchedule::class)
+                    @can('create', NotificationSchedule::class)
                         @unless ($client->trashed())
                             <x-slot:actions>
                                 <x-button :href="route('clients.schedules.create', $client)" icon="plus">
@@ -107,7 +114,7 @@
                                 <x-table.heading>{{ __('cadence.columns.next_send_at') }}</x-table.heading>
                                 <x-table.heading>{{ __('cadence.columns.last_sent_at') }}</x-table.heading>
                                 <x-table.heading>{{ __('cadence.columns.state') }}</x-table.heading>
-                                <x-table.heading align="right"><span class="sr-only">{{ __('common.actions.view') }}</span></x-table.heading>
+                                <x-table.heading align="right"><span class="sr-only">{{ __('common.columns.actions') }}</span></x-table.heading>
                             </tr>
                         </thead>
 
@@ -155,9 +162,10 @@
                             <thead class="border-b border-border bg-surface-sunken/50">
                                 <tr>
                                     <x-table.heading>{{ __('deliveries.columns.subject') }}</x-table.heading>
+                                    <x-table.heading>{{ __('deliveries.columns.source') }}</x-table.heading>
                                     <x-table.heading>{{ __('deliveries.columns.scheduled_for') }}</x-table.heading>
                                     <x-table.heading>{{ __('deliveries.columns.status') }}</x-table.heading>
-                                    <x-table.heading align="right"><span class="sr-only">{{ __('common.actions.view') }}</span></x-table.heading>
+                                    <x-table.heading align="right"><span class="sr-only">{{ __('common.columns.actions') }}</span></x-table.heading>
                                 </tr>
                             </thead>
 
@@ -165,6 +173,12 @@
                                 @foreach ($deliveries as $delivery)
                                     <x-table.row>
                                         <x-table.cell>{{ $delivery->subject }}</x-table.cell>
+
+                                        <x-table.cell>
+                                            <x-badge :variant="$delivery->source->badgeVariant()">
+                                                {{ $delivery->source->label() }}
+                                            </x-badge>
+                                        </x-table.cell>
 
                                         <x-table.cell muted>
                                             <x-datetime :value="$delivery->scheduled_for" />
@@ -178,9 +192,11 @@
 
                                         <x-table.cell align="right">
                                             @can('view', $delivery)
-                                                <x-button :href="route('cadence.deliveries.show', $delivery)" variant="ghost" size="sm" icon="eye">
-                                                    {{ __('common.actions.view') }}
-                                                </x-button>
+                                                <x-table.actions>
+                                                    <x-dropdown.item :href="route('cadence.deliveries.show', $delivery)" icon="eye">
+                                                        {{ __('common.actions.view') }}
+                                                    </x-dropdown.item>
+                                                </x-table.actions>
                                             @endcan
                                         </x-table.cell>
                                     </x-table.row>

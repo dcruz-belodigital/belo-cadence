@@ -6,20 +6,42 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Client Email Copy
+    | Notification Email Copy
     |--------------------------------------------------------------------------
     |
-    | The wording of the source-controlled client email templates. Adding a
+    | The wording of the source-controlled email templates. Adding a
     | template means adding a section here as well.
     |
     */
 
-    'client_notifications' => [
+    'notifications' => [
 
         'greeting' => 'Hello :name,',
         'closing' => 'Kind regards,',
         'footer' => 'You are receiving this message because :application sends it as part of an agreed schedule.',
         'scheduled_for' => 'Scheduled for :date',
+
+        'greeting_all' => 'Hello,',
+
+        'status_update' => [
+            'subject' => ':name — update from :application',
+            'lines' => [
+                'This is the scheduled update for :name.',
+                'Nothing here needs a reply unless something looks wrong to you.',
+            ],
+        ],
+
+        'action_required' => [
+            'subject' => ':name needs attention — :application',
+            'lines' => [
+                'This is the scheduled note for :name, and it needs somebody to pick it up.',
+                'Please take a look and reply once it has been dealt with.',
+            ],
+        ],
+
+        'blank' => [
+            'empty' => 'This notification was sent without a message.',
+        ],
 
         'general_reminder' => [
             'subject' => 'A reminder from :application',

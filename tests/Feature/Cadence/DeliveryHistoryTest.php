@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationDeliveryStatus;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationDeliveryStatus;
 use App\Enums\PermissionName;
 use App\Models\Client;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +18,7 @@ use function Pest\Laravel\put;
 
 describe('the history table', function (): void {
     it('lists deliveries with their client and status', function (): void {
-        $delivery = ClientNotificationDelivery::factory()
+        $delivery = NotificationDelivery::factory()
             ->for(Client::factory()->create(['name' => 'Northwind Studio']))
             ->create(['subject' => 'Your monthly update']);
 
@@ -31,8 +31,8 @@ describe('the history table', function (): void {
     });
 
     it('searches by subject and recipient', function (): void {
-        ClientNotificationDelivery::factory()->create(['subject' => 'Annual review reminder']);
-        ClientNotificationDelivery::factory()->create(['subject' => 'Something else entirely']);
+        NotificationDelivery::factory()->create(['subject' => 'Annual review reminder']);
+        NotificationDelivery::factory()->create(['subject' => 'Something else entirely']);
 
         actingAs(administrator())
             ->get(route('cadence.deliveries.index', ['search' => 'Annual review']))
@@ -42,11 +42,11 @@ describe('the history table', function (): void {
     });
 
     it('filters by status', function (): void {
-        ClientNotificationDelivery::factory()->failed()->create(['subject' => 'Failed message']);
-        ClientNotificationDelivery::factory()->sent()->create(['subject' => 'Delivered message']);
+        NotificationDelivery::factory()->failed()->create(['subject' => 'Failed message']);
+        NotificationDelivery::factory()->sent()->create(['subject' => 'Delivered message']);
 
         actingAs(administrator())
-            ->get(route('cadence.deliveries.index', ['status' => ClientNotificationDeliveryStatus::Failed->value]))
+            ->get(route('cadence.deliveries.index', ['status' => NotificationDeliveryStatus::Failed->value]))
             ->assertOk()
             ->assertSee('Failed message')
             ->assertDontSee('Delivered message');
@@ -55,11 +55,11 @@ describe('the history table', function (): void {
     it('filters by client and template', function (): void {
         $client = Client::factory()->create(['name' => 'Northwind Studio']);
 
-        ClientNotificationDelivery::factory()
+        NotificationDelivery::factory()
             ->for($client)
-            ->create(['subject' => 'Northwind message', 'template' => ClientEmailTemplate::AnnualReminder]);
+            ->create(['subject' => 'Northwind message', 'template' => EmailTemplate::AnnualReminder]);
 
-        ClientNotificationDelivery::factory()->create(['subject' => 'Other message']);
+        NotificationDelivery::factory()->create(['subject' => 'Other message']);
 
         $administrator = administrator();
 
@@ -70,18 +70,37 @@ describe('the history table', function (): void {
             ->assertDontSee('Other message');
 
         actingAs($administrator)
-            ->get(route('cadence.deliveries.index', ['template' => ClientEmailTemplate::AnnualReminder->value]))
+            ->get(route('cadence.deliveries.index', ['template' => EmailTemplate::AnnualReminder->value]))
             ->assertOk()
             ->assertSee('Northwind message');
     });
 
+    it('filters by where the delivery came from', function (): void {
+        NotificationDelivery::factory()->manual()->create(['subject' => 'Sent by hand']);
+        NotificationDelivery::factory()->create(['subject' => 'Sent by the scheduler']);
+
+        $administrator = administrator();
+
+        actingAs($administrator)
+            ->get(route('cadence.deliveries.index', ['source' => 'manual']))
+            ->assertOk()
+            ->assertSee('Sent by hand')
+            ->assertDontSee('Sent by the scheduler');
+
+        actingAs($administrator)
+            ->get(route('cadence.deliveries.index', ['source' => 'scheduled']))
+            ->assertOk()
+            ->assertSee('Sent by the scheduler')
+            ->assertDontSee('Sent by hand');
+    });
+
     it('filters by date range in the reader timezone', function (): void {
-        $delivery = ClientNotificationDelivery::factory()->create([
+        $delivery = NotificationDelivery::factory()->create([
             'subject' => 'Within range',
             'scheduled_for' => CarbonImmutable::parse('2026-05-10 09:00', 'UTC'),
         ]);
 
-        ClientNotificationDelivery::factory()->create([
+        NotificationDelivery::factory()->create([
             'subject' => 'Outside range',
             'scheduled_for' => CarbonImmutable::parse('2026-01-10 09:00', 'UTC'),
         ]);
@@ -96,7 +115,7 @@ describe('the history table', function (): void {
 
 describe('a single delivery', function (): void {
     it('shows the snapshot of what was sent', function (): void {
-        $delivery = ClientNotificationDelivery::factory()->create([
+        $delivery = NotificationDelivery::factory()->create([
             'subject' => 'Your annual reminder',
             'recipient_email' => 'client@example.test',
             'sender_email' => 'cadence@belo.test',
@@ -113,7 +132,7 @@ describe('a single delivery', function (): void {
     });
 
     it('shows why a delivery failed', function (): void {
-        $delivery = ClientNotificationDelivery::factory()->failed()->create();
+        $delivery = NotificationDelivery::factory()->failed()->create();
 
         actingAs(administrator())
             ->get(route('cadence.deliveries.show', $delivery))
@@ -125,7 +144,7 @@ describe('a single delivery', function (): void {
 
 describe('history is read-only', function (): void {
     it('has no route for changing or removing a delivery', function (): void {
-        $delivery = ClientNotificationDelivery::factory()->create();
+        $delivery = NotificationDelivery::factory()->create();
 
         actingAs(administrator());
 
@@ -136,12 +155,12 @@ describe('history is read-only', function (): void {
     });
 
     it('never authorises changing a delivery, even for an administrator', function (): void {
-        $delivery = ClientNotificationDelivery::factory()->create();
+        $delivery = NotificationDelivery::factory()->create();
         $administrator = administrator();
 
         expect($administrator->can('update', $delivery))->toBeFalse()
             ->and($administrator->can('delete', $delivery))->toBeFalse()
-            ->and($administrator->can('create', ClientNotificationDelivery::class))->toBeFalse();
+            ->and($administrator->can('create', NotificationDelivery::class))->toBeFalse();
     });
 
     it('offers no import for delivery history', function (): void {
@@ -152,9 +171,9 @@ describe('history is read-only', function (): void {
 describe('historical integrity', function (): void {
     it('keeps the recipient and subject a delivery was sent with when the client changes', function (): void {
         $client = Client::factory()->create(['name' => 'Northwind Studio', 'email' => 'hello@northwind.test']);
-        $schedule = ClientNotificationSchedule::factory()->for($client)->create();
+        $schedule = NotificationSchedule::factory()->for($client)->create();
 
-        $delivery = ClientNotificationDelivery::factory()->forSchedule($schedule)->create([
+        $delivery = NotificationDelivery::factory()->forSchedule($schedule)->create([
             'recipient_email' => 'hello@northwind.test',
             'recipient_name' => 'Northwind Studio',
             'subject' => 'Your monthly update from Belo Cadence',
@@ -175,7 +194,7 @@ describe('historical integrity', function (): void {
     });
 
     it('keeps the sender a delivery was sent with when the application settings change', function (): void {
-        $delivery = ClientNotificationDelivery::factory()->create([
+        $delivery = NotificationDelivery::factory()->create([
             'sender_email' => 'old-sender@belo.test',
             'sender_name' => 'Old Sender',
         ]);
@@ -195,17 +214,17 @@ describe('historical integrity', function (): void {
     });
 
     it('keeps the stored message even when the template changes', function (): void {
-        $schedule = ClientNotificationSchedule::factory()
+        $schedule = NotificationSchedule::factory()
             ->for(Client::factory())
-            ->create(['template' => ClientEmailTemplate::MonthlyReminder]);
+            ->create(['template' => EmailTemplate::MonthlyReminder]);
 
-        $delivery = ClientNotificationDelivery::factory()->forSchedule($schedule)->create([
-            'template' => ClientEmailTemplate::MonthlyReminder,
+        $delivery = NotificationDelivery::factory()->forSchedule($schedule)->create([
+            'template' => EmailTemplate::MonthlyReminder,
             'body_html' => '<p>The monthly wording as it was.</p>',
         ]);
 
         actingAs(administrator())->put(route('cadence.schedules.update', $schedule), [
-            'template' => ClientEmailTemplate::AnnualReminder->value,
+            'template' => EmailTemplate::AnnualReminder->value,
             'frequency' => $schedule->frequency->value,
             'starts_at' => $schedule->starts_at->format('Y-m-d\TH:i'),
             'is_enabled' => '1',
@@ -213,14 +232,14 @@ describe('historical integrity', function (): void {
 
         $delivery->refresh();
 
-        expect($delivery->template)->toBe(ClientEmailTemplate::MonthlyReminder)
+        expect($delivery->template)->toBe(EmailTemplate::MonthlyReminder)
             ->and($delivery->body_html)->toBe('<p>The monthly wording as it was.</p>');
     });
 
     it('keeps deliveries when the client is archived', function (): void {
         $client = Client::factory()->create();
-        $schedule = ClientNotificationSchedule::factory()->for($client)->create();
-        $delivery = ClientNotificationDelivery::factory()->forSchedule($schedule)->create();
+        $schedule = NotificationSchedule::factory()->for($client)->create();
+        $delivery = NotificationDelivery::factory()->forSchedule($schedule)->create();
 
         actingAs(administrator())->delete(route('clients.destroy', $client));
 
@@ -241,8 +260,8 @@ describe('authorisation', function (): void {
 
     it('hides deliveries on the client page from a user who may not see history', function (): void {
         $client = Client::factory()->create();
-        $schedule = ClientNotificationSchedule::factory()->for($client)->create();
-        ClientNotificationDelivery::factory()->forSchedule($schedule)->create(['subject' => 'Secret subject']);
+        $schedule = NotificationSchedule::factory()->for($client)->create();
+        NotificationDelivery::factory()->forSchedule($schedule)->create(['subject' => 'Secret subject']);
 
         actingAs(administratorWithout([PermissionName::NotificationDeliveriesViewAny]))
             ->get(route('clients.show', $client))

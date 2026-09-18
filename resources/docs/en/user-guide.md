@@ -36,7 +36,20 @@ Tick *Include archived* on the client list to find an archived client again.
 
 ## Notification schedules
 
-A **schedule** answers: which email does this client receive, and when?
+A **schedule** answers: which email goes out, to whom, and when?
+
+Every schedule sends to one of two things, and it is decided when you create it:
+
+- **A client.** The email goes to that client's address and the schedule is tracked under
+  them, on their own page.
+- **A recipient list.** You give the notification a name and the addresses it goes to.
+  It belongs to no client, which is how anything that is not about one client gets
+  scheduled — an internal digest, a note to a supplier, a reminder for your own team.
+
+Create a client schedule from the client's page, and either kind from **Cadence →
+Notification schedules → New notification**. A schedule never changes what it sends to:
+editing one lets you change its name, its addresses, its template and its timing, but a
+client schedule stays a client schedule.
 
 You choose one of the email templates, a frequency, and the first send date and time.
 From then on Belo Cadence works out each following occurrence itself.
@@ -61,6 +74,13 @@ was off are not sent in a burst.
 **Deleting** a schedule removes it from the working lists and keeps everything it already
 sent.
 
+**Send now**, on any schedule, sends that schedule's own message immediately to its own
+recipients. The recurrence is untouched: nothing is rescheduled and no occurrence is used
+up. It is recorded as a manual send.
+
+A client schedule only sends while its client is active and not archived — that applies to
+Send now as well. A recipient list answers to nobody's status.
+
 ## Upcoming
 
 **Upcoming** is the answer to "what is going out next?", nearest first. Narrow it to
@@ -70,15 +90,55 @@ state. Whatever you are looking at can be exported as it stands.
 ## Email templates
 
 Templates are part of the application, not something you edit in the browser. That is
-deliberate: it means the wording of a client email is reviewed like any other change and
-cannot be altered by accident.
+deliberate: it means the wording of an email is reviewed like any other change and cannot
+be altered by accident.
 
-Open **Cadence → Email templates** to read each one exactly as a client receives it,
-with a sample client filled in. You can also preview a template from the schedule form
-while you are choosing one.
+Every template is written for a particular reader, and that decides where it can be used:
 
-Adding a template is a small development task: an entry in the catalogue, a view, the
-wording, and a test.
+- **For a client** — the wording speaks to the client it is about. Only client schedules
+  may use these.
+- **For a recipient list** — the wording speaks to whoever was put on the list. Only
+  recipient-list schedules may use these.
+- **For any schedule** — the **Blank** template, which either kind may use.
+
+The schedule form only offers the templates that suit what you are sending to, so a
+client cannot be sent wording written for a mailing list.
+
+**Blank** is the one exception to wording living in the application: it ships with no copy
+at all, and you write the subject and the message on the schedule itself. It is plain text
+— leave a blank line between paragraphs — and it is sent exactly as typed, inside the
+normal email frame. Use it for the one-off that no template covers; use a real template
+for anything you send repeatedly, because that wording gets reviewed.
+
+Open **Cadence → Email templates** to read each one exactly as it arrives, with an example
+name filled in and a note of who it is written for. You can also preview a template from
+the schedule form while you are choosing one.
+
+Adding a template is a small development task: an entry in the catalogue, its audience, a
+view, the wording, and a test.
+
+## Sending by hand
+
+Sometimes something needs to go out now, and no schedule covers it. There are two ways.
+
+**From a schedule.** Open the schedule and press **Send now**. It sends that schedule's
+own message to its own recipients, and changes nothing about its recurrence.
+
+**Without a schedule.** Open **Cadence → Delivery history → Send now**, or use **Send
+now** on a client's own page. Choose either a client or type the addresses yourself, pick
+a template, and confirm — no schedule has to exist first. The email leaves immediately.
+
+Only **active** clients are offered. Marking a client inactive, or archiving them, is how
+you say "stop emailing them", so a manual send will not override it. Typed addresses are
+yours to get right; nothing checks them beyond being valid addresses.
+
+A manual send is recorded in delivery history exactly like a scheduled one, marked
+**Manual** and naming the person who sent it. Nothing about any schedule changes: no
+anchor moves, no occurrence is used up. Sending twice sends twice — there is no occurrence
+to be duplicated, so asking again means asking again.
+
+You can narrow delivery history to manual or scheduled sends with the **Source** filter,
+and the distinction comes along in both exports.
 
 ## Delivery history
 
@@ -87,20 +147,31 @@ the recipient, the sender, the subject and the exact message that was produced, 
 of it is ever recalculated. If a client's name or address changes tomorrow, or the sender
 changes, or a template is reworded, an old delivery still shows what actually went out.
 
+**One address, one delivery.** A notification going to five people is five deliveries, one
+per address. That is what lets a single rejected address show up on its own instead of
+hiding behind the four that arrived, and it is why a recipient list produces several rows
+for the same occurrence.
+
+Each delivery records what it was **sent to** — a client, or the name the recipient list
+had at the time — and that name is snapshotted like everything else, so renaming a list
+never rewrites its history.
+
 Open a delivery to see the message as it was sent, when it was scheduled, when it was
 attempted, and — if it failed — why.
 
 Delivery history cannot be edited or imported, by design. It can be searched, filtered
 and exported.
 
-Each occurrence is sent **once**. Running the scheduler twice, or by hand while it is
-already running, cannot produce a second email for the same occurrence.
+Each occurrence is sent **once per address**. Running the scheduler twice, or by hand
+while it is already running, cannot produce a second email for the same occurrence and the
+same recipient.
 
 ## When something fails
 
 A failed send is kept, marked as failed with the reason, and raises a notification for
 everybody who can see delivery history. The schedule then moves on to its next
-occurrence, so one bad afternoon does not block the whole series.
+occurrence, so one bad afternoon does not block the whole series. When one address on a
+recipient list fails, only that address fails — the rest of the list still went out.
 
 Look at the failure message on the delivery page first: it usually names the problem
 (a mail server that refused the connection, a rejected address). Once the cause is fixed,

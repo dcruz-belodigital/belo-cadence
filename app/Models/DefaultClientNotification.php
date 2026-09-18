@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationFrequency;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationFrequency;
 use Carbon\CarbonImmutable;
 use Database\Factories\DefaultClientNotificationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -19,8 +19,8 @@ use Illuminate\Database\Eloquent\Model;
  * governs a schedule after the fact.
  *
  * @property int $id
- * @property ClientEmailTemplate $template
- * @property ClientNotificationFrequency $frequency
+ * @property EmailTemplate $template
+ * @property NotificationFrequency $frequency
  * @property bool $is_enabled_by_default
  * @property CarbonImmutable $created_at
  * @property CarbonImmutable $updated_at
@@ -39,8 +39,8 @@ final class DefaultClientNotification extends Model
     protected function casts(): array
     {
         return [
-            'template' => ClientEmailTemplate::class,
-            'frequency' => ClientNotificationFrequency::class,
+            'template' => EmailTemplate::class,
+            'frequency' => NotificationFrequency::class,
             'is_enabled_by_default' => 'boolean',
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',

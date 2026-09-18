@@ -9,22 +9,41 @@ return [
         'inactive' => 'Inativo',
     ],
 
-    'client_notification_frequency' => [
+    'notification_frequency' => [
         'one_time' => 'Uma vez',
         'monthly' => 'Mensal',
         'yearly' => 'Anual',
     ],
 
-    'client_notification_delivery_status' => [
+    'notification_delivery_status' => [
         'pending' => 'Pendente',
         'sent' => 'Enviado',
         'failed' => 'Falhou',
     ],
 
-    'client_email_template' => [
+    'notification_delivery_source' => [
+        'scheduled' => 'Agendado',
+        'manual' => 'Manual',
+    ],
+
+    'notification_target' => [
+        'client' => 'Cliente',
+        'recipients' => 'Lista de destinatários',
+    ],
+
+    'email_template_audience' => [
+        'client' => 'Para um cliente',
+        'recipients' => 'Para uma lista de destinatários',
+        'any' => 'Para qualquer agendamento',
+    ],
+
+    'email_template' => [
         'general_reminder' => 'Lembrete geral',
         'monthly_reminder' => 'Lembrete mensal',
         'annual_reminder' => 'Lembrete anual',
+        'status_update' => 'Atualização de estado',
+        'action_required' => 'Ação necessária',
+        'blank' => 'Em branco',
     ],
 
     /*
@@ -85,7 +104,7 @@ return [
             'imported' => 'Clientes importados',
         ],
 
-        'client_notification_schedule' => [
+        'notification_schedule' => [
             'created' => 'Agendamento criado',
             'updated' => 'Agendamento atualizado',
             'enabled' => 'Agendamento ativado',

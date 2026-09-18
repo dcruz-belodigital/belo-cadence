@@ -27,6 +27,22 @@ function compiledStylesheet(): string
     return (string) file_get_contents(public_path('build/'.$file));
 }
 
+/**
+ * Every Blade file in the application, whatever its depth. `glob()` does not recurse and
+ * `+` on two lists keeps only the longer one's extra entries, so the listing is merged.
+ *
+ * @return list<string>
+ */
+function everyViewFile(): array
+{
+    return array_merge(
+        glob(resource_path('views/*.blade.php')) ?: [],
+        glob(resource_path('views/*/*.blade.php')) ?: [],
+        glob(resource_path('views/*/*/*.blade.php')) ?: [],
+        glob(resource_path('views/*/*/*/*.blade.php')) ?: [],
+    );
+}
+
 function stylesheetDefines(string $utility): bool
 {
     // Matches ".btn-primary" but not ".btn-primary-something", and allows the escaped
@@ -44,7 +60,10 @@ it('compiles every button variant and size the component can produce', function 
 
 it('compiles the shared form and focus utilities', function (string $utility): void {
     expect(stylesheetDefines($utility))->toBeTrue("The [{$utility}] utility is missing from the compiled stylesheet.");
-})->with(['form-control', 'focus-ring', 'focus-ring-inset', 'user-menu-trigger']);
+})->with([
+    'form-control', 'focus-ring', 'focus-ring-inset', 'user-menu-trigger',
+    'field-with-action', 'field-action', 'field-action-label',
+]);
 
 it('compiles the typography scale', function (string $utility): void {
     expect(stylesheetDefines($utility))->toBeTrue("The [{$utility}] utility is missing from the compiled stylesheet.");
@@ -66,7 +85,7 @@ it('compiles the shape and layout tokens', function (string $utility): void {
 it('never lets a page set its own width', function (): void {
     $offenders = [];
 
-    foreach (glob(resource_path('views/**/*.blade.php')) + glob(resource_path('views/**/**/*.blade.php')) as $file) {
+    foreach (everyViewFile() as $file) {
         $source = (string) file_get_contents($file);
 
         if (! str_contains($source, '<x-app-layout')) {
@@ -100,7 +119,7 @@ it('ships a dark palette as well as a light one', function (): void {
 it('never assembles a class name at runtime in a component', function (): void {
     $offenders = [];
 
-    foreach (glob(resource_path('views/components/**/*.blade.php')) + glob(resource_path('views/components/*.blade.php')) as $file) {
+    foreach (array_filter(everyViewFile(), fn (string $file): bool => str_contains($file, '/views/components/')) as $file) {
         foreach (explode("\n", (string) file_get_contents($file)) as $line) {
             // A quoted class fragment glued to a variable, such as 'btn-'.$variant. Only
             // lines that are about classes count: an id built the same way is harmless.
@@ -115,4 +134,29 @@ it('never assembles a class name at runtime in a component', function (): void {
     }
 
     expect($offenders)->toBe([], 'These components build class names at runtime, which Tailwind cannot see: '.implode(', ', $offenders));
+});
+
+/*
+| Every action a row offers sits in its menu. A loose button in an action cell is how a
+| table grows back into a wall of repeated controls, and nothing else fails while it does:
+| the markup still renders, and every page test still passes.
+*/
+it('keeps a table row action inside the row menu', function (): void {
+    $offenders = [];
+
+    foreach (everyViewFile() as $file) {
+        $source = (string) file_get_contents($file);
+
+        preg_match_all('/<x-table\.cell[^>]*\balign="right"[^>]*>(.*?)<\/x-table\.cell>/s', $source, $matches);
+
+        foreach ($matches[1] as $cell) {
+            if (str_contains($cell, '<x-button')) {
+                $offenders[] = basename($file);
+
+                break;
+            }
+        }
+    }
+
+    expect($offenders)->toBe([], 'These tables put a loose button in a row instead of an entry in x-table.actions: '.implode(', ', $offenders));
 });

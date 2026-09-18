@@ -63,7 +63,11 @@ final class ClientController extends Controller
     {
         $this->authorize('view', $client);
 
+        // Each schedule carries its client as well, even on the client's own page:
+        // `NotificationSchedulePolicy::send()` reads it to decide whether the send
+        // action may be offered, and lazy loading is prevented outside production.
         $client->load(['notificationSchedules' => fn (Builder $schedules): Builder => $schedules
+            ->with('client')
             ->orderByRaw('next_send_at is null')
             ->orderBy('next_send_at')]);
 

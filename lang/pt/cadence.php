@@ -17,6 +17,10 @@ return [
     ],
 
     'templates' => [
+        'audience' => 'Público',
+        'sample_list' => 'Lista de Exemplo',
+        'sample_subject' => 'A sua linha de assunto aparece aqui',
+        'sample_message' => "É aqui que aparece a mensagem que escrever no agendamento.\n\nAs linhas em branco tornam-se novos parágrafos.",
         'title' => 'Modelos de email',
         'description' => 'O email que os seus clientes recebem, exatamente como é enviado.',
         'source_notice' => 'Os modelos fazem parte da aplicação, por isso o seu texto é revisto como qualquer outra alteração e não pode ser editado aqui. Acrescentar um é uma pequena tarefa de desenvolvimento.',
@@ -27,7 +31,12 @@ return [
         'sample_notice' => 'As pré-visualizações usam um cliente de exemplo e a data atual.',
     ],
 
+    'recipient_count' => '{0} Sem destinatários|{1} 1 destinatário|[2,*] :count destinatários',
+
     'columns' => [
+        'name' => 'Notificação',
+        'recipients' => 'Destinatários',
+        'target' => 'Envia para',
         'client' => 'Cliente',
         'frequency' => 'Frequência',
         'last_sent_at' => 'Último envio',
@@ -39,6 +48,12 @@ return [
     ],
 
     'fields' => [
+        'client' => 'Cliente',
+        'message' => 'Mensagem',
+        'name' => 'Nome da notificação',
+        'recipients' => 'Emails dos destinatários',
+        'subject' => 'Assunto',
+        'target' => 'Envia para',
         'frequency' => 'Frequência',
         'is_enabled' => 'Ativo',
         'starts_at' => 'Data e hora do primeiro envio',
@@ -46,6 +61,12 @@ return [
     ],
 
     'hints' => [
+        'client' => 'Só é possível enviar email a clientes ativos. Um cliente arquivado ou inativo não aparece na lista.',
+        'message' => 'Texto simples. Deixe uma linha em branco entre parágrafos. É enviado exatamente como o escrever.',
+        'name' => 'Como esta notificação se chama nas listas, e o nome que os modelos imprimem.',
+        'recipients' => 'Um endereço de email por linha. Cada pessoa da lista recebe a sua própria cópia.',
+        'subject' => 'A linha de assunto do email.',
+        'target' => 'Um agendamento de cliente envia para esse cliente e fica registado nele. Uma lista de destinatários envia para os endereços que indicar.',
         'frequency' => 'Uma notificação de uma só vez é enviada uma vez e depois fecha-se sozinha.',
         'is_enabled' => 'Um agendamento desativado mantém as suas definições mas não envia nada.',
         'starts_at' => 'As horas são mostradas e introduzidas no seu fuso horário (:timezone).',
@@ -54,6 +75,8 @@ return [
     ],
 
     'actions' => [
+        'create_list' => 'Nova notificação',
+        'send' => 'Enviar agora',
         'create' => 'Novo agendamento',
         'delete' => 'Eliminar agendamento',
         'disable' => 'Desativar',
@@ -73,9 +96,10 @@ return [
     ],
 
     'filters' => [
+        'target' => 'Envia para',
         'frequency' => 'Frequência',
         'range' => 'Intervalo de tempo',
-        'search' => 'Pesquisar cliente',
+        'search' => 'Pesquisar nome ou cliente',
         'state' => 'Estado',
         'template' => 'Modelo',
     ],
@@ -99,10 +123,31 @@ return [
     ],
 
     'show' => [
+        'recipients' => 'Destinatários',
+        'message' => 'Mensagem',
+        'subject' => 'Assunto',
         'title' => 'Agendamento',
         'details' => 'Agendamento',
         'deliveries' => 'Envios deste agendamento',
         'deliveries_empty' => 'Este agendamento ainda não enviou nada',
+    ],
+
+    'send' => [
+        'title' => 'Enviar esta notificação agora?',
+        'message' => 'O email sai de imediato, para todos os destinatários desta notificação. O agendamento fica intacto: nada é reagendado e nenhuma ocorrência é gasta.',
+        'confirm' => 'Enviar agora',
+    ],
+
+    'enable' => [
+        'title' => 'Ativar este agendamento?',
+        'message' => 'Volta a enviar a partir da próxima ocorrência. Não sai nada agora.',
+        'confirm' => 'Ativar',
+    ],
+
+    'disable' => [
+        'title' => 'Desativar este agendamento?',
+        'message' => 'Não sai mais nada até voltar a ser ativado. O agendamento mantém o texto, as datas e tudo o que já enviou.',
+        'confirm' => 'Desativar',
     ],
 
     'delete' => [
@@ -119,6 +164,9 @@ return [
     ],
 
     'flash' => [
+        'send_no_recipients' => 'Esta notificação não tem destinatários, por isso nada foi enviado.',
+        'sent' => ':count email(s) enviado(s).',
+        'sent_with_failures' => 'Não foi possível enviar :failed de :total emails. O histórico de envios tem o motivo de cada um.',
         'created' => 'O agendamento :template foi criado.',
         'deleted' => 'O agendamento foi eliminado.',
         'disabled' => 'O agendamento foi desativado.',

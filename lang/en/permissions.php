@@ -13,7 +13,7 @@ return [
     'groups' => [
         'application-settings' => 'Application settings',
         'audit-log' => 'Audit log',
-        'client-notifications' => 'Notification schedules',
+        'notifications' => 'Notification schedules',
         'clients' => 'Clients',
         'dashboard' => 'Dashboard',
         'default-client-notifications' => 'Default notifications',
@@ -38,12 +38,13 @@ return [
             'export' => 'Export clients to CSV',
         ],
 
-        'client-notifications' => [
+        'notifications' => [
             'viewAny' => 'List notification schedules',
             'view' => 'View a notification schedule',
             'create' => 'Create notification schedules',
             'update' => 'Update, enable and disable schedules',
             'delete' => 'Delete notification schedules',
+            'send' => 'Send an email by hand',
             'export' => 'Export notification schedules to CSV',
         ],
 

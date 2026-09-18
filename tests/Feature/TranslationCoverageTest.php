@@ -3,17 +3,20 @@
 declare(strict_types=1);
 
 use App\Enums\AuditAction;
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationDeliveryStatus;
-use App\Enums\ClientNotificationFrequency;
 use App\Enums\ClientStatus;
 use App\Enums\ColorScheme;
+use App\Enums\EmailTemplate;
+use App\Enums\EmailTemplateAudience;
 use App\Enums\Locale;
+use App\Enums\NotificationDeliverySource;
+use App\Enums\NotificationDeliveryStatus;
+use App\Enums\NotificationFrequency;
+use App\Enums\NotificationTarget;
 use App\Enums\NotificationTimeRange;
 use App\Enums\PermissionName;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationSchedule;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Lang;
@@ -34,17 +37,29 @@ it('has a label for every client status', function (ClientStatus $status): void 
     expectTranslated($status->label(), 'enums.');
 })->with(ClientStatus::cases());
 
-it('has a label for every frequency', function (ClientNotificationFrequency $frequency): void {
+it('has a label for every frequency', function (NotificationFrequency $frequency): void {
     expectTranslated($frequency->label(), 'enums.');
-})->with(ClientNotificationFrequency::cases());
+})->with(NotificationFrequency::cases());
 
-it('has a label for every delivery status', function (ClientNotificationDeliveryStatus $status): void {
+it('has a label for every delivery status', function (NotificationDeliveryStatus $status): void {
     expectTranslated($status->label(), 'enums.');
-})->with(ClientNotificationDeliveryStatus::cases());
+})->with(NotificationDeliveryStatus::cases());
 
-it('has a label for every email template', function (ClientEmailTemplate $template): void {
+it('has a label for every delivery source', function (NotificationDeliverySource $source): void {
+    expectTranslated($source->label(), 'enums.');
+})->with(NotificationDeliverySource::cases());
+
+it('has a label for every notification target', function (NotificationTarget $target): void {
+    expectTranslated($target->label(), 'enums.');
+})->with(NotificationTarget::cases());
+
+it('has a label for every template audience', function (EmailTemplateAudience $audience): void {
+    expect($audience->label())->not->toBe('')->not->toStartWith('enums.');
+})->with(EmailTemplateAudience::cases());
+
+it('has a label for every email template', function (EmailTemplate $template): void {
     expectTranslated($template->label(), 'enums.');
-})->with(ClientEmailTemplate::cases());
+})->with(EmailTemplate::cases());
 
 it('has a label for every theme', function (ColorScheme $theme): void {
     expectTranslated($theme->label(), 'enums.');
@@ -67,23 +82,31 @@ it('has a name and a group label for every permission', function (PermissionName
         ->and($permission->groupLabel())->not->toBe('')->not->toStartWith('permissions.');
 })->with(PermissionName::cases());
 
-it('has a subject for every email template', function (ClientEmailTemplate $template): void {
-    $subject = $template->subject(['application' => 'Belo Cadence', 'client' => 'A Client']);
+/*
+| The blank template deliberately ships no wording: its subject and message are written
+| on the schedule, so there is nothing in the lang files to check.
+*/
+it('has a subject for every email template that brings its own copy', function (EmailTemplate $template): void {
+    $subject = $template->subject([
+        'application' => 'Belo Cadence',
+        'client' => 'A Client',
+        'name' => 'A Recipient List',
+    ]);
 
     expect($subject)->not->toBe('')
         ->not->toStartWith('mail.')
         ->toContain('Belo Cadence');
-})->with(ClientEmailTemplate::cases());
+})->with(array_filter(EmailTemplate::cases(), fn (EmailTemplate $template): bool => $template->hasOwnCopy()));
 
-it('has body copy for every email template', function (ClientEmailTemplate $template): void {
-    $lines = Lang::get('mail.client_notifications.'.$template->value.'.lines', ['application' => 'Belo Cadence']);
+it('has body copy for every email template that brings its own copy', function (EmailTemplate $template): void {
+    $lines = Lang::get('mail.notifications.'.$template->value.'.lines', ['application' => 'Belo Cadence']);
 
     expect($lines)->toBeArray()->not->toBeEmpty();
 
     foreach ($lines as $line) {
         expect($line)->toBeString()->not->toBe('');
     }
-})->with(ClientEmailTemplate::cases());
+})->with(array_filter(EmailTemplate::cases(), fn (EmailTemplate $template): bool => $template->hasOwnCopy()));
 
 it('has a label for every record type the audit log can refer to', function (): void {
     // Every mapped morph key can appear in auditable_type, so each needs a label.
@@ -103,7 +126,7 @@ it('has every date format the application asks for', function (string $format): 
 
 it('renders no raw translation keys on the pages a reader visits', function (): void {
     $client = Client::factory()->withNotes()->create();
-    $schedule = ClientNotificationSchedule::factory()->for($client)->create();
+    $schedule = NotificationSchedule::factory()->for($client)->create();
     Audit::factory()->forRecord($client)->create(['user_id' => User::factory()]);
 
     $administrator = administrator();
@@ -120,6 +143,7 @@ it('renders no raw translation keys on the pages a reader visits', function (): 
         route('cadence.schedules.show', $schedule),
         route('cadence.schedules.edit', $schedule),
         route('cadence.deliveries.index'),
+        route('cadence.deliveries.send'),
         route('admin.users.index'),
         route('admin.roles.index'),
         route('admin.roles.create'),

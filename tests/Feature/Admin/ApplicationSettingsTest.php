@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-use App\Actions\ClientNotifications\ProcessDueClientNotificationsAction;
+use App\Actions\Notifications\ProcessDueNotificationsAction;
 use App\Enums\AuditAction;
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationFrequency;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationFrequency;
 use App\Enums\PermissionName;
-use App\Mail\ClientNotificationMail;
+use App\Mail\NotificationMail;
 use App\Models\ApplicationSettings;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationSchedule;
 use App\Models\DefaultClientNotification;
+use App\Models\NotificationSchedule;
 use Illuminate\Support\Facades\Mail;
 
 use function Pest\Laravel\actingAs;
@@ -98,11 +98,11 @@ describe('application settings', function (): void {
             'client_email_sender_email' => 'team@belo.test',
         ]));
 
-        ClientNotificationSchedule::factory()->for(Client::factory())->due()->create();
+        NotificationSchedule::factory()->for(Client::factory())->due()->create();
 
-        app(ProcessDueClientNotificationsAction::class)();
+        app(ProcessDueNotificationsAction::class)();
 
-        Mail::assertSent(ClientNotificationMail::class, fn (ClientNotificationMail $mail): bool => $mail->hasFrom('team@belo.test', 'The Belo Team'));
+        Mail::assertSent(NotificationMail::class, fn (NotificationMail $mail): bool => $mail->hasFrom('team@belo.test', 'The Belo Team'));
     });
 
     it('does not expose mail server credentials', function (): void {
@@ -126,17 +126,17 @@ describe('default client notifications', function (): void {
         actingAs(administrator())
             ->put(route('admin.default-client-notifications.update'), [
                 'entries' => [
-                    ['template' => ClientEmailTemplate::MonthlyReminder->value, 'frequency' => ClientNotificationFrequency::Monthly->value, 'is_enabled_by_default' => '1'],
-                    ['template' => ClientEmailTemplate::AnnualReminder->value, 'frequency' => ClientNotificationFrequency::Yearly->value, 'is_enabled_by_default' => '0'],
+                    ['template' => EmailTemplate::MonthlyReminder->value, 'frequency' => NotificationFrequency::Monthly->value, 'is_enabled_by_default' => '1'],
+                    ['template' => EmailTemplate::AnnualReminder->value, 'frequency' => NotificationFrequency::Yearly->value, 'is_enabled_by_default' => '0'],
                 ],
             ])
             ->assertRedirect(route('admin.settings.edit'));
 
         expect(DefaultClientNotification::query()->count())->toBe(2);
 
-        $monthly = DefaultClientNotification::query()->where('template', ClientEmailTemplate::MonthlyReminder)->firstOrFail();
+        $monthly = DefaultClientNotification::query()->where('template', EmailTemplate::MonthlyReminder)->firstOrFail();
 
-        expect($monthly->frequency)->toBe(ClientNotificationFrequency::Monthly)
+        expect($monthly->frequency)->toBe(NotificationFrequency::Monthly)
             ->and($monthly->is_enabled_by_default)->toBeTrue();
 
         assertDatabaseHas('audits', ['action' => AuditAction::DefaultClientNotificationsUpdated->value]);
@@ -144,7 +144,7 @@ describe('default client notifications', function (): void {
 
     it('removes entries that are left out', function (): void {
         DefaultClientNotification::factory()
-            ->forTemplate(ClientEmailTemplate::GeneralReminder, ClientNotificationFrequency::OneTime)
+            ->forTemplate(EmailTemplate::GeneralReminder, NotificationFrequency::OneTime)
             ->create();
 
         actingAs(administrator())
@@ -158,8 +158,8 @@ describe('default client notifications', function (): void {
         actingAs(administrator())
             ->put(route('admin.default-client-notifications.update'), [
                 'entries' => [
-                    ['template' => ClientEmailTemplate::MonthlyReminder->value, 'frequency' => ClientNotificationFrequency::Monthly->value, 'is_enabled_by_default' => '1'],
-                    ['template' => ClientEmailTemplate::MonthlyReminder->value, 'frequency' => ClientNotificationFrequency::Monthly->value, 'is_enabled_by_default' => '0'],
+                    ['template' => EmailTemplate::MonthlyReminder->value, 'frequency' => NotificationFrequency::Monthly->value, 'is_enabled_by_default' => '1'],
+                    ['template' => EmailTemplate::MonthlyReminder->value, 'frequency' => NotificationFrequency::Monthly->value, 'is_enabled_by_default' => '0'],
                 ],
             ])
             ->assertRedirect();
@@ -171,7 +171,7 @@ describe('default client notifications', function (): void {
         actingAs(administrator())
             ->put(route('admin.default-client-notifications.update'), [
                 'entries' => [
-                    ['template' => 'weekly_digest', 'frequency' => ClientNotificationFrequency::Monthly->value],
+                    ['template' => 'weekly_digest', 'frequency' => NotificationFrequency::Monthly->value],
                 ],
             ])
             ->assertSessionHasErrors('entries.0.template');
@@ -179,13 +179,13 @@ describe('default client notifications', function (): void {
 
     it('offers the configured defaults on the client creation form', function (): void {
         DefaultClientNotification::factory()
-            ->forTemplate(ClientEmailTemplate::AnnualReminder, ClientNotificationFrequency::Yearly)
+            ->forTemplate(EmailTemplate::AnnualReminder, NotificationFrequency::Yearly)
             ->create();
 
         actingAs(administrator())
             ->get(route('clients.create'))
             ->assertOk()
-            ->assertSee(ClientEmailTemplate::AnnualReminder->label())
+            ->assertSee(EmailTemplate::AnnualReminder->label())
             ->assertSee(__('clients.create.apply'));
     });
 

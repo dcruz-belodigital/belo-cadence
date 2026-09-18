@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Enums\Locale;
 use App\Enums\ColorScheme;
+use App\Enums\Locale;
 use App\Models\Client;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationSchedule;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Hash;
@@ -68,7 +68,7 @@ describe('preferences', function (): void {
 
         $client = Client::factory()->create();
 
-        $schedule = ClientNotificationSchedule::factory()
+        $schedule = NotificationSchedule::factory()
             ->for($client)
             ->scheduledFor(CarbonImmutable::parse('2026-06-01 22:00', 'UTC'))
             ->create();

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationFrequency;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationFrequency;
 use App\Models\DefaultClientNotification;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,13 +22,13 @@ final class DefaultClientNotificationFactory extends Factory
     public function definition(): array
     {
         return [
-            'template' => ClientEmailTemplate::GeneralReminder,
-            'frequency' => ClientNotificationFrequency::Monthly,
+            'template' => EmailTemplate::GeneralReminder,
+            'frequency' => NotificationFrequency::Monthly,
             'is_enabled_by_default' => true,
         ];
     }
 
-    public function forTemplate(ClientEmailTemplate $template, ClientNotificationFrequency $frequency): static
+    public function forTemplate(EmailTemplate $template, NotificationFrequency $frequency): static
     {
         return $this->state(fn (array $attributes): array => [
             'template' => $template,

@@ -724,6 +724,118 @@
     }
 }
 
+/*
+| A field with an action fixed to its trailing edge — previewing a template, and anything
+| like it. The control and the button share one outline and one focus ring, so the pair
+| reads as a single field rather than as an input with a button parked beside it.
+|
+| The control keeps the browser's own dropdown arrow. Moving the action inside the box
+| would mean drawing our own arrow, which would leave these selects looking unlike every
+| other select in the application.
+*/
+@utility field-with-action {
+    display: flex;
+    align-items: stretch;
+    border-radius: var(--radius-control);
+
+    /* The ring belongs to the group now, so the control gives up its own. */
+    & > .form-control {
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+        border-inline-end-width: 0;
+    }
+
+    & > .form-control:focus {
+        outline: none;
+    }
+
+    &:has(:focus-visible) {
+        outline: 2px solid var(--color-ring);
+        outline-offset: 1px;
+    }
+
+    /* Focus and invalidity are properties of the field, so both halves show them. */
+    &:has(:focus-visible) > * {
+        border-color: var(--color-ring);
+    }
+
+    &:has([aria-invalid='true']) > * {
+        border-color: var(--color-danger);
+    }
+}
+
+/*
+| The action itself: an icon the width of a control's height, so it reads as part of the
+| field rather than as a button that happens to sit near it.
+*/
+@utility field-action {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: var(--spacing-control);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    border-start-end-radius: var(--radius-control);
+    border-end-end-radius: var(--radius-control);
+    border: 1px solid var(--color-border-strong);
+    background-color: var(--color-surface-sunken);
+    color: var(--color-foreground-muted);
+    transition-property: color, background-color, border-color;
+    transition-duration: var(--default-transition-duration);
+
+    &:hover {
+        background-color: var(--color-surface-hover);
+        color: var(--color-foreground);
+    }
+
+    /* The group draws the ring for the pair, so the button does not draw a second one. */
+    &:focus-visible {
+        outline: none;
+    }
+
+    &:disabled {
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    &:hover > .field-action-label,
+    &:focus-visible > .field-action-label {
+        opacity: 1;
+    }
+}
+
+/*
+| What an icon-only action is called, shown on hover and on keyboard focus. It is drawn
+| by CSS rather than by a script, and hidden from assistive software: the button carries
+| the same words in an `sr-only` span, which is what a screen reader reads.
+|
+| It hangs from the action's trailing edge rather than being centred on it. The action
+| sits at the end of a field, which sits against the padding of a card that clips to its
+| radius — a centred label is wider than the space left beside it and gets cut in half.
+*/
+@utility field-action-label {
+    position: absolute;
+    bottom: calc(100% + 0.375rem);
+    inset-inline-end: 0;
+    z-index: 20;
+    white-space: nowrap;
+    border-radius: var(--radius-control);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface-elevated);
+    padding-inline: 0.5rem;
+    padding-block: 0.1875rem;
+    color: var(--color-foreground);
+    font-size: var(--text-meta);
+    line-height: var(--text-meta--line-height);
+    box-shadow: var(--shadow-popover);
+    opacity: 0;
+    pointer-events: none;
+    transition-property: opacity;
+    transition-duration: var(--default-transition-duration);
+}
+
 @utility form-control {
     display: block;
     width: 100%;

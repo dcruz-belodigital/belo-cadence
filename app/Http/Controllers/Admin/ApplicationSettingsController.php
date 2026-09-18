@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdateApplicationSettingsRequest;
 use App\Models\ApplicationSettings;
 use App\Models\DefaultClientNotification;
-use App\Support\ClientEmailTemplatePreview;
+use App\Support\EmailTemplatePreview;
 use App\ValueObjects\TimezoneIdentifier;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
@@ -26,7 +26,7 @@ use Illuminate\View\View;
  */
 final class ApplicationSettingsController extends Controller
 {
-    public function edit(ClientEmailTemplatePreview $templatePreviews): View
+    public function edit(EmailTemplatePreview $templatePreviews): View
     {
         $mayViewSettings = Gate::allows('view', ApplicationSettings::class);
         $mayViewDefaults = Gate::allows('viewAny', DefaultClientNotification::class);

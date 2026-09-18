@@ -18,6 +18,7 @@ return [
         'export_table' => 'Exportar esta vista',
         'hide_password' => 'Ocultar palavra-passe',
         'import' => 'Importar',
+        'more' => 'Mais ações',
         'save' => 'Guardar alterações',
         'search' => 'Pesquisar',
         'show_password' => 'Mostrar palavra-passe',
@@ -45,6 +46,10 @@ return [
         'next' => 'Página seguinte',
         'previous' => 'Página anterior',
         'summary' => 'A mostrar :first–:last de :total',
+    ],
+
+    'columns' => [
+        'actions' => 'Ações',
     ],
 
     'placeholders' => [

@@ -28,8 +28,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable $created_at
  * @property CarbonImmutable $updated_at
  * @property CarbonImmutable|null $deleted_at
- * @property-read Collection<int, ClientNotificationSchedule> $notificationSchedules
- * @property-read Collection<int, ClientNotificationDelivery> $notificationDeliveries
+ * @property-read Collection<int, NotificationSchedule> $notificationSchedules
+ * @property-read Collection<int, NotificationDelivery> $notificationDeliveries
  * @property-read int|null $notification_schedules_count
  */
 #[Fillable(['name', 'email', 'status', 'notes'])]
@@ -39,22 +39,22 @@ final class Client extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * @return HasMany<ClientNotificationSchedule, $this>
+     * @return HasMany<NotificationSchedule, $this>
      */
     public function notificationSchedules(): HasMany
     {
-        return $this->hasMany(ClientNotificationSchedule::class);
+        return $this->hasMany(NotificationSchedule::class);
     }
 
     /**
      * Delivery history is kept directly on the client as well, so it survives the
      * removal of the schedule that produced it.
      *
-     * @return HasMany<ClientNotificationDelivery, $this>
+     * @return HasMany<NotificationDelivery, $this>
      */
     public function notificationDeliveries(): HasMany
     {
-        return $this->hasMany(ClientNotificationDelivery::class);
+        return $this->hasMany(NotificationDelivery::class);
     }
 
     public function isActive(): bool

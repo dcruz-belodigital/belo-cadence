@@ -12,7 +12,7 @@
 
 <th scope="col"
     aria-sort="{{ $active ? ($direction === 'asc' ? 'ascending' : 'descending') : 'none' }}"
-    class="px-4 py-2.5 text-overline uppercase text-foreground-muted {{ $align === 'right' ? 'text-right' : 'text-left' }}">
+    class="px-4 py-2.5 text-overline whitespace-nowrap uppercase text-foreground-muted {{ $align === 'right' ? 'text-right' : 'text-left' }}">
     <a href="{{ $url }}"
        class="focus-ring inline-flex items-center gap-1 rounded-control transition hover:text-foreground {{ $active ? 'text-foreground' : '' }}">
         {{ $slot }}

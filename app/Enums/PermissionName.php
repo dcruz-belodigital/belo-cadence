@@ -24,12 +24,13 @@ enum PermissionName: string
     case ClientsImport = 'clients.import';
     case ClientsExport = 'clients.export';
 
-    case ClientNotificationsViewAny = 'client-notifications.viewAny';
-    case ClientNotificationsView = 'client-notifications.view';
-    case ClientNotificationsCreate = 'client-notifications.create';
-    case ClientNotificationsUpdate = 'client-notifications.update';
-    case ClientNotificationsDelete = 'client-notifications.delete';
-    case ClientNotificationsExport = 'client-notifications.export';
+    case NotificationsViewAny = 'notifications.viewAny';
+    case NotificationsView = 'notifications.view';
+    case NotificationsCreate = 'notifications.create';
+    case NotificationsUpdate = 'notifications.update';
+    case NotificationsDelete = 'notifications.delete';
+    case NotificationsSend = 'notifications.send';
+    case NotificationsExport = 'notifications.export';
 
     case NotificationDeliveriesViewAny = 'notification-deliveries.viewAny';
     case NotificationDeliveriesView = 'notification-deliveries.view';

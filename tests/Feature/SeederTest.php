@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-use App\Enums\ClientNotificationDeliveryStatus;
-use App\Enums\ClientNotificationFrequency;
 use App\Enums\ColorScheme;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationDeliveryStatus;
+use App\Enums\NotificationFrequency;
 use App\Enums\PermissionName;
 use App\Models\ApplicationSettings;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
 use App\Models\DefaultClientNotification;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -63,8 +64,8 @@ describe('the essential seeder', function (): void {
 
     it('creates no demo business data at all', function (): void {
         expect(Client::query()->withTrashed()->count())->toBe(0)
-            ->and(ClientNotificationSchedule::query()->withTrashed()->count())->toBe(0)
-            ->and(ClientNotificationDelivery::query()->count())->toBe(0)
+            ->and(NotificationSchedule::query()->withTrashed()->count())->toBe(0)
+            ->and(NotificationDelivery::query()->count())->toBe(0)
             ->and(DefaultClientNotification::query()->count())->toBe(0)
             ->and(Audit::query()->count())->toBe(0)
             ->and(DatabaseNotification::query()->count())->toBe(0)
@@ -109,31 +110,59 @@ describe('the demo seeder', function (): void {
     });
 
     it('creates every frequency and both schedule states', function (): void {
-        foreach (ClientNotificationFrequency::cases() as $frequency) {
-            expect(ClientNotificationSchedule::query()->where('frequency', $frequency->value)->exists())->toBeTrue();
+        foreach (NotificationFrequency::cases() as $frequency) {
+            expect(NotificationSchedule::query()->where('frequency', $frequency->value)->exists())->toBeTrue();
         }
 
-        expect(ClientNotificationSchedule::query()->where('is_enabled', true)->exists())->toBeTrue()
-            ->and(ClientNotificationSchedule::query()->where('is_enabled', false)->exists())->toBeTrue()
-            ->and(ClientNotificationSchedule::query()->whereNotNull('last_sent_at')->exists())->toBeTrue();
+        expect(NotificationSchedule::query()->where('is_enabled', true)->exists())->toBeTrue()
+            ->and(NotificationSchedule::query()->where('is_enabled', false)->exists())->toBeTrue()
+            ->and(NotificationSchedule::query()->whereNotNull('last_sent_at')->exists())->toBeTrue();
     });
 
     it('creates notifications due today, soon and further out', function (): void {
         $now = CarbonImmutable::now();
 
-        expect(ClientNotificationSchedule::query()->due($now)->exists())->toBeTrue()
-            ->and(ClientNotificationSchedule::query()
+        expect(NotificationSchedule::query()->due($now)->exists())->toBeTrue()
+            ->and(NotificationSchedule::query()
                 ->whereBetween('next_send_at', [$now, $now->addDays(7)])
                 ->exists())->toBeTrue()
-            ->and(ClientNotificationSchedule::query()
+            ->and(NotificationSchedule::query()
                 ->where('next_send_at', '>', $now->addDays(30))
                 ->exists())->toBeTrue();
     });
 
     it('creates sent, failed and pending delivery history', function (): void {
-        foreach (ClientNotificationDeliveryStatus::cases() as $status) {
-            expect(ClientNotificationDelivery::query()->where('status', $status->value)->exists())->toBeTrue();
+        foreach (NotificationDeliveryStatus::cases() as $status) {
+            expect(NotificationDelivery::query()->where('status', $status->value)->exists())->toBeTrue();
         }
+    });
+
+    it('creates schedules for both targets, including a blank one', function (): void {
+        $lists = NotificationSchedule::query()->whereNull('client_id')->get();
+
+        expect(NotificationSchedule::query()->whereNotNull('client_id')->exists())->toBeTrue()
+            ->and($lists)->not->toBeEmpty()
+            ->and($lists->every(fn (NotificationSchedule $schedule): bool => $schedule->name !== null))->toBeTrue()
+            ->and($lists->contains(fn (NotificationSchedule $schedule): bool => $schedule->template === EmailTemplate::Blank))->toBeTrue()
+            ->and($lists->contains(fn (NotificationSchedule $schedule): bool => $schedule->message !== null))->toBeTrue();
+    });
+
+    it('creates one delivery per address for a recipient list, including a rejected one', function (): void {
+        $listDeliveries = NotificationDelivery::query()->whereNull('client_id')->where('is_manual', false)->get();
+
+        expect($listDeliveries->count())->toBeGreaterThanOrEqual(2)
+            ->and($listDeliveries->pluck('scheduled_for')->unique())->toHaveCount(1)
+            ->and($listDeliveries->pluck('target_name')->unique())->toHaveCount(1)
+            ->and($listDeliveries->where('status', NotificationDeliveryStatus::Failed)->count())->toBe(1);
+    });
+
+    it('creates a manual send alongside the scheduled ones', function (): void {
+        $manual = NotificationDelivery::query()->manual()->first();
+
+        expect($manual)->not->toBeNull()
+            ->and($manual->notification_schedule_id)->toBeNull()
+            ->and($manual->triggered_by_user_id)->not->toBeNull()
+            ->and(NotificationDelivery::query()->where('is_manual', false)->exists())->toBeTrue();
     });
 
     it('creates read and unread application notifications', function (): void {
@@ -152,13 +181,13 @@ describe('the demo seeder', function (): void {
 
     it('can be run twice without duplicating anything', function (): void {
         $clients = Client::query()->withTrashed()->count();
-        $schedules = ClientNotificationSchedule::query()->count();
+        $schedules = NotificationSchedule::query()->count();
         $users = User::query()->count();
 
         seed(DemoSeeder::class);
 
         expect(Client::query()->withTrashed()->count())->toBe($clients)
-            ->and(ClientNotificationSchedule::query()->count())->toBe($schedules)
+            ->and(NotificationSchedule::query()->count())->toBe($schedules)
             ->and(User::query()->count())->toBe($users);
     });
 });

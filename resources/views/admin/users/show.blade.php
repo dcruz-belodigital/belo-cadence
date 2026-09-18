@@ -23,10 +23,17 @@
                 @endcan
             @else
                 @can('activate', $user)
-                    <form method="POST" action="{{ route('admin.users.activate', $user) }}">
-                        @csrf
-                        <x-button type="submit" icon="check-circle">{{ __('users.actions.activate') }}</x-button>
-                    </form>
+                    <x-confirm-form :action="route('admin.users.activate', $user)"
+                                    method="POST"
+                                    :title="__('users.activate.title')"
+                                    :message="__('users.activate.message')"
+                                    :confirm="__('users.activate.confirm')"
+                                    variant="primary"
+                                    trigger-variant="primary"
+                                    trigger-size="md"
+                                    icon="check-circle">
+                        <x-slot:trigger>{{ __('users.actions.activate') }}</x-slot:trigger>
+                    </x-confirm-form>
                 @endcan
             @endif
         </x-slot:actions>

@@ -3,15 +3,15 @@
 declare(strict_types=1);
 
 use App\Enums\AuditAction;
-use App\Enums\ClientEmailTemplate;
-use App\Enums\ClientNotificationFrequency;
 use App\Enums\ClientStatus;
+use App\Enums\EmailTemplate;
+use App\Enums\NotificationFrequency;
 use App\Enums\PermissionName;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
 use App\Models\DefaultClientNotification;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 use Carbon\CarbonImmutable;
 
 use function Pest\Laravel\actingAs;
@@ -20,7 +20,7 @@ use function Pest\Laravel\assertDatabaseHas;
 describe('listing clients', function (): void {
     it('shows clients with their schedule count', function (): void {
         $client = Client::factory()->create(['name' => 'Northwind Studio']);
-        ClientNotificationSchedule::factory()->for($client)->count(2)->create();
+        NotificationSchedule::factory()->for($client)->count(2)->create();
 
         actingAs(administrator())
             ->get(route('clients.index'))
@@ -145,11 +145,11 @@ describe('creating a client', function (): void {
 describe('applying default notifications while creating a client', function (): void {
     it('creates the schedules the user ticked', function (): void {
         $monthly = DefaultClientNotification::factory()
-            ->forTemplate(ClientEmailTemplate::MonthlyReminder, ClientNotificationFrequency::Monthly)
+            ->forTemplate(EmailTemplate::MonthlyReminder, NotificationFrequency::Monthly)
             ->create();
 
         $annual = DefaultClientNotification::factory()
-            ->forTemplate(ClientEmailTemplate::AnnualReminder, ClientNotificationFrequency::Yearly)
+            ->forTemplate(EmailTemplate::AnnualReminder, NotificationFrequency::Yearly)
             ->create();
 
         $firstSend = CarbonImmutable::now()->addDays(10)->setTime(9, 0);
@@ -169,8 +169,8 @@ describe('applying default notifications while creating a client', function (): 
         $client = Client::query()->firstOrFail();
 
         expect($client->notificationSchedules)->toHaveCount(1)
-            ->and($client->notificationSchedules->first()->template)->toBe(ClientEmailTemplate::MonthlyReminder)
-            ->and($client->notificationSchedules->first()->frequency)->toBe(ClientNotificationFrequency::Monthly)
+            ->and($client->notificationSchedules->first()->template)->toBe(EmailTemplate::MonthlyReminder)
+            ->and($client->notificationSchedules->first()->frequency)->toBe(NotificationFrequency::Monthly)
             ->and($client->notificationSchedules->first()->next_send_at->format('Y-m-d H:i'))
             ->toBe($firstSend->format('Y-m-d H:i'));
     });
@@ -214,7 +214,7 @@ describe('applying default notifications while creating a client', function (): 
 
     it('takes the template and frequency from the stored default, not from the form', function (): void {
         $default = DefaultClientNotification::factory()
-            ->forTemplate(ClientEmailTemplate::AnnualReminder, ClientNotificationFrequency::Yearly)
+            ->forTemplate(EmailTemplate::AnnualReminder, NotificationFrequency::Yearly)
             ->create();
 
         actingAs(administrator())
@@ -229,22 +229,22 @@ describe('applying default notifications while creating a client', function (): 
                         'starts_at' => CarbonImmutable::now()->addDays(3)->format('Y-m-d\TH:i'),
                         'is_enabled' => '1',
                         // A tampered payload trying to pick a different template.
-                        'template' => ClientEmailTemplate::GeneralReminder->value,
-                        'frequency' => ClientNotificationFrequency::Monthly->value,
+                        'template' => EmailTemplate::GeneralReminder->value,
+                        'frequency' => NotificationFrequency::Monthly->value,
                     ],
                 ],
             ])
             ->assertRedirect();
 
-        $schedule = ClientNotificationSchedule::query()->firstOrFail();
+        $schedule = NotificationSchedule::query()->firstOrFail();
 
-        expect($schedule->template)->toBe(ClientEmailTemplate::AnnualReminder)
-            ->and($schedule->frequency)->toBe(ClientNotificationFrequency::Yearly);
+        expect($schedule->template)->toBe(EmailTemplate::AnnualReminder)
+            ->and($schedule->frequency)->toBe(NotificationFrequency::Yearly);
     });
 
     it('does not change schedules that were already created when the defaults change later', function (): void {
         $default = DefaultClientNotification::factory()
-            ->forTemplate(ClientEmailTemplate::MonthlyReminder, ClientNotificationFrequency::Monthly)
+            ->forTemplate(EmailTemplate::MonthlyReminder, NotificationFrequency::Monthly)
             ->create();
 
         actingAs(administrator())
@@ -262,18 +262,18 @@ describe('applying default notifications while creating a client', function (): 
                 ],
             ]);
 
-        $schedule = ClientNotificationSchedule::query()->firstOrFail();
+        $schedule = NotificationSchedule::query()->firstOrFail();
 
         actingAs(administrator())
             ->put(route('admin.default-client-notifications.update'), [
                 'entries' => [
-                    ['template' => ClientEmailTemplate::AnnualReminder->value, 'frequency' => ClientNotificationFrequency::Yearly->value, 'is_enabled_by_default' => '1'],
+                    ['template' => EmailTemplate::AnnualReminder->value, 'frequency' => NotificationFrequency::Yearly->value, 'is_enabled_by_default' => '1'],
                 ],
             ])
             ->assertRedirect();
 
-        expect($schedule->fresh()->template)->toBe(ClientEmailTemplate::MonthlyReminder)
-            ->and($schedule->fresh()->frequency)->toBe(ClientNotificationFrequency::Monthly);
+        expect($schedule->fresh()->template)->toBe(EmailTemplate::MonthlyReminder)
+            ->and($schedule->fresh()->frequency)->toBe(NotificationFrequency::Monthly);
     });
 });
 
@@ -329,8 +329,8 @@ describe('updating a client', function (): void {
 describe('archiving and restoring a client', function (): void {
     it('archives the client, switches off its schedules and keeps its history', function (): void {
         $client = Client::factory()->create();
-        $schedule = ClientNotificationSchedule::factory()->for($client)->create();
-        $delivery = ClientNotificationDelivery::factory()->forSchedule($schedule)->create();
+        $schedule = NotificationSchedule::factory()->for($client)->create();
+        $delivery = NotificationDelivery::factory()->forSchedule($schedule)->create();
 
         actingAs(administrator())
             ->delete(route('clients.destroy', $client))
@@ -346,7 +346,7 @@ describe('archiving and restoring a client', function (): void {
 
     it('restores an archived client without switching its schedules back on', function (): void {
         $client = Client::factory()->archived()->create();
-        $schedule = ClientNotificationSchedule::factory()->for($client)->disabled()->create();
+        $schedule = NotificationSchedule::factory()->for($client)->disabled()->create();
 
         actingAs(administrator())
             ->post(route('clients.restore', $client))
@@ -372,13 +372,32 @@ describe('archiving and restoring a client', function (): void {
 describe('viewing a client', function (): void {
     it('shows the client with its schedules', function (): void {
         $client = Client::factory()->withNotes()->create(['name' => 'Northwind Studio']);
-        ClientNotificationSchedule::factory()->for($client)->create();
+        NotificationSchedule::factory()->for($client)->create();
 
         actingAs(administrator())
             ->get(route('clients.show', $client))
             ->assertOk()
             ->assertSee('Northwind Studio')
             ->assertSee($client->notes);
+    });
+
+    /*
+     * Eloquent only marks models as protected from lazy loading when a query returned
+     * more than one row, so a client with a single schedule cannot show a missing eager
+     * load. Two schedules are what makes the send action's policy read its client for
+     * real, which is how this page once broke.
+     */
+    it('offers the send action on every schedule of a client', function (): void {
+        $client = Client::factory()->create();
+        $schedules = NotificationSchedule::factory()->for($client)->count(2)->create();
+
+        $response = actingAs(administrator())
+            ->get(route('clients.show', $client))
+            ->assertOk();
+
+        foreach ($schedules as $schedule) {
+            $response->assertSee(route('cadence.schedules.send', $schedule), escape: false);
+        }
     });
 
     // Archived clients have their own suite: tests/Feature/Clients/ArchivedClientTest.php

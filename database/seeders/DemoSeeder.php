@@ -38,8 +38,8 @@ final class DemoSeeder extends Seeder
             DemoUserSeeder::class,
             DemoDefaultClientNotificationSeeder::class,
             DemoClientSeeder::class,
-            DemoClientNotificationSeeder::class,
-            DemoNotificationSeeder::class,
+            DemoNotificationScheduleSeeder::class,
+            DemoInAppNotificationSeeder::class,
             DemoAuditSeeder::class,
         ]);
     }

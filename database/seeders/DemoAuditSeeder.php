@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use App\Enums\AuditAction;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationSchedule;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
@@ -26,7 +26,7 @@ final class DemoAuditSeeder extends Seeder
         $administrator = User::query()->where('email', 'ada@example.test')->first();
         $coordinator = User::query()->where('email', 'bruno@example.test')->first();
         $client = Client::query()->where('email', 'hello@northwind.test')->first();
-        $schedule = ClientNotificationSchedule::query()->where('client_id', $client?->getKey())->first();
+        $schedule = NotificationSchedule::query()->where('client_id', $client?->getKey())->first();
 
         if (! $administrator instanceof User || ! $client instanceof Client) {
             return;
@@ -57,10 +57,10 @@ final class DemoAuditSeeder extends Seeder
             'created_at' => $now->subDays(12),
         ]);
 
-        if ($schedule instanceof ClientNotificationSchedule) {
+        if ($schedule instanceof NotificationSchedule) {
             Audit::query()->create([
                 'user_id' => $coordinator?->getKey(),
-                'action' => AuditAction::ClientNotificationScheduleCreated,
+                'action' => AuditAction::NotificationScheduleCreated,
                 'auditable_type' => $schedule->getMorphClass(),
                 'auditable_id' => $schedule->getKey(),
                 'new_values' => [

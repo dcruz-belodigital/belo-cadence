@@ -9,7 +9,7 @@ use App\Enums\ClientStatus;
 use App\Enums\PermissionName;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationSchedule;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Mail;
@@ -39,7 +39,7 @@ describe('what gets recorded', function (): void {
     it('records work done by the scheduler as a system action', function (): void {
         Mail::fake();
 
-        $schedule = ClientNotificationSchedule::factory()
+        $schedule = NotificationSchedule::factory()
             ->for(Client::factory())
             ->due()
             ->create();

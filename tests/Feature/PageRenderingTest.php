@@ -5,9 +5,9 @@ declare(strict_types=1);
 use App\Enums\ColorScheme;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
 use App\Models\DefaultClientNotification;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 use App\Models\Role;
 use App\Models\User;
 
@@ -23,8 +23,17 @@ function everyPageUrl(): array
 {
     $client = Client::factory()->withNotes()->create();
     $archivedClient = Client::factory()->archived()->create();
-    $schedule = ClientNotificationSchedule::factory()->for($client)->create();
-    $delivery = ClientNotificationDelivery::factory()->forSchedule($schedule)->failed()->create();
+    $schedule = NotificationSchedule::factory()->for($client)->create();
+    // A second schedule for the same client, because Eloquent only guards a result set
+    // of more than one row against lazy loading — one row hides a missing eager load.
+    NotificationSchedule::factory()->for($client)->create();
+    $delivery = NotificationDelivery::factory()->forSchedule($schedule)->failed()->create();
+    // A manual delivery has no schedule behind it, which its page has to survive.
+    $manualDelivery = NotificationDelivery::factory()->manual()->create();
+    // A schedule with no client at all, and one whose wording lives on the schedule.
+    $listSchedule = NotificationSchedule::factory()->forRecipients('Weekly ops digest')->create();
+    $blankSchedule = NotificationSchedule::factory()->forRecipients('Board note')->blank()->create();
+    $listDelivery = NotificationDelivery::factory()->forRecipientList('Weekly ops digest')->create();
     $audit = Audit::factory()->forRecord($client)->create();
     $role = Role::factory()->create();
     $user = User::factory()->create();
@@ -49,9 +58,20 @@ function everyPageUrl(): array
         route('cadence.schedules.index', ['sort' => 'client', 'direction' => 'desc']),
         route('cadence.schedules.show', $schedule),
         route('cadence.schedules.edit', $schedule),
+        route('cadence.schedules.create'),
+        route('cadence.schedules.show', $listSchedule),
+        route('cadence.schedules.edit', $listSchedule),
+        route('cadence.schedules.show', $blankSchedule),
+        route('cadence.schedules.edit', $blankSchedule),
+        route('cadence.schedules.index', ['target' => 'recipients']),
         route('cadence.deliveries.index'),
         route('cadence.deliveries.index', ['status' => 'failed', 'from' => '2020-01-01', 'to' => '2030-01-01', 'sort' => 'client']),
         route('cadence.deliveries.show', $delivery),
+        route('cadence.deliveries.show', $manualDelivery),
+        route('cadence.deliveries.show', $listDelivery),
+        route('cadence.deliveries.index', ['source' => 'manual']),
+        route('cadence.deliveries.send'),
+        route('cadence.deliveries.send', ['client' => $client->getKey()]),
         route('admin.users.index'),
         route('admin.users.index', ['state' => 'active', 'search' => 'a']),
         route('admin.users.create'),
@@ -103,8 +123,8 @@ it('renders the guest pages', function (): void {
 
 it('renders a client with an archived client in its history', function (): void {
     $client = Client::factory()->create();
-    $schedule = ClientNotificationSchedule::factory()->for($client)->create();
-    ClientNotificationDelivery::factory()->forSchedule($schedule)->create();
+    $schedule = NotificationSchedule::factory()->for($client)->create();
+    NotificationDelivery::factory()->forSchedule($schedule)->create();
 
     $administrator = administrator();
 

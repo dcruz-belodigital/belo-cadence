@@ -18,6 +18,7 @@ return [
         'export_table' => 'Export this view',
         'hide_password' => 'Hide password',
         'import' => 'Import',
+        'more' => 'More actions',
         'save' => 'Save changes',
         'search' => 'Search',
         'show_password' => 'Show password',
@@ -42,6 +43,10 @@ return [
         'next' => 'Next page',
         'previous' => 'Previous page',
         'summary' => 'Showing :first–:last of :total',
+    ],
+
+    'columns' => [
+        'actions' => 'Actions',
     ],
 
     'placeholders' => [

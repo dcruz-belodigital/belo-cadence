@@ -9,22 +9,41 @@ return [
         'inactive' => 'Inactive',
     ],
 
-    'client_notification_frequency' => [
+    'notification_frequency' => [
         'one_time' => 'One time',
         'monthly' => 'Monthly',
         'yearly' => 'Yearly',
     ],
 
-    'client_notification_delivery_status' => [
+    'notification_delivery_status' => [
         'pending' => 'Pending',
         'sent' => 'Sent',
         'failed' => 'Failed',
     ],
 
-    'client_email_template' => [
+    'notification_delivery_source' => [
+        'scheduled' => 'Scheduled',
+        'manual' => 'Manual',
+    ],
+
+    'notification_target' => [
+        'client' => 'Client',
+        'recipients' => 'Recipient list',
+    ],
+
+    'email_template_audience' => [
+        'client' => 'For a client',
+        'recipients' => 'For a recipient list',
+        'any' => 'For any schedule',
+    ],
+
+    'email_template' => [
         'general_reminder' => 'General reminder',
         'monthly_reminder' => 'Monthly reminder',
         'annual_reminder' => 'Annual reminder',
+        'status_update' => 'Status update',
+        'action_required' => 'Action required',
+        'blank' => 'Blank',
     ],
 
     /*
@@ -83,7 +102,7 @@ return [
             'imported' => 'Clients imported',
         ],
 
-        'client_notification_schedule' => [
+        'notification_schedule' => [
             'created' => 'Schedule created',
             'updated' => 'Schedule updated',
             'enabled' => 'Schedule enabled',

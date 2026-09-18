@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 /**
  * State-changing operations worth recording in the audit log.
  *
- * Client email sending is not represented here: delivery history already records
+ * Sending is not represented here: delivery history already records
  * every attempt in far more detail.
  */
 enum AuditAction: string
@@ -20,11 +20,11 @@ enum AuditAction: string
     case ClientRestored = 'client.restored';
     case ClientsImported = 'clients.imported';
 
-    case ClientNotificationScheduleCreated = 'client_notification_schedule.created';
-    case ClientNotificationScheduleUpdated = 'client_notification_schedule.updated';
-    case ClientNotificationScheduleEnabled = 'client_notification_schedule.enabled';
-    case ClientNotificationScheduleDisabled = 'client_notification_schedule.disabled';
-    case ClientNotificationScheduleDeleted = 'client_notification_schedule.deleted';
+    case NotificationScheduleCreated = 'notification_schedule.created';
+    case NotificationScheduleUpdated = 'notification_schedule.updated';
+    case NotificationScheduleEnabled = 'notification_schedule.enabled';
+    case NotificationScheduleDisabled = 'notification_schedule.disabled';
+    case NotificationScheduleDeleted = 'notification_schedule.deleted';
 
     case UserCreated = 'user.created';
     case UserUpdated = 'user.updated';

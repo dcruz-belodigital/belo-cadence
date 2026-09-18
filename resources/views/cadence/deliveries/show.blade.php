@@ -1,11 +1,15 @@
 <x-app-layout :heading="$delivery->subject"
                :back="route('cadence.deliveries.index')"
                :back-label="__('deliveries.title')">
-    <x-page-header :description="$delivery->client->name" />
+    <x-page-header :description="$delivery->target_name ?? $delivery->client?->name" />
 
 
     <div class="space-y-6">
-        @if ($delivery->status === \App\Enums\ClientNotificationDeliveryStatus::Failed)
+        @if ($delivery->is_manual)
+            <x-alert variant="info">{{ __('deliveries.show.manual_notice') }}</x-alert>
+        @endif
+
+        @if ($delivery->status === \App\Enums\NotificationDeliveryStatus::Failed)
             <x-alert variant="danger" :title="__('deliveries.show.failure')">
                 {{ $delivery->failure_message }}
             </x-alert>
@@ -13,14 +17,35 @@
 
         <x-card :title="__('deliveries.show.details')">
             <x-detail-list>
-                <x-detail-item :label="__('deliveries.columns.client')">
-                    <a href="{{ route('clients.show', $delivery->client) }}" class="focus-ring rounded-control text-primary transition hover:underline">
-                        {{ $delivery->client->name }}
-                    </a>
+                <x-detail-item :label="__('deliveries.columns.target')">
+                    @if ($delivery->client !== null)
+                        <a href="{{ route('clients.show', $delivery->client) }}" class="focus-ring rounded-control text-primary transition hover:underline">
+                            {{ $delivery->target_name ?? $delivery->client->name }}
+                        </a>
+                    @else
+                        {{ $delivery->target_name }}
+                    @endif
+                </x-detail-item>
+
+                <x-detail-item :label="__('cadence.columns.target')">
+                    <x-badge :variant="$delivery->target->badgeVariant()">{{ $delivery->target->label() }}</x-badge>
                 </x-detail-item>
 
                 <x-detail-item :label="__('deliveries.columns.status')">
                     <x-badge :variant="$delivery->status->badgeVariant()">{{ $delivery->status->label() }}</x-badge>
+                </x-detail-item>
+
+                <x-detail-item :label="__('deliveries.columns.source')">
+                    <x-badge :variant="$delivery->source->badgeVariant()">{{ $delivery->source->label() }}</x-badge>
+                </x-detail-item>
+
+                <x-detail-item :label="__('deliveries.columns.sent_by')">
+                    {{-- Work the scheduler did belongs to no person, and is named as such. --}}
+                    @if ($delivery->triggeredBy !== null)
+                        {{ $delivery->triggeredBy->name }}
+                    @else
+                        <span class="text-foreground-muted">{{ __('deliveries.show.sent_by_system') }}</span>
+                    @endif
                 </x-detail-item>
 
                 <x-detail-item :label="__('deliveries.columns.recipient')">
@@ -34,7 +59,9 @@
                 <x-detail-item :label="__('deliveries.columns.template')">{{ $delivery->template->label() }}</x-detail-item>
 
                 <x-detail-item :label="__('deliveries.show.schedule')">
-                    @if ($delivery->schedule->trashed())
+                    @if ($delivery->schedule === null)
+                        <span class="text-foreground-muted">{{ __('deliveries.show.no_schedule') }}</span>
+                    @elseif ($delivery->schedule->trashed())
                         <span class="text-foreground-muted">{{ __('deliveries.show.schedule_deleted') }}</span>
                     @else
                         <a href="{{ route('cadence.schedules.show', $delivery->schedule) }}" class="focus-ring rounded-control text-primary transition hover:underline">

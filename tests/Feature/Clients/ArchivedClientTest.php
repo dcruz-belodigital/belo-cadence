@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Enums\PermissionName;
 use App\Models\Client;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 
 use function Pest\Laravel\actingAs;
 
@@ -36,7 +36,7 @@ it('opens an archived client from the archived list', function (): void {
 
 it('restores an archived client from its own page', function (): void {
     $client = Client::factory()->archived()->create();
-    $schedule = ClientNotificationSchedule::factory()->for($client)->disabled()->create();
+    $schedule = NotificationSchedule::factory()->for($client)->disabled()->create();
 
     $administrator = administrator();
 
@@ -56,8 +56,8 @@ it('restores an archived client from its own page', function (): void {
 
 it('shows the history of an archived client without offering changes', function (): void {
     $client = Client::factory()->create();
-    $schedule = ClientNotificationSchedule::factory()->for($client)->create();
-    $delivery = ClientNotificationDelivery::factory()->forSchedule($schedule)->create(['subject' => 'Past message']);
+    $schedule = NotificationSchedule::factory()->for($client)->create();
+    $delivery = NotificationDelivery::factory()->forSchedule($schedule)->create(['subject' => 'Past message']);
 
     $administrator = administrator();
 

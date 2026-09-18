@@ -35,9 +35,9 @@
             @endcan
         </ul>
 
-        @canany([PermissionName::ClientNotificationsViewAny->value, PermissionName::NotificationDeliveriesViewAny->value])
+        @canany([PermissionName::NotificationsViewAny->value, PermissionName::NotificationDeliveriesViewAny->value])
             <x-nav-section :title="__('navigation.sections.cadence')">
-                @can(PermissionName::ClientNotificationsViewAny->value)
+                @can(PermissionName::NotificationsViewAny->value)
                     <li>
                         <x-nav-item :href="route('cadence.upcoming')" icon="calendar" :active="request()->routeIs('cadence.upcoming')">
                             {{ __('navigation.upcoming') }}

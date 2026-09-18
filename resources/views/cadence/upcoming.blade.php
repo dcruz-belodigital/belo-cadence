@@ -1,11 +1,11 @@
 @php
-    use App\Models\ClientNotificationSchedule;
+    use App\Models\NotificationSchedule;
 @endphp
 
 <x-app-layout :heading="__('cadence.upcoming.title')">
     <x-page-header :description="__('cadence.upcoming.description')">
         <x-slot:actions>
-            @can('export', ClientNotificationSchedule::class)
+            @can('export', NotificationSchedule::class)
                 <x-export-menu :action="route('cadence.schedules.export')" :params="['upcoming' => 1]" />
             @endcan
         </x-slot:actions>
@@ -20,12 +20,12 @@
     <x-table :label="__('cadence.upcoming.title')">
         <x-slot:head>
             <x-table.sort-heading column="next_send_at">{{ __('cadence.columns.next_send_at') }}</x-table.sort-heading>
-            <x-table.sort-heading column="client">{{ __('cadence.columns.client') }}</x-table.sort-heading>
+            <x-table.sort-heading column="client">{{ __('cadence.columns.name') }}</x-table.sort-heading>
             <x-table.heading>{{ __('cadence.columns.recipient') }}</x-table.heading>
             <x-table.sort-heading column="template">{{ __('cadence.columns.template') }}</x-table.sort-heading>
             <x-table.sort-heading column="frequency">{{ __('cadence.columns.frequency') }}</x-table.sort-heading>
             <x-table.heading>{{ __('cadence.columns.state') }}</x-table.heading>
-            <x-table.heading align="right"><span class="sr-only">{{ __('common.actions.view') }}</span></x-table.heading>
+            <x-table.heading align="right"><span class="sr-only">{{ __('common.columns.actions') }}</span></x-table.heading>
         </x-slot:head>
 
         @forelse ($schedules as $schedule)
@@ -35,12 +35,20 @@
                 </x-table.cell>
 
                 <x-table.cell>
-                    <a href="{{ route('clients.show', $schedule->client) }}" class="focus-ring rounded-control transition hover:text-primary">
-                        {{ $schedule->client->name }}
+                    <a href="{{ $schedule->client !== null ? route('clients.show', $schedule->client) : route('cadence.schedules.show', $schedule) }}"
+                       class="focus-ring rounded-control transition hover:text-primary">
+                        {{ $schedule->displayName() }}
                     </a>
                 </x-table.cell>
 
-                <x-table.cell muted>{{ $schedule->client->email }}</x-table.cell>
+                {{-- A list schedule has as many addresses as it has recipients, so it is counted rather than printed. --}}
+                <x-table.cell muted>
+                    @if ($schedule->client !== null)
+                        {{ $schedule->client->email }}
+                    @else
+                        {{ trans_choice('cadence.recipient_count', count($schedule->recipients ?? [])) }}
+                    @endif
+                </x-table.cell>
                 <x-table.cell>{{ $schedule->template->label() }}</x-table.cell>
                 <x-table.cell muted>{{ $schedule->frequency->label() }}</x-table.cell>
 

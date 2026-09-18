@@ -46,7 +46,7 @@
             <x-table.heading>{{ __('audit.columns.actor') }}</x-table.heading>
             <x-table.sort-heading column="action">{{ __('audit.columns.action') }}</x-table.sort-heading>
             <x-table.heading>{{ __('audit.columns.record') }}</x-table.heading>
-            <x-table.heading align="right"><span class="sr-only">{{ __('common.actions.view') }}</span></x-table.heading>
+            <x-table.heading align="right"><span class="sr-only">{{ __('common.columns.actions') }}</span></x-table.heading>
         </x-slot:head>
 
         @forelse ($audits as $audit)
@@ -77,9 +77,11 @@
 
                 <x-table.cell align="right">
                     @can('view', $audit)
-                        <x-button :href="route('admin.audit-log.show', $audit)" variant="ghost" size="sm" icon="eye">
-                            {{ __('common.actions.view') }}
-                        </x-button>
+                        <x-table.actions>
+                            <x-dropdown.item :href="route('admin.audit-log.show', $audit)" icon="eye">
+                                {{ __('common.actions.view') }}
+                            </x-dropdown.item>
+                        </x-table.actions>
                     @endcan
                 </x-table.cell>
             </x-table.row>

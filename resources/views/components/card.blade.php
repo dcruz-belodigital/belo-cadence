@@ -4,7 +4,8 @@
     'flush' => false,
 ])
 
-<section {{ $attributes->merge(['class' => 'rounded-card border border-border bg-surface shadow-card']) }}>
+{{-- `overflow-hidden` clips the header tint, a flush row's fill and the footer to the radius; without it they square off the corners. --}}
+<section {{ $attributes->merge(['class' => 'overflow-hidden rounded-card border border-border bg-surface shadow-card']) }}>
     @if ($title || isset($actions))
         <header class="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-surface-sunken/50 px-4 py-3 sm:px-5">
             {{-- The tick is centred on the title's own line, so it does not drift down a heading that carries a description. --}}

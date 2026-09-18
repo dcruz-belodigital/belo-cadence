@@ -18,6 +18,13 @@
                     :title="$preview['template']->label()"
                     :description="__('cadence.templates.subject').': '.$preview['subject']"
                     class="scroll-mt-24">
+                {{-- Which kind of schedule may use this template, which its wording assumes. --}}
+                <x-slot:actions>
+                    <x-badge variant="neutral">
+                        {{ __('cadence.templates.audience') }}: {{ $preview['template']->audience()->label() }}
+                    </x-badge>
+                </x-slot:actions>
+
                 {{-- The message is shown in a sandboxed frame, on the light canvas an email is written for. --}}
                 <iframe title="{{ $preview['template']->label() }}"
                         sandbox

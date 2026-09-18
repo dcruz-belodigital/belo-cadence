@@ -20,7 +20,7 @@
             <x-table.heading>{{ __('roles.columns.name') }}</x-table.heading>
             <x-table.heading align="right">{{ __('roles.columns.permissions') }}</x-table.heading>
             <x-table.heading align="right">{{ __('roles.columns.users') }}</x-table.heading>
-            <x-table.heading align="right"><span class="sr-only">{{ __('common.actions.view') }}</span></x-table.heading>
+            <x-table.heading align="right"><span class="sr-only">{{ __('common.columns.actions') }}</span></x-table.heading>
         </x-slot:head>
 
         @forelse ($roles as $role)
@@ -35,17 +35,17 @@
                 <x-table.cell align="right" muted>{{ $role->users_count }}</x-table.cell>
 
                 <x-table.cell align="right">
-                    <div class="flex items-center justify-end gap-1">
-                        <x-button :href="route('admin.roles.show', $role)" variant="ghost" size="sm" icon="eye">
+                    <x-table.actions>
+                        <x-dropdown.item :href="route('admin.roles.show', $role)" icon="eye">
                             {{ __('common.actions.view') }}
-                        </x-button>
+                        </x-dropdown.item>
 
                         @can('update', $role)
-                            <x-button :href="route('admin.roles.edit', $role)" variant="ghost" size="sm" icon="pencil">
+                            <x-dropdown.item :href="route('admin.roles.edit', $role)" icon="pencil">
                                 {{ __('common.actions.edit') }}
-                            </x-button>
+                            </x-dropdown.item>
                         @endcan
-                    </div>
+                    </x-table.actions>
                 </x-table.cell>
             </x-table.row>
         @empty

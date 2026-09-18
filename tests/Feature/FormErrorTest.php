@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Models\Client;
-use App\Models\ClientNotificationSchedule;
 use App\Models\DefaultClientNotification;
+use App\Models\NotificationSchedule;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -89,12 +89,31 @@ it('shows every message the client forms can produce', function (): void {
 it('shows every message the schedule forms can produce', function (): void {
     $administrator = administrator();
     $client = Client::factory()->create();
-    $schedule = ClientNotificationSchedule::factory()->for($client)->create();
+    $schedule = NotificationSchedule::factory()->for($client)->create();
+    $listSchedule = NotificationSchedule::factory()->forRecipients()->create();
 
-    $keys = ['template', 'frequency', 'starts_at', 'is_enabled'];
+    $shared = ['template', 'frequency', 'starts_at', 'is_enabled', 'subject', 'message'];
+    $listOnly = ['name', 'recipients', 'recipients.*'];
 
-    assertShowsEveryMessage(route('clients.schedules.create', $client), $keys, $administrator);
-    assertShowsEveryMessage(route('cadence.schedules.edit', $schedule), $keys, $administrator);
+    // Only the general form chooses a target, so only it can fail on one.
+    assertShowsEveryMessage(
+        route('cadence.schedules.create'),
+        [...$shared, ...$listOnly, 'target', 'client'],
+        $administrator,
+    );
+
+    // These forms have their target already, so target and client are not theirs to fail on.
+    assertShowsEveryMessage(route('clients.schedules.create', $client), $shared, $administrator);
+    assertShowsEveryMessage(route('cadence.schedules.edit', $schedule), $shared, $administrator);
+    assertShowsEveryMessage(route('cadence.schedules.edit', $listSchedule), [...$shared, ...$listOnly], $administrator);
+});
+
+it('shows every message the manual send form can produce', function (): void {
+    Client::factory()->create();
+
+    assertShowsEveryMessage(route('cadence.deliveries.send'), [
+        'target', 'client', 'template', 'name', 'recipients', 'recipients.*', 'subject', 'message',
+    ], administrator());
 });
 
 it('shows every message the user and role forms can produce', function (): void {

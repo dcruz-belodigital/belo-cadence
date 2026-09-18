@@ -8,7 +8,7 @@ return [
     'description' => 'What the application wants you to know about.',
 
     'empty' => 'Nothing to report',
-    'empty_description' => 'Notifications about failed client email appear here.',
+    'empty_description' => 'Notifications about failed email appear here.',
     'fallback_title' => 'Notification',
     'mark_all_read' => 'Mark all as read',
     'unread' => 'Unread',
@@ -24,8 +24,8 @@ return [
     ],
 
     'delivery_failed' => [
-        'title' => 'A client email failed to send',
-        'message' => 'The :template for :client could not be delivered.',
+        'title' => 'An email failed to send',
+        'message' => 'The :template for :target could not be delivered.',
     ],
 
 ];

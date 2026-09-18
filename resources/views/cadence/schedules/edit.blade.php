@@ -1,14 +1,13 @@
 <x-app-layout :heading="__('cadence.edit.title')"
                :back="route('cadence.schedules.show', $schedule)"
-               :back-label="$schedule->client->name" width="narrow">
+               :back-label="$schedule->displayName()" width="narrow">
     <x-page-header :description="__('cadence.edit.description')" />
-
 
     <form method="POST" action="{{ route('cadence.schedules.update', $schedule) }}" class="space-y-6">
         @csrf
         @method('PUT')
 
-        <x-card :title="$schedule->client->name">
+        <x-card :title="$schedule->displayName()">
             @include('cadence.schedules.partials.fields', [
                 'schedule' => $schedule,
                 'startsAtValue' => $startsAtInputValue,

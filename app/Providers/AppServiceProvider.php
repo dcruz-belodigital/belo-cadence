@@ -7,9 +7,9 @@ namespace App\Providers;
 use App\Models\ApplicationSettings;
 use App\Models\Audit;
 use App\Models\Client;
-use App\Models\ClientNotificationDelivery;
-use App\Models\ClientNotificationSchedule;
 use App\Models\DefaultClientNotification;
+use App\Models\NotificationDelivery;
+use App\Models\NotificationSchedule;
 use App\Models\Role;
 use App\Models\User;
 use App\Support\ViewerTimezone;
@@ -47,8 +47,8 @@ final class AppServiceProvider extends ServiceProvider
             'application_settings' => ApplicationSettings::class,
             'audit' => Audit::class,
             'client' => Client::class,
-            'client_notification_delivery' => ClientNotificationDelivery::class,
-            'client_notification_schedule' => ClientNotificationSchedule::class,
+            'notification_delivery' => NotificationDelivery::class,
+            'notification_schedule' => NotificationSchedule::class,
             'default_client_notification' => DefaultClientNotification::class,
             'role' => Role::class,
             'user' => User::class,
