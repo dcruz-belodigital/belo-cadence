@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Casts\AsEmailAddressList;
+use App\Casts\AsTemplateBindings;
 use App\Data\Notifications\NotificationScheduleFilters;
 use App\Enums\EmailTemplate;
 use App\Enums\NotificationFrequency;
 use App\Enums\NotificationTarget;
 use App\ValueObjects\EmailAddress;
+use App\ValueObjects\TemplateBindings;
 use Carbon\CarbonImmutable;
 use Database\Factories\NotificationScheduleFactory;
 use DateTimeInterface;
@@ -39,6 +41,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property list<EmailAddress>|null $recipients
  * @property string|null $subject
  * @property string|null $message
+ * @property TemplateBindings $template_bindings
  * @property EmailTemplate $template
  * @property NotificationFrequency $frequency
  * @property CarbonImmutable $starts_at
@@ -59,6 +62,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'recipients',
     'subject',
     'message',
+    'template_bindings',
     'template',
     'frequency',
     'starts_at',
@@ -234,6 +238,7 @@ final class NotificationSchedule extends Model
         return [
             'template' => EmailTemplate::class,
             'recipients' => AsEmailAddressList::class,
+            'template_bindings' => AsTemplateBindings::class,
             'frequency' => NotificationFrequency::class,
             'starts_at' => 'immutable_datetime',
             'next_send_at' => 'immutable_datetime',

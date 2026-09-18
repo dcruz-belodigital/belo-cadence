@@ -60,6 +60,17 @@ return [
         'template' => 'Modelo de email',
     ],
 
+    'slots' => [
+        'title' => 'Valores do modelo',
+        'description' => 'O que este modelo preenche a partir do cliente. Escolha um dos atributos do cliente, ou escreva um valor usado apenas por esta notificação.',
+        'manual' => 'Escrever um valor',
+        'value' => 'Valor',
+    ],
+
+    'errors' => [
+        'unresolved_slot' => 'Não foi possível preencher o valor :slot do modelo para este cliente.',
+    ],
+
     'hints' => [
         'client' => 'Só é possível enviar email a clientes ativos. Um cliente arquivado ou inativo não aparece na lista.',
         'message' => 'Texto simples. Deixe uma linha em branco entre parágrafos. É enviado exatamente como o escrever.',

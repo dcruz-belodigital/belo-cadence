@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ActivateUserController;
 use App\Http\Controllers\Admin\ApplicationSettingsController;
 use App\Http\Controllers\Admin\AuditController;
 use App\Http\Controllers\Admin\AuditExportController;
+use App\Http\Controllers\Admin\ClientAttributeController;
 use App\Http\Controllers\Admin\DeactivateUserController;
 use App\Http\Controllers\Admin\DefaultClientNotificationController;
 use App\Http\Controllers\Admin\RoleController;
@@ -148,6 +149,10 @@ Route::middleware(['auth', 'active'])->group(function (): void {
 
         Route::get('roles/export', RoleExportController::class)->name('roles.export');
         Route::resource('roles', RoleController::class);
+
+        // The route key is `attribute`, so a controller reads one the way it is named.
+        Route::resource('client-attributes', ClientAttributeController::class)
+            ->parameters(['client-attributes' => 'attribute']);
 
         Route::get('audit-log/export', AuditExportController::class)->name('audit-log.export');
         Route::get('audit-log', [AuditController::class, 'index'])->name('audit-log.index');

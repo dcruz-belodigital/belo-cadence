@@ -8,6 +8,7 @@ use App\Actions\Audits\RecordAuditAction;
 use App\Actions\Clients\CreateClientAction;
 use App\Actions\Clients\UpdateClientAction;
 use App\Data\Audits\RecordAuditData;
+use App\Data\Clients\ClientAttributeValuesData;
 use App\Data\Clients\CreateClientData;
 use App\Data\Clients\UpdateClientData;
 use App\Data\Imports\ColumnMapping;
@@ -15,9 +16,12 @@ use App\Data\Imports\ImportResult;
 use App\Enums\AuditAction;
 use App\Enums\ClientStatus;
 use App\Models\Client;
+use App\Models\ClientAttribute;
+use App\Rules\ClientAttributeValueRule;
 use App\Rules\EmailAddressRule;
 use App\Support\Csv\CsvData;
 use App\Support\Csv\CsvReader;
+use App\Support\Csv\ImportTemplates;
 use App\ValueObjects\EmailAddress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -65,6 +69,7 @@ final class ImportClientsAction
                         email: $row['email'],
                         status: $row['status'],
                         notes: $row['notes'],
+                        attributeValues: $row['attributes'],
                     ));
 
                     $updated++;
@@ -77,6 +82,7 @@ final class ImportClientsAction
                     email: $row['email'],
                     status: $row['status'],
                     notes: $row['notes'],
+                    attributeValues: $row['attributes'],
                 ));
 
                 $created++;
@@ -97,13 +103,23 @@ final class ImportClientsAction
     }
 
     /**
-     * @return list<array{id: int|null, name: string, email: EmailAddress, status: ClientStatus, notes: string|null}>
+     * @return list<array{id: int|null, name: string, email: EmailAddress, status: ClientStatus, notes: string|null, attributes: ClientAttributeValuesData}>
      */
     private function validatedRows(CsvData $csv, ColumnMapping $mapping): array
     {
         if ($csv->rows === []) {
             throw ValidationException::withMessages(['file' => __('imports.errors.no_rows')]);
         }
+
+        /*
+        | Only the attributes whose column somebody actually matched. An attribute left
+        | unmapped is absent from every row, and `ClientAttributeValuesData` is a patch,
+        | so a file that carries three columns cannot wipe the rest.
+        */
+        $attributes = ClientAttribute::query()
+            ->active()
+            ->get()
+            ->filter(fn (ClientAttribute $attribute): bool => $mapping->isMapped(ImportTemplates::ATTRIBUTE_PREFIX.$attribute->key));
 
         $errors = [];
         $rows = [];
@@ -121,10 +137,26 @@ final class ImportClientsAction
                 'notes' => $mapping->value($row, 'notes'),
             ];
 
-            $validator = Validator::make(array_map(
-                static fn (string $value): ?string => $value === '' ? null : $value,
-                $values,
-            ), [
+            $answers = [];
+            $answerRules = [];
+            $answerNames = [];
+
+            foreach ($attributes as $attribute) {
+                $column = ImportTemplates::ATTRIBUTE_PREFIX.$attribute->key;
+
+                // Decoded before validating, so the rule sees the same shape the form does.
+                $answers[$column] = $attribute->fromCsv($mapping->value($row, $column));
+                $answerRules[$column] = ClientAttributeValueRule::for($attribute);
+                $answerNames[$column] = $attribute->name;
+            }
+
+            $validator = Validator::make([
+                ...array_map(
+                    static fn (string $value): ?string => $value === '' ? null : $value,
+                    $values,
+                ),
+                ...$answers,
+            ], [
                 'id' => ['nullable', 'integer', Rule::exists('clients', 'id')],
                 'name' => ['required', 'string', 'max:255'],
                 'email' => [
@@ -136,7 +168,8 @@ final class ImportClientsAction
                 ],
                 'status' => ['required', Rule::enum(ClientStatus::class)],
                 'notes' => ['nullable', 'string', 'max:5000'],
-            ]);
+                ...$answerRules,
+            ], [], $answerNames);
 
             if ($validator->fails()) {
                 foreach ($validator->errors()->all() as $message) {
@@ -168,6 +201,11 @@ final class ImportClientsAction
                 'email' => $email,
                 'status' => ClientStatus::from($values['status']),
                 'notes' => $values['notes'] === '' ? null : $values['notes'],
+                'attributes' => new ClientAttributeValuesData($attributes
+                    ->mapWithKeys(fn (ClientAttribute $attribute): array => [
+                        $attribute->getKey() => $answers[ImportTemplates::ATTRIBUTE_PREFIX.$attribute->key],
+                    ])
+                    ->all()),
             ];
         }
 

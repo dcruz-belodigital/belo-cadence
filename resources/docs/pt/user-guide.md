@@ -24,8 +24,9 @@ atividade recente. Cada painel liga à lista completa.
 
 ## Clientes
 
-Um **cliente** é uma organização que recebe email. O Belo Cadence mantém-nos
-deliberadamente simples: um nome, um endereço de email, um estado e notas internas.
+Um **cliente** é uma organização que recebe email. Cada cliente tem um nome, um endereço
+de email, um estado e notas internas — e tudo o mais que a sua equipa tenha decidido
+registar sobre ele, através dos **atributos de cliente**.
 
 - Os clientes **ativos** recebem o email agendado. Os clientes **inativos** mantêm todas
   as definições e todo o histórico, mas nunca recebem email.
@@ -36,6 +37,34 @@ deliberadamente simples: um nome, um endereço de email, um estado e notas inter
 
 Assinale *Incluir arquivados* na lista de clientes para voltar a encontrar um cliente
 arquivado.
+
+## Atributos de cliente
+
+O Belo Cadence não decide o que mais precisa de saber sobre um cliente. **Administração →
+Atributos de cliente** é onde a sua equipa o define: um nome, um tipo, e se é obrigatório.
+Cada atributo ativo passa a aparecer no formulário de cliente, pela ordem que lhes der.
+
+Os tipos são texto, texto longo, número, data, sim/não, escolha de uma lista, endereço
+web, endereço de email e **linhas repetíveis** — um conjunto de campos que pode ser
+preenchido as vezes que forem precisas, como uma lista de contactos. Uma linha repetível
+pode, por sua vez, conter linhas repetíveis, até três níveis.
+
+Vale a pena saber:
+
+- O **identificador** é definido a partir do nome quando o atributo é criado e nunca muda.
+  É o nome da coluna nos ficheiros CSV, por isso mudar o nome de um atributo nunca parte um
+  ficheiro ou um processo que já o use.
+- O **tipo não pode ser alterado** depois, porque todas as respostas já registadas estão
+  guardadas nesse formato. Para o mudar, desative o atributo e crie outro.
+- Remover uma opção de uma lista deixa de a oferecer, mas um cliente que já a use mantém a
+  sua resposta e continua editável.
+- **Desativar** um atributo esconde-o do formulário de cliente, da página do cliente e de
+  ambos os ficheiros CSV, mantendo todas as respostas. Volte a ativá-lo e continuam lá.
+- **Eliminar** um atributo elimina mesmo as respostas com ele. A confirmação diz quantos
+  clientes são afetados.
+
+Marcar um atributo como obrigatório impede que um cliente seja guardado sem ele. Os
+clientes criados antes disso ficam como estão até alguém os editar.
 
 ## Agendamentos de notificação
 
@@ -120,6 +149,16 @@ um modelo a partir do formulário de agendamento enquanto o escolhe.
 
 Acrescentar um modelo é uma pequena tarefa de desenvolvimento: uma entrada no catálogo, o
 seu público, uma vista, o texto e um teste.
+
+Alguns modelos deixam **espaços** para preencher, como uma data de renovação. Quando
+escolhe um desses num agendamento — ou ao enviar à mão — aparece um seletor para cada
+espaço. Aponte-o a um dos atributos do cliente, incluindo um único campo dentro de linhas
+repetíveis, ou escolha *Escrever um valor* e indique algo usado apenas por essa
+notificação.
+
+Se um espaço apontar para um atributo sem resposta nesse cliente, a notificação **não** é
+enviada: a tentativa fica registada no histórico de envios como falhada, com o motivo,
+para que ninguém receba um email incompleto.
 
 ## Enviar manualmente
 
@@ -211,6 +250,12 @@ introduzidos à mão, por isso aparecem também no registo de auditoria.
 
 O histórico de envios e o registo de auditoria **não** são importáveis, de propósito: são
 o registo do que aconteceu.
+
+Os atributos personalizados recebem uma coluna cada um, chamada `attribute_` seguido do
+identificador do atributo. Uma coluna que não associe fica intocada, por isso um ficheiro
+que apenas corrige endereços de email nunca mexe em mais nada. As linhas repetíveis viajam
+em JSON numa única célula, e é por isso que a exportação **em bruto** é a que pode ser
+importada de volta tal como está.
 
 ## Utilizadores e perfis de acesso
 

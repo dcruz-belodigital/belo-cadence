@@ -7,6 +7,8 @@ use App\Enums\ClientStatus;
 use App\Enums\PermissionName;
 use App\Models\Audit;
 use App\Models\Client;
+use App\Models\ClientAttribute;
+use App\Models\ClientAttributeValue;
 use App\Models\NotificationDelivery;
 use App\Models\NotificationSchedule;
 use App\Models\Role;
@@ -36,6 +38,48 @@ function csvRows(TestResponse $response): array
 }
 
 describe('client exports', function (): void {
+    it('appends a column per active attribute, in the order somebody chose', function (): void {
+        $owner = ClientAttribute::factory()->create(['name' => 'Account owner', 'key' => 'account_owner', 'position' => 2]);
+        $tier = ClientAttribute::factory()->select()->create(['name' => 'Tier', 'key' => 'tier', 'position' => 1]);
+        ClientAttribute::factory()->inactive()->create(['name' => 'Retired field', 'key' => 'retired_field', 'position' => 3]);
+
+        $client = Client::factory()->create(['name' => 'Northwind Studio']);
+        ClientAttributeValue::factory()->for($client)->of($owner, 'Ana Costa')->create();
+        ClientAttributeValue::factory()->for($client)->of($tier, 'Gold')->create();
+
+        $raw = csvRows(actingAs(administrator())->get(route('clients.export', ['mode' => 'raw']))->assertOk());
+
+        // The columns that were always there keep their places, so an existing reader still works.
+        expect($raw[0])->toBe([
+            'id', 'name', 'email', 'status', 'notes', 'created_at', 'updated_at', 'deleted_at',
+            'attribute_tier', 'attribute_account_owner',
+        ])->and($raw[1][8])->toBe('Gold')
+            ->and($raw[1][9])->toBe('Ana Costa');
+
+        $table = csvRows(actingAs(administrator())->get(route('clients.export', ['mode' => 'table']))->assertOk());
+
+        expect($table[0])->toBe([
+            __('clients.columns.name'), __('clients.columns.email'), __('clients.columns.status'),
+            __('clients.columns.schedules'), __('clients.columns.created'),
+            'Tier', 'Account owner',
+        ])->and($table[0])->not->toContain('Retired field');
+    });
+
+    it('writes a repeater as json for a machine and as words for a person', function (): void {
+        $contacts = ClientAttribute::factory()->repeater()->create(['name' => 'Contacts', 'key' => 'contacts', 'position' => 1]);
+
+        $client = Client::factory()->create();
+        ClientAttributeValue::factory()->for($client)->of($contacts, [
+            ['name' => 'Ana', 'extension' => 22],
+        ])->create();
+
+        $raw = csvRows(actingAs(administrator())->get(route('clients.export', ['mode' => 'raw']))->assertOk());
+        $table = csvRows(actingAs(administrator())->get(route('clients.export', ['mode' => 'table']))->assertOk());
+
+        expect($raw[1][8])->toBe('[{"name":"Ana","extension":22}]')
+            ->and($table[1][5])->toBe('Name: Ana, Extension: 22');
+    });
+
     it('writes the raw columns with raw values and iso dates', function (): void {
         $client = Client::factory()->create([
             'name' => 'Northwind Studio',

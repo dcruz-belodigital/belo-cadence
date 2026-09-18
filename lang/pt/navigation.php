@@ -8,6 +8,7 @@ return [
     'aria_label' => 'Navegação principal',
     'audit_log' => 'Registo de auditoria',
     'changelog' => 'Registo de alterações',
+    'client_attributes' => 'Atributos de cliente',
     'clients' => 'Clientes',
     'close' => 'Fechar navegação',
     'dashboard' => 'Painel',

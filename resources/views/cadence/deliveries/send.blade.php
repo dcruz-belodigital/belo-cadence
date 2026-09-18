@@ -43,6 +43,7 @@
                     listTemplate: '{{ $currentTemplate && $listTemplates->has($currentTemplate) ? $currentTemplate : $listTemplates->keys()->first() }}',
                     get template() { return this.target === '{{ NotificationTarget::Client->value }}' ? this.clientTemplate : this.listTemplate },
                     get isBlank() { return this.template === '{{ EmailTemplate::Blank->value }}' },
+                    message: @js(old('message', '')),
                  }">
 
                 <x-form.field name="target" :label="__('cadence.fields.target')" required>
@@ -122,6 +123,7 @@
                                          rows="4"
                                          x-bind:disabled="target !== '{{ NotificationTarget::Recipients->value }}'">{{ $recipientsText }}</x-form.textarea>
                     </x-form.field>
+
                 </div>
 
                 {{-- The blank template brings no wording of its own, so it is written here. --}}
@@ -131,9 +133,11 @@
                     </x-form.field>
 
                     <x-form.field name="message" :label="__('cadence.fields.message')" :hint="__('cadence.hints.message')" required>
-                        <x-form.textarea name="message" rows="6" x-bind:disabled="! isBlank">{{ old('message') }}</x-form.textarea>
+                        <x-form.textarea name="message" rows="6" x-model="message" x-bind:disabled="! isBlank">{{ old('message') }}</x-form.textarea>
                     </x-form.field>
                 </div>
+
+                @include('cadence.partials.template-slots')
             </div>
 
             <x-template-preview-dialog :previews="$templatePreviews" />

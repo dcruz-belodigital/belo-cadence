@@ -9,6 +9,18 @@ return [
         'inactive' => 'Inativo',
     ],
 
+    'client_attribute_type' => [
+        'text' => 'Texto',
+        'long_text' => 'Texto longo',
+        'number' => 'Número',
+        'date' => 'Data',
+        'boolean' => 'Sim ou não',
+        'select' => 'Escolha de uma lista',
+        'url' => 'Endereço web',
+        'email' => 'Endereço de email',
+        'repeater' => 'Linhas repetíveis',
+    ],
+
     'notification_frequency' => [
         'one_time' => 'Uma vez',
         'monthly' => 'Mensal',
@@ -102,6 +114,12 @@ return [
 
         'clients' => [
             'imported' => 'Clientes importados',
+        ],
+
+        'client_attribute' => [
+            'created' => 'Atributo de cliente criado',
+            'updated' => 'Atributo de cliente atualizado',
+            'deleted' => 'Atributo de cliente eliminado',
         ],
 
         'notification_schedule' => [

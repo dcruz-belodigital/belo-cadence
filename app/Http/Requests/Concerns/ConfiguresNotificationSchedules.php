@@ -24,6 +24,7 @@ use Illuminate\Validation\Rule;
  */
 trait ConfiguresNotificationSchedules
 {
+    use BindsTemplateSlots;
     use ConvertsViewerDateTimes;
     use ParsesRecipientLists;
 
@@ -64,6 +65,7 @@ trait ConfiguresNotificationSchedules
             clientId: $isClient ? $this->resolvedClientId() : null,
             name: $isClient ? null : $this->string('name')->trim()->value(),
             recipients: $isClient ? [] : $this->recipientAddresses(),
+            templateBindings: $this->templateBindings(),
             subject: $template->hasOwnCopy() ? null : $this->string('subject')->trim()->value(),
             message: $template->hasOwnCopy() ? null : $this->string('message')->trim()->value(),
         );
@@ -96,6 +98,8 @@ trait ConfiguresNotificationSchedules
             'frequency' => ['required', Rule::enum(NotificationFrequency::class)],
             'starts_at' => ['required', 'date', ...($mustStartInFuture ? ['after:now'] : [])],
             'is_enabled' => ['boolean'],
+
+            ...$this->templateSlotRules(),
         ];
 
         if (! $this->targetIsFixed()) {
@@ -145,6 +149,7 @@ trait ConfiguresNotificationSchedules
             'recipients.*' => __('cadence.fields.recipients'),
             'subject' => __('cadence.fields.subject'),
             'message' => __('cadence.fields.message'),
+            ...$this->templateSlotNames(),
         ];
     }
 
@@ -162,6 +167,14 @@ trait ConfiguresNotificationSchedules
     {
         return $this->routeSchedule() instanceof NotificationSchedule
             || $this->routeClient() instanceof Client;
+    }
+
+    /**
+     * A list schedule has no client, so its slots offer only a literal.
+     */
+    protected function boundClientId(): ?int
+    {
+        return $this->scheduleTarget() === NotificationTarget::Client ? $this->resolvedClientId() : null;
     }
 
     private function resolvedClientId(): ?int

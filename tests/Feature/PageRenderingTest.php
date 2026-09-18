@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Enums\ColorScheme;
 use App\Models\Audit;
 use App\Models\Client;
+use App\Models\ClientAttribute;
+use App\Models\ClientAttributeValue;
 use App\Models\DefaultClientNotification;
 use App\Models\NotificationDelivery;
 use App\Models\NotificationSchedule;
@@ -37,6 +39,17 @@ function everyPageUrl(): array
     $audit = Audit::factory()->forRecord($client)->create();
     $role = Role::factory()->create();
     $user = User::factory()->create();
+
+    // Two of each: Eloquent only marks models as protected against lazy loading when a
+    // query returned more than one row, so a single one would hide a missing eager load.
+    $attribute = ClientAttribute::factory()->create(['name' => 'Renewal date', 'position' => 1]);
+    $repeater = ClientAttribute::factory()->nestedRepeater()->create(['name' => 'Contacts', 'position' => 2]);
+    ClientAttribute::factory()->inactive()->create(['name' => 'Retired field', 'position' => 3]);
+
+    ClientAttributeValue::factory()->for($client)->of($attribute, '2026-03-01')->create();
+    ClientAttributeValue::factory()->for($client)->of($repeater, [
+        ['name' => 'Ana', 'addresses' => [['city' => 'Porto']]],
+    ])->create();
 
     DefaultClientNotification::factory()->create();
 
@@ -79,6 +92,12 @@ function everyPageUrl(): array
         route('admin.users.edit', $user),
         route('admin.users.import.create'),
         route('admin.roles.index'),
+        route('admin.client-attributes.index'),
+        route('admin.client-attributes.index', ['search' => 'a', 'type' => 'text', 'state' => 'active', 'sort' => 'name', 'direction' => 'desc']),
+        route('admin.client-attributes.create'),
+        route('admin.client-attributes.show', $attribute),
+        route('admin.client-attributes.edit', $attribute),
+        route('admin.client-attributes.edit', $repeater),
         route('admin.roles.create'),
         route('admin.roles.show', $role),
         route('admin.roles.edit', $role),

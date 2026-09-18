@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 use App\Enums\AuditAction;
+use App\Enums\ClientAttributeType;
 use App\Enums\ClientStatus;
 use App\Enums\PermissionName;
 use App\Models\Audit;
 use App\Models\Client;
+use App\Models\ClientAttribute;
+use App\Models\ClientAttributeValue;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -400,5 +403,142 @@ describe('authorisation', function (): void {
             ->assertForbidden();
 
         expect(Client::query()->count())->toBe(0);
+    });
+});
+
+describe('custom attributes in the import', function (): void {
+    it('offers a column for every active attribute, and none for a retired one', function (): void {
+        ClientAttribute::factory()->create(['name' => 'Account owner', 'key' => 'account_owner', 'position' => 1]);
+        ClientAttribute::factory()->inactive()->create(['name' => 'Retired field', 'key' => 'retired_field', 'position' => 2]);
+
+        $content = ltrim(actingAs(administrator())
+            ->get(route('clients.import.template'))
+            ->assertOk()
+            ->streamedContent(), "\xEF\xBB\xBF");
+
+        expect($content)->toContain('attribute_account_owner')
+            ->and($content)->not->toContain('attribute_retired_field');
+    });
+
+    it('records an answer from a mapped column', function (): void {
+        $owner = ClientAttribute::factory()->create(['name' => 'Account owner', 'key' => 'account_owner', 'position' => 1]);
+
+        $csv = "name,email,status,attribute_account_owner\nNorthwind,hello@northwind.test,active,Ana Costa\n";
+
+        uploadClients($csv)->assertRedirect(route('clients.import.mapping'));
+        importClients(identityMapping($csv))->assertSessionHasNoErrors();
+
+        expect(Client::query()->firstOrFail()->attributeValues->first()->value)->toBe('Ana Costa')
+            ->and(ClientAttributeValue::query()->where('client_attribute_id', $owner->getKey())->count())->toBe(1);
+    });
+
+    it('leaves an answer alone when its column is not in the file', function (): void {
+        $owner = ClientAttribute::factory()->create(['name' => 'Account owner', 'key' => 'account_owner', 'position' => 1]);
+
+        $client = Client::factory()->create(['name' => 'Northwind', 'email' => 'hello@northwind.test']);
+        ClientAttributeValue::factory()->for($client)->of($owner, 'Ana Costa')->create();
+
+        // A file that only means to correct the name must not wipe what it never carried.
+        $csv = "id,name,email,status\n{$client->getKey()},Northwind Studio,hello@northwind.test,active\n";
+
+        uploadClients($csv)->assertRedirect(route('clients.import.mapping'));
+        importClients(identityMapping($csv))->assertSessionHasNoErrors();
+
+        expect($client->fresh()->name)->toBe('Northwind Studio')
+            ->and($client->fresh()->attributeValues->first()->value)->toBe('Ana Costa');
+    });
+
+    it('clears an answer when its column is mapped and the cell is empty', function (): void {
+        $owner = ClientAttribute::factory()->create(['name' => 'Account owner', 'key' => 'account_owner', 'position' => 1]);
+
+        $client = Client::factory()->create(['name' => 'Northwind', 'email' => 'hello@northwind.test']);
+        ClientAttributeValue::factory()->for($client)->of($owner, 'Ana Costa')->create();
+
+        $csv = "id,name,email,status,attribute_account_owner\n{$client->getKey()},Northwind,hello@northwind.test,active,\n";
+
+        uploadClients($csv)->assertRedirect(route('clients.import.mapping'));
+        importClients(identityMapping($csv))->assertSessionHasNoErrors();
+
+        expect($client->fresh()->attributeValues)->toHaveCount(0);
+    });
+
+    it('refuses a row whose mapped cell is empty for a required attribute', function (): void {
+        ClientAttribute::factory()->required()->create(['name' => 'Account owner', 'key' => 'account_owner', 'position' => 1]);
+
+        $csv = "name,email,status,attribute_account_owner\nNorthwind,hello@northwind.test,active,\n";
+
+        uploadClients($csv)->assertRedirect(route('clients.import.mapping'));
+        importClients(identityMapping($csv))->assertSessionHasErrors('file');
+
+        expect(Client::query()->count())->toBe(0);
+    });
+
+    it('reads a repeater from one json cell, nesting included', function (): void {
+        ClientAttribute::factory()->nestedRepeater()->create(['name' => 'Contacts', 'key' => 'contacts', 'position' => 1]);
+
+        $json = '"[{""name"":""Ana"",""addresses"":[{""city"":""Porto""}]}]"';
+        $csv = "name,email,status,attribute_contacts\nNorthwind,hello@northwind.test,active,{$json}\n";
+
+        uploadClients($csv)->assertRedirect(route('clients.import.mapping'));
+        importClients(identityMapping($csv))->assertSessionHasNoErrors();
+
+        $value = ClientAttributeValue::query()->firstOrFail()->value;
+
+        expect($value[0]['name'])->toBe('Ana')
+            ->and($value[0]['addresses'][0]['city'])->toBe('Porto');
+    });
+
+    it('reports a repeater cell that is not json against its own line', function (): void {
+        ClientAttribute::factory()->repeater()->create(['name' => 'Contacts', 'key' => 'contacts', 'position' => 1]);
+
+        $csv = "name,email,status,attribute_contacts\nNorthwind,hello@northwind.test,active,not json\n";
+
+        uploadClients($csv)->assertRedirect(route('clients.import.mapping'));
+        $response = importClients(identityMapping($csv))->assertSessionHasErrors('file');
+
+        expect(implode(' ', session('errors')->get('file')))->toContain('Line 2');
+        expect(Client::query()->count())->toBe(0);
+    });
+
+    it('refuses an answer the client form would have refused', function (): void {
+        ClientAttribute::factory()->ofType(ClientAttributeType::Number)->create([
+            'name' => 'Seats', 'key' => 'seats', 'position' => 1,
+        ]);
+
+        $csv = "name,email,status,attribute_seats\nNorthwind,hello@northwind.test,active,about twelve\n";
+
+        uploadClients($csv)->assertRedirect(route('clients.import.mapping'));
+        importClients(identityMapping($csv))->assertSessionHasErrors('file');
+    });
+
+    it('takes a raw export straight back in, with every answer unchanged', function (): void {
+        $owner = ClientAttribute::factory()->create(['name' => 'Account owner', 'key' => 'account_owner', 'position' => 1]);
+        $seats = ClientAttribute::factory()->ofType(ClientAttributeType::Number)->create(['name' => 'Seats', 'key' => 'seats', 'position' => 2]);
+        $vip = ClientAttribute::factory()->ofType(ClientAttributeType::Boolean)->create(['name' => 'VIP', 'key' => 'vip', 'position' => 3]);
+        $contacts = ClientAttribute::factory()->nestedRepeater()->create(['name' => 'Contacts', 'key' => 'contacts', 'position' => 4]);
+
+        $client = Client::factory()->create(['name' => 'Northwind', 'email' => 'hello@northwind.test']);
+        ClientAttributeValue::factory()->for($client)->of($owner, 'Ana Costa')->create();
+        ClientAttributeValue::factory()->for($client)->of($seats, 12)->create();
+        ClientAttributeValue::factory()->for($client)->of($vip, true)->create();
+        ClientAttributeValue::factory()->for($client)->of($contacts, [
+            ['name' => 'Rui', 'addresses' => [['city' => 'Porto']]],
+        ])->create();
+
+        $exported = ltrim(actingAs(administrator())
+            ->get(route('clients.export', ['mode' => 'raw']))
+            ->assertOk()
+            ->streamedContent(), "\xEF\xBB\xBF");
+
+        uploadClients($exported)->assertRedirect(route('clients.import.mapping'));
+        importClients(identityMapping($exported))->assertSessionHasNoErrors();
+
+        $answers = $client->fresh()->attributeValues->mapWithKeys(fn ($v) => [$v->client_attribute_id => $v->value]);
+
+        expect(Client::query()->count())->toBe(1)
+            ->and($answers[$owner->getKey()])->toBe('Ana Costa')
+            ->and($answers[$seats->getKey()])->toBe(12)
+            ->and($answers[$vip->getKey()])->toBeTrue()
+            ->and($answers[$contacts->getKey()][0]['addresses'][0]['city'])->toBe('Porto');
     });
 });

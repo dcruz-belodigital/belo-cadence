@@ -8,6 +8,7 @@ return [
     'aria_label' => 'Main navigation',
     'audit_log' => 'Audit log',
     'changelog' => 'Changelog',
+    'client_attributes' => 'Client attributes',
     'clients' => 'Clients',
     'close' => 'Close navigation',
     'dashboard' => 'Dashboard',

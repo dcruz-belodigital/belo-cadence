@@ -14,5 +14,6 @@ final readonly class UpdateClientData
         public EmailAddress $email,
         public ClientStatus $status,
         public ?string $notes,
+        public ClientAttributeValuesData $attributeValues = new ClientAttributeValuesData,
     ) {}
 }

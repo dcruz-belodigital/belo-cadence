@@ -6,6 +6,7 @@ namespace App\Data\Notifications;
 
 use App\Enums\EmailTemplate;
 use App\Enums\Locale;
+use App\Support\TemplateSlots;
 use App\ValueObjects\EmailAddress;
 
 /**
@@ -20,6 +21,9 @@ use App\ValueObjects\EmailAddress;
  */
 final readonly class NotificationMailData
 {
+    /**
+     * @param  array<string, string>  $slotValues  What each of the template's blanks was filled with.
+     */
     public function __construct(
         public EmailTemplate $template,
         public string $applicationName,
@@ -32,7 +36,16 @@ final readonly class NotificationMailData
         public string $scheduledForLabel,
         public Locale $locale,
         public ?string $message = null,
+        public array $slotValues = [],
     ) {}
+
+    /**
+     * What filled one of the template's blanks. Views print this and nothing else.
+     */
+    public function slot(string $key): string
+    {
+        return $this->slotValues[$key] ?? '';
+    }
 
     /**
      * The typed message split into the paragraphs it was written as.
@@ -48,7 +61,9 @@ final readonly class NotificationMailData
             return [];
         }
 
-        $paragraphs = preg_split('/\R{2,}/', trim($this->message)) ?: [];
+        $filled = TemplateSlots::fill($this->message, $this->slotValues);
+
+        $paragraphs = preg_split('/\R{2,}/', trim($filled)) ?: [];
 
         return array_values(array_filter(array_map('trim', $paragraphs), static fn (string $p): bool => $p !== ''));
     }

@@ -60,6 +60,12 @@ return [
         ],
 
         'annual_reminder' => [
+            'due' => 'A data limite é :date.',
+            'contacts' => 'Com quem falar sobre isto:',
+            'slots' => [
+                'due_date' => 'Data limite',
+                'contacts' => 'Quem contactar',
+            ],
             'subject' => 'O seu lembrete anual da :application',
             'lines' => [
                 'Este é o seu lembrete anual da :application.',

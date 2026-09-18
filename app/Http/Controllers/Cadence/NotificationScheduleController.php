@@ -13,8 +13,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Notifications\StoreNotificationScheduleRequest;
 use App\Http\Requests\Notifications\UpdateNotificationScheduleRequest;
 use App\Models\Client;
+use App\Models\ClientAttribute;
 use App\Models\NotificationSchedule;
 use App\Support\EmailTemplatePreview;
+use App\Support\TemplateSlots;
 use App\Support\ViewerTimezone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,6 +54,7 @@ final class NotificationScheduleController extends Controller
             'client' => null,
             'clients' => $this->emailableClients(),
             'viewerTimezone' => $viewerTimezone->current()->value,
+            'slotOptions' => TemplateSlots::formOptions(ClientAttribute::query()->active()->get()),
             'templatePreviews' => $templatePreviews->all(),
         ]);
     }
@@ -70,6 +73,7 @@ final class NotificationScheduleController extends Controller
             'client' => $client,
             'clients' => $this->emailableClients(),
             'viewerTimezone' => $viewerTimezone->current()->value,
+            'slotOptions' => TemplateSlots::formOptions(ClientAttribute::query()->active()->get()),
             'templatePreviews' => $templatePreviews->all(),
         ]);
     }
@@ -121,6 +125,7 @@ final class NotificationScheduleController extends Controller
             'schedule' => $schedule,
             'clients' => $this->emailableClients(),
             'viewerTimezone' => $viewerTimezone->current()->value,
+            'slotOptions' => TemplateSlots::formOptions(ClientAttribute::query()->active()->get()),
             'startsAtInputValue' => $viewerTimezone->toInputValue($schedule->starts_at),
             'templatePreviews' => $templatePreviews->all(),
         ]);

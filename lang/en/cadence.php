@@ -60,6 +60,17 @@ return [
         'template' => 'Email template',
     ],
 
+    'slots' => [
+        'title' => 'Template values',
+        'description' => 'What this template fills in from the client. Choose one of the client\'s attributes, or type a value used by this notification alone.',
+        'manual' => 'Type a value',
+        'value' => 'Value',
+    ],
+
+    'errors' => [
+        'unresolved_slot' => 'The template value :slot could not be filled in for this client.',
+    ],
+
     'hints' => [
         'client' => 'Only active clients can be emailed. An archived or inactive client is not listed.',
         'message' => 'Plain text. Leave a blank line between paragraphs. It is sent exactly as typed.',

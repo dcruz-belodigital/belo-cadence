@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Enums\ClientAttributeType;
+use App\Http\Requests\Clients\StoreClientRequest;
 use App\Models\Client;
+use App\Models\ClientAttribute;
 use App\Models\DefaultClientNotification;
 use App\Models\NotificationSchedule;
 use App\Models\Role;
@@ -78,12 +81,30 @@ it('shows every message the client forms can produce', function (): void {
     $client = Client::factory()->create();
     DefaultClientNotification::factory()->create();
 
+    // One of every type, so the generated keys below cover every branch of the partial.
+    foreach (ClientAttributeType::cases() as $position => $type) {
+        ClientAttribute::factory()
+            ->when($type === ClientAttributeType::Repeater, fn ($factory) => $factory->nestedRepeater())
+            ->when($type === ClientAttributeType::Select, fn ($factory) => $factory->select())
+            ->ofType($type)
+            ->create(['position' => $position]);
+    }
+
+    /*
+    | The attribute keys depend on database rows, so they are read off the request rather
+    | than written out here: a new one could otherwise ship with nowhere to appear.
+    */
+    $attributeKeys = array_keys(StoreClientRequest::create(route('clients.store'), 'POST')->clientAttributeRules());
+
     assertShowsEveryMessage(route('clients.create'), [
         'name', 'email', 'status', 'notes',
         'schedules', 'schedules.0.default_id', 'schedules.0.starts_at', 'schedules.0.is_enabled',
+        ...$attributeKeys,
     ], $administrator);
 
-    assertShowsEveryMessage(route('clients.edit', $client), ['name', 'email', 'status', 'notes'], $administrator);
+    assertShowsEveryMessage(route('clients.edit', $client), [
+        'name', 'email', 'status', 'notes', ...$attributeKeys,
+    ], $administrator);
 });
 
 it('shows every message the schedule forms can produce', function (): void {
@@ -92,7 +113,12 @@ it('shows every message the schedule forms can produce', function (): void {
     $schedule = NotificationSchedule::factory()->for($client)->create();
     $listSchedule = NotificationSchedule::factory()->forRecipients()->create();
 
-    $shared = ['template', 'frequency', 'starts_at', 'is_enabled', 'subject', 'message'];
+    $shared = [
+        'template', 'frequency', 'starts_at', 'is_enabled', 'subject', 'message',
+        // Which blanks exist depends on the template chosen in the browser, so every one
+        // of them reports above the rows rather than under a field of its own.
+        'template_bindings', 'template_bindings.due_date.source', 'template_bindings.due_date.value',
+    ];
     $listOnly = ['name', 'recipients', 'recipients.*'];
 
     // Only the general form chooses a target, so only it can fail on one.
@@ -113,6 +139,7 @@ it('shows every message the manual send form can produce', function (): void {
 
     assertShowsEveryMessage(route('cadence.deliveries.send'), [
         'target', 'client', 'template', 'name', 'recipients', 'recipients.*', 'subject', 'message',
+        'template_bindings', 'template_bindings.due_date.source', 'template_bindings.due_date.value',
     ], administrator());
 });
 
@@ -131,6 +158,23 @@ it('shows every message the user and role forms can produce', function (): void 
 
     assertShowsEveryMessage(route('admin.roles.create'), ['name', 'permissions', 'permissions.0'], $administrator);
     assertShowsEveryMessage(route('admin.roles.edit', $role), ['name', 'permissions', 'permissions.0'], $administrator);
+});
+
+it('shows every message the client attribute forms can produce', function (): void {
+    $administrator = administrator();
+    $attribute = ClientAttribute::factory()->repeater()->create();
+
+    $definition = [
+        'name', 'hint', 'options', 'is_required', 'is_active', 'position',
+        'fields', 'fields.0.key', 'fields.0.name', 'fields.0.type', 'fields.0.is_required', 'fields.0.options',
+        // The deepest level the editor draws, which is also the deepest it validates.
+        'fields.0.fields.0.fields.0.name',
+    ];
+
+    assertShowsEveryMessage(route('admin.client-attributes.create'), [...$definition, 'type'], $administrator);
+
+    // The type is settled at creation, so the edit form cannot fail on one.
+    assertShowsEveryMessage(route('admin.client-attributes.edit', $attribute), $definition, $administrator);
 });
 
 it('shows every message the settings forms can produce', function (): void {

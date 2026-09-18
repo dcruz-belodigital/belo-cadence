@@ -12,6 +12,8 @@
             @include('clients.partials.fields', ['client' => $client])
         </x-card>
 
+        @include('clients.partials.attribute-fields')
+
         <x-form.actions>
             <x-button :href="route('clients.show', $client)" variant="secondary" type="button">
                 {{ __('common.actions.cancel') }}

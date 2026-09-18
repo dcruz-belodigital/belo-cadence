@@ -10,6 +10,11 @@ use App\Support\Csv\ImportTemplates;
 
 final class MapClientImportRequest extends MapImportRequest
 {
+    /**
+     * The client shape reads the active attributes, so it is built once per request.
+     */
+    private ?ImportTemplate $template = null;
+
     public function authorize(): bool
     {
         return $this->user()->can('import', Client::class);
@@ -22,6 +27,6 @@ final class MapClientImportRequest extends MapImportRequest
 
     protected function template(): ImportTemplate
     {
-        return ImportTemplates::clients();
+        return $this->template ??= ImportTemplates::clients();
     }
 }

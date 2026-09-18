@@ -15,6 +15,7 @@ return [
         'audit-log' => 'Audit log',
         'notifications' => 'Notification schedules',
         'clients' => 'Clients',
+        'client-attributes' => 'Client attributes',
         'dashboard' => 'Dashboard',
         'default-client-notifications' => 'Default notifications',
         'notification-deliveries' => 'Delivery history',
@@ -26,6 +27,14 @@ return [
 
         'dashboard' => [
             'view' => 'View dashboard',
+        ],
+
+        'client-attributes' => [
+            'viewAny' => 'List client attributes',
+            'view' => 'View a client attribute',
+            'create' => 'Create client attributes',
+            'update' => 'Update client attributes',
+            'delete' => 'Delete client attributes',
         ],
 
         'clients' => [

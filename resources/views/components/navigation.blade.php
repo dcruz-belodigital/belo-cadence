@@ -69,6 +69,7 @@
             PermissionName::UsersViewAny->value,
             PermissionName::RolesViewAny->value,
             PermissionName::AuditLogViewAny->value,
+            PermissionName::ClientAttributesViewAny->value,
             PermissionName::ApplicationSettingsView->value,
             PermissionName::DefaultClientNotificationsView->value,
         ])
@@ -85,6 +86,14 @@
                     <li>
                         <x-nav-item :href="route('admin.roles.index')" icon="shield" :active="request()->routeIs('admin.roles.*')">
                             {{ __('navigation.roles') }}
+                        </x-nav-item>
+                    </li>
+                @endcan
+
+                @can(PermissionName::ClientAttributesViewAny->value)
+                    <li>
+                        <x-nav-item :href="route('admin.client-attributes.index')" icon="key" :active="request()->routeIs('admin.client-attributes.*')">
+                            {{ __('navigation.client_attributes') }}
                         </x-nav-item>
                     </li>
                 @endcan

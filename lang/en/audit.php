@@ -46,6 +46,8 @@ return [
         'application_settings' => 'Application settings',
         'audit' => 'Audit entry',
         'client' => 'Client',
+        'client_attribute' => 'Client attribute',
+        'client_attribute_value' => 'Client attribute value',
         'notification_delivery' => 'Delivery',
         'notification_schedule' => 'Notification schedule',
         'default_client_notification' => 'Default notification',

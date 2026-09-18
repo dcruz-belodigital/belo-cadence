@@ -13,6 +13,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Clients\StoreClientRequest;
 use App\Http\Requests\Clients\UpdateClientRequest;
 use App\Models\Client;
+use App\Models\ClientAttribute;
+use App\Models\ClientAttributeValue;
 use App\Models\DefaultClientNotification;
 use App\Support\ViewerTimezone;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -45,6 +47,8 @@ final class ClientController extends Controller
         return view('clients.create', [
             'defaultNotifications' => DefaultClientNotification::query()->orderBy('id')->get(),
             'viewerTimezone' => $viewerTimezone->current()->value,
+            'clientAttributes' => ClientAttribute::query()->active()->get(),
+            'clientAttributeValues' => [],
         ]);
     }
 
@@ -73,6 +77,8 @@ final class ClientController extends Controller
 
         return view('clients.show', [
             'client' => $client,
+            'clientAttributes' => ClientAttribute::query()->active()->get(),
+            'clientAttributeValues' => $this->answersOf($client),
             'deliveries' => $request->user()->can(PermissionName::NotificationDeliveriesViewAny->value)
                 ? $client->notificationDeliveries()->latest('scheduled_for')->limit(10)->get()
                 : null,
@@ -83,7 +89,11 @@ final class ClientController extends Controller
     {
         $this->authorize('update', $client);
 
-        return view('clients.edit', ['client' => $client]);
+        return view('clients.edit', [
+            'client' => $client,
+            'clientAttributes' => ClientAttribute::query()->active()->get(),
+            'clientAttributeValues' => $this->answersOf($client),
+        ]);
     }
 
     public function update(
@@ -98,6 +108,23 @@ final class ClientController extends Controller
         return redirect()
             ->route('clients.show', $client)
             ->with('success', __('clients.flash.updated', ['name' => $client->name]));
+    }
+
+    /**
+     * This client's answers, keyed by attribute id.
+     *
+     * Eager loaded rather than read per attribute: lazy loading is prevented outside
+     * production, and a page with several attributes would otherwise query per field.
+     *
+     * @return array<int, mixed>
+     */
+    private function answersOf(Client $client): array
+    {
+        $client->load('attributeValues');
+
+        return $client->attributeValues
+            ->mapWithKeys(fn (ClientAttributeValue $value): array => [$value->client_attribute_id => $value->value])
+            ->all();
     }
 
     public function destroy(Client $client, ArchiveClientAction $archiveClient): RedirectResponse

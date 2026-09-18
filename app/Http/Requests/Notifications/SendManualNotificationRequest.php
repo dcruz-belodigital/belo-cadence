@@ -8,6 +8,7 @@ use App\Data\Notifications\NotificationDispatch;
 use App\Enums\ClientStatus;
 use App\Enums\EmailTemplate;
 use App\Enums\NotificationTarget;
+use App\Http\Requests\Concerns\BindsTemplateSlots;
 use App\Http\Requests\Concerns\ParsesRecipientLists;
 use App\Models\Client;
 use App\Rules\EmailAddressRule;
@@ -19,6 +20,7 @@ use Illuminate\Validation\Rule;
  */
 final class SendManualNotificationRequest extends FormRequest
 {
+    use BindsTemplateSlots;
     use ParsesRecipientLists;
 
     public const MAX_RECIPIENTS = 50;
@@ -57,6 +59,8 @@ final class SendManualNotificationRequest extends FormRequest
                 static fn (EmailTemplate $template): string => $template->value,
                 EmailTemplate::for($this->target()),
             ))],
+
+            ...$this->templateSlotRules(),
         ];
 
         if ($isClient) {
@@ -96,6 +100,7 @@ final class SendManualNotificationRequest extends FormRequest
             'recipients.*' => __('cadence.fields.recipients'),
             'subject' => __('cadence.fields.subject'),
             'message' => __('cadence.fields.message'),
+            ...$this->templateSlotNames(),
         ];
     }
 
@@ -123,7 +128,18 @@ final class SendManualNotificationRequest extends FormRequest
             recipientName: $client?->name,
             subject: $template->hasOwnCopy() ? null : $this->string('subject')->trim()->value(),
             message: $template->hasOwnCopy() ? null : $this->string('message')->trim()->value(),
+            templateBindings: $this->templateBindings(),
         );
+    }
+
+    /**
+     * A send to a typed list has no client, so its slots offer only a literal.
+     */
+    protected function boundClientId(): ?int
+    {
+        return $this->target() === NotificationTarget::Client && $this->filled('client')
+            ? $this->integer('client')
+            : null;
     }
 
     protected function prepareForValidation(): void

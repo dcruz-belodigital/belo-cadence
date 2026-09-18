@@ -4,6 +4,28 @@ Todas as versões do Belo Cadence, da mais recente para a mais antiga. Para cada
 acrescente um título `##` com a data da versão e agrupe as entradas em **Novidades**,
 **Alterações** ou **Correções**.
 
+## 18 de setembro de 2026
+
+### Novidades
+
+- **Os clientes podem guardar tudo o mais que a sua equipa regista sobre eles.** Em
+  Administração → Atributos de cliente define os campos: texto, números, datas, sim/não,
+  escolha de uma lista, endereços web e de email, e linhas repetíveis — um conjunto de
+  campos preenchido as vezes que forem precisas, que por sua vez pode conter linhas
+  repetíveis. Cada atributo ativo aparece no formulário de cliente, na página do cliente e
+  em ambos os ficheiros CSV.
+- **Os atributos podem ser importados e exportados.** Cada um recebe a sua própria coluna,
+  com o nome do seu identificador. Uma coluna que não associe durante uma importação fica
+  intocada, por isso um ficheiro que apenas corrige endereços de email não altera mais nada.
+- **Os modelos de email podem lê-los.** Um modelo que deixa um espaço — o lembrete anual
+  passa a deixar dois — oferece um seletor no formulário de agendamento: preencha-o a
+  partir de um dos atributos do cliente, incluindo um único campo dentro de linhas
+  repetíveis, ou escreva um valor usado apenas por essa notificação. Um espaço apontado a
+  uma resposta que o cliente não tem regista o envio como falhado, em vez de enviar um
+  email incompleto.
+- **Desativar um atributo mantém as suas respostas.** Desativar esconde-o em todo o lado
+  sem perder nada; eliminar diz primeiro quantos clientes seriam afetados.
+
 ## 21 de agosto de 2026
 
 ### Novidades

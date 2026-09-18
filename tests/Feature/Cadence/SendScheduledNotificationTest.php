@@ -5,10 +5,10 @@ declare(strict_types=1);
 use App\Actions\Notifications\ProcessDueNotificationsAction;
 use App\Actions\Notifications\SendScheduledNotificationAction;
 use App\Data\Notifications\ProcessDueNotificationsResult;
+use App\Enums\ClientStatus;
 use App\Enums\EmailTemplate;
 use App\Enums\NotificationDeliveryStatus;
 use App\Enums\NotificationFrequency;
-use App\Enums\ClientStatus;
 use App\Enums\PermissionName;
 use App\Mail\NotificationMail;
 use App\Models\ApplicationSettings;
@@ -133,8 +133,10 @@ describe('the message that is sent', function (): void {
 
         $monthlyLine = __('mail.notifications.monthly_reminder.lines', ['application' => 'Belo Cadence'])[0];
 
+        // Escaped, because the view escapes it: a faker company name containing an
+        // apostrophe would otherwise fail this assertion once every few suite runs.
         expect($delivery->body_html)->toContain($monthlyLine)
-            ->and($delivery->body_html)->toContain($schedule->client->name);
+            ->and($delivery->body_html)->toContain(e($schedule->client->name));
     });
 });
 

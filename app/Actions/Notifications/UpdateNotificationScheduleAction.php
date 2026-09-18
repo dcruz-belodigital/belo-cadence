@@ -36,6 +36,7 @@ final class UpdateNotificationScheduleAction
                 'is_enabled' => $data->isEnabled,
                 'subject' => $data->subject,
                 'message' => $data->message,
+                'template_bindings' => $data->templateBindings,
             ]);
 
             // A schedule never changes what it targets: the form that edits a client

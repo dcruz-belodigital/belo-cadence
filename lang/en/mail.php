@@ -60,6 +60,12 @@ return [
         ],
 
         'annual_reminder' => [
+            'due' => 'It is due on :date.',
+            'contacts' => 'Who to speak to about it:',
+            'slots' => [
+                'due_date' => 'Due date',
+                'contacts' => 'Who to contact',
+            ],
             'subject' => 'Your annual reminder from :application',
             'lines' => [
                 'This is your yearly reminder from :application.',

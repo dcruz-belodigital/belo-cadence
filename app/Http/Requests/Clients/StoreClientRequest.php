@@ -8,6 +8,7 @@ use App\Data\Clients\CreateClientData;
 use App\Data\Notifications\NotificationScheduleData;
 use App\Enums\ClientStatus;
 use App\Http\Requests\Concerns\ConvertsViewerDateTimes;
+use App\Http\Requests\Concerns\ValidatesClientAttributes;
 use App\Models\DefaultClientNotification;
 use App\Rules\EmailAddressRule;
 use App\ValueObjects\EmailAddress;
@@ -18,6 +19,7 @@ use Illuminate\Validation\Rule;
 final class StoreClientRequest extends FormRequest
 {
     use ConvertsViewerDateTimes;
+    use ValidatesClientAttributes;
 
     /**
      * @return array<string, mixed>
@@ -34,6 +36,8 @@ final class StoreClientRequest extends FormRequest
             'schedules.*.default_id' => ['required', 'integer', Rule::exists('default_client_notifications', 'id')],
             'schedules.*.starts_at' => ['required', 'date', 'after:now'],
             'schedules.*.is_enabled' => ['boolean'],
+
+            ...$this->clientAttributeRules(),
         ];
     }
 
@@ -44,6 +48,7 @@ final class StoreClientRequest extends FormRequest
     {
         return [
             'schedules.*.starts_at' => __('cadence.fields.starts_at'),
+            ...$this->clientAttributeNames(),
         ];
     }
 
@@ -54,6 +59,7 @@ final class StoreClientRequest extends FormRequest
             email: new EmailAddress($this->string('email')->toString()),
             status: ClientStatus::from($this->string('status')->toString()),
             notes: $this->filled('notes') ? $this->string('notes')->toString() : null,
+            attributeValues: $this->clientAttributeValues(),
             notificationSchedules: $this->notificationSchedules(),
         );
     }
@@ -80,6 +86,8 @@ final class StoreClientRequest extends FormRequest
         }
 
         $this->merge(['schedules' => $applied]);
+
+        $this->prepareClientAttributeInput();
     }
 
     /**

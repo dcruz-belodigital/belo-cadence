@@ -2,9 +2,15 @@
     'name',
     'type' => 'text',
     'id' => null,
+    'errorKey' => null,
 ])
 
 @php
+    // A grouped field submits as client_attributes[7] but its message arrives under
+    // client_attributes.7, so the two can differ — the same split `x-form.checkbox`
+    // already carries.
+    $errorKey ??= $name;
+
     /*
     | A file input is not a box you type in, so it gets its own utility. Written out in
     | full rather than assembled, so Tailwind can see both class names.
@@ -23,7 +29,7 @@
                type="password"
                name="{{ $name }}"
                id="{{ $id ?? $name }}"
-               @error($name)
+               @error($errorKey)
                    aria-invalid="true"
                    aria-describedby="{{ $id ?? $name }}-error"
                @enderror
@@ -42,7 +48,7 @@
     <input type="{{ $type }}"
            name="{{ $name }}"
            id="{{ $id ?? $name }}"
-           @error($name)
+           @error($errorKey)
                aria-invalid="true"
                aria-describedby="{{ $id ?? $name }}-error"
            @enderror

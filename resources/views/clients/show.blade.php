@@ -89,6 +89,8 @@
             </x-detail-list>
         </x-card>
 
+        @include('clients.partials.attribute-values')
+
         <x-card :title="__('clients.show.schedules')" :description="__('clients.show.schedules_description')" flush>
             @if ($client->notificationSchedules->isEmpty())
                 <x-empty-state :title="__('clients.show.schedules_empty')"

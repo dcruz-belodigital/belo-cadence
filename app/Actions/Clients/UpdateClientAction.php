@@ -20,13 +20,14 @@ use Illuminate\Support\Facades\DB;
 final class UpdateClientAction
 {
     public function __construct(
+        private readonly SyncClientAttributeValuesAction $syncAttributeValues,
         private readonly RecordAuditAction $recordAudit,
     ) {}
 
     public function __invoke(Client $client, UpdateClientData $data): Client
     {
         return DB::transaction(function () use ($client, $data): Client {
-            $before = $this->auditValues($client);
+            $before = $client->auditShape();
 
             $client->update([
                 'name' => $data->name,
@@ -35,27 +36,16 @@ final class UpdateClientAction
                 'notes' => $data->notes,
             ]);
 
+            ($this->syncAttributeValues)($client, $data->attributeValues);
+
             ($this->recordAudit)(new RecordAuditData(
                 action: AuditAction::ClientUpdated,
                 auditable: $client,
                 oldValues: $before,
-                newValues: $this->auditValues($client),
+                newValues: $client->auditShape(),
             ));
 
             return $client;
         });
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function auditValues(Client $client): array
-    {
-        return [
-            'name' => $client->name,
-            'email' => $client->email->value,
-            'status' => $client->status->value,
-            'notes' => $client->notes,
-        ];
     }
 }

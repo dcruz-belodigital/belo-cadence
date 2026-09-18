@@ -6,6 +6,7 @@ namespace App\Http\Requests\Clients;
 
 use App\Data\Clients\UpdateClientData;
 use App\Enums\ClientStatus;
+use App\Http\Requests\Concerns\ValidatesClientAttributes;
 use App\Models\Client;
 use App\Rules\EmailAddressRule;
 use App\ValueObjects\EmailAddress;
@@ -14,6 +15,8 @@ use Illuminate\Validation\Rule;
 
 final class UpdateClientRequest extends FormRequest
 {
+    use ValidatesClientAttributes;
+
     /**
      * @return array<string, mixed>
      */
@@ -30,6 +33,8 @@ final class UpdateClientRequest extends FormRequest
             ],
             'status' => ['required', Rule::enum(ClientStatus::class)],
             'notes' => ['nullable', 'string', 'max:5000'],
+
+            ...$this->clientAttributeRules(),
         ];
     }
 
@@ -40,7 +45,21 @@ final class UpdateClientRequest extends FormRequest
             email: new EmailAddress($this->string('email')->toString()),
             status: ClientStatus::from($this->string('status')->toString()),
             notes: $this->filled('notes') ? $this->string('notes')->toString() : null,
+            attributeValues: $this->clientAttributeValues(),
         );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return $this->clientAttributeNames();
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->prepareClientAttributeInput();
     }
 
     private function client(): Client

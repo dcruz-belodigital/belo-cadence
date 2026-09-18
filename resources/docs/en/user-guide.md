@@ -22,8 +22,9 @@ activity. Each panel links to the full list.
 
 ## Clients
 
-A **client** is an organisation that receives email. Belo Cadence keeps them deliberately
-simple: a name, one email address, a status, and internal notes.
+A **client** is an organisation that receives email. Every client has a name, one email
+address, a status and internal notes — and whatever else your team has chosen to record
+about them, through **client attributes**.
 
 - **Active** clients receive their scheduled email. **Inactive** clients keep all their
   settings and history but are never emailed.
@@ -33,6 +34,35 @@ simple: a name, one email address, a status, and internal notes.
   can be restored from its own page.
 
 Tick *Include archived* on the client list to find an archived client again.
+
+## Client attributes
+
+Belo Cadence does not decide what else you need to know about a client. **Administration →
+Client attributes** is where your team defines it: a name, a type, and whether it has to be
+filled in. Every active attribute then appears on the client form, in the order you give
+them.
+
+The types are text, long text, number, date, yes/no, a choice from a list, a web address,
+an email address, and **repeating rows** — a set of fields that can be filled in as many
+times as needed, such as a list of contacts. A repeating row can itself contain repeating
+rows, up to three levels deep.
+
+A few things worth knowing:
+
+- The **identifier** is set from the name when the attribute is created and never changes.
+  It is what the column is called in CSV files, so renaming an attribute never breaks a
+  file or a pipeline that already uses it.
+- The **type cannot be changed** afterwards, because every answer already recorded is
+  stored in that shape. To change it, deactivate the attribute and create another.
+- Removing an option from a list stops it being offered, but a client already using it
+  keeps its answer and stays editable.
+- **Deactivating** an attribute hides it from the client form, the client page and both
+  CSV files while keeping every answer. Switch it back on and they are all still there.
+- **Deleting** one really does delete the answers with it. The confirmation says how many
+  clients are affected.
+
+Marking an attribute required stops a client being saved without it. Clients created
+before that was ticked are left alone until somebody next edits them.
 
 ## Notification schedules
 
@@ -116,6 +146,15 @@ the schedule form while you are choosing one.
 
 Adding a template is a small development task: an entry in the catalogue, its audience, a
 view, the wording, and a test.
+
+Some templates leave **blanks** for you to fill in, such as a renewal date. When you pick
+one of those on a schedule — or when sending by hand — a picker appears for each blank.
+Point it at one of the client's attributes, including a single field inside repeating
+rows, or choose *Type a value* and write something used by that notification alone.
+
+If a blank is pointed at an attribute the client has no answer for, the notification is
+**not** sent: the attempt is recorded in delivery history as failed, with the reason, so
+nobody receives an email with a hole in it.
 
 ## Sending by hand
 
@@ -201,6 +240,11 @@ they appear in the audit log too.
 
 Delivery history and the audit log are deliberately **not** importable: they are the
 record of what happened.
+
+Custom attributes get a column each, named `attribute_` followed by the attribute's
+identifier. A column you do not match is left alone, so a file that only corrects email
+addresses never touches anything else. Repeating rows travel as JSON in a single cell,
+which is why the **raw** export is the one that can be imported straight back.
 
 ## Users and roles
 

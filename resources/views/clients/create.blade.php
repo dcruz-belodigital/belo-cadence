@@ -8,6 +8,8 @@
             @include('clients.partials.fields')
         </x-card>
 
+        @include('clients.partials.attribute-fields')
+
         <x-card :title="__('clients.create.defaults')" :description="__('clients.create.defaults_description')">
             {{-- Messages about the set of schedules, rather than one row's start date. --}}
             <x-form.error :name="['schedules', 'schedules.*.default_id']" class="mb-4" />

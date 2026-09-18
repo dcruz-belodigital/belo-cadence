@@ -9,6 +9,18 @@ return [
         'inactive' => 'Inactive',
     ],
 
+    'client_attribute_type' => [
+        'text' => 'Text',
+        'long_text' => 'Long text',
+        'number' => 'Number',
+        'date' => 'Date',
+        'boolean' => 'Yes or no',
+        'select' => 'Choice from a list',
+        'url' => 'Web address',
+        'email' => 'Email address',
+        'repeater' => 'Repeating rows',
+    ],
+
     'notification_frequency' => [
         'one_time' => 'One time',
         'monthly' => 'Monthly',
@@ -100,6 +112,12 @@ return [
 
         'clients' => [
             'imported' => 'Clients imported',
+        ],
+
+        'client_attribute' => [
+            'created' => 'Client attribute created',
+            'updated' => 'Client attribute updated',
+            'deleted' => 'Client attribute deleted',
         ],
 
         'notification_schedule' => [

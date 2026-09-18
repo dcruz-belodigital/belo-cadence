@@ -44,6 +44,7 @@
         listTemplate: '{{ $currentTemplate && $listTemplates->has($currentTemplate) ? $currentTemplate : $listTemplates->keys()->first() }}',
         get template() { return this.target === '{{ NotificationTarget::Client->value }}' ? this.clientTemplate : this.listTemplate },
         get isBlank() { return this.template === '{{ EmailTemplate::Blank->value }}' },
+        message: @js(old('message', $schedule?->message ?? '')),
      }">
 
     @if ($fixedTarget === null)
@@ -126,7 +127,7 @@
         </x-form.field>
 
         <x-form.field name="message" :label="__('cadence.fields.message')" :hint="__('cadence.hints.message')" required>
-            <x-form.textarea name="message" rows="6" x-bind:disabled="! isBlank">{{ old('message', $schedule?->message) }}</x-form.textarea>
+            <x-form.textarea name="message" rows="6" x-model="message" x-bind:disabled="! isBlank">{{ old('message', $schedule?->message) }}</x-form.textarea>
         </x-form.field>
     </div>
 
@@ -144,6 +145,8 @@
             <x-form.input name="starts_at" type="datetime-local" :value="old('starts_at', $startsAtValue)" required />
         </x-form.field>
     </div>
+
+    @include('cadence.partials.template-slots')
 
     <div>
         <p class="mb-3 text-meta text-foreground-muted">{{ __('cadence.hints.starts_at_anchor') }}</p>

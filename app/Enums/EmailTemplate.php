@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Data\Notifications\EmailTemplateSlot;
 use Illuminate\Support\Facades\Lang;
 
 /**
@@ -36,6 +37,32 @@ enum EmailTemplate: string
             self::cases(),
             static fn (self $template): bool => $template->supports($target),
         ));
+    }
+
+    /**
+     * The blanks this template leaves for a schedule to fill in.
+     *
+     * Declared here because the wording that surrounds them is declared here too. The
+     * blank template is the exception, as it always is: its wording lives on the
+     * schedule, so its blanks are read out of that wording instead — see
+     * `App\Support\TemplateSlots`.
+     *
+     * @return list<EmailTemplateSlot>
+     */
+    public function slots(): array
+    {
+        return match ($this) {
+            self::AnnualReminder => [
+                new EmailTemplateSlot('due_date', [ClientAttributeType::Date]),
+                new EmailTemplateSlot(
+                    'contacts',
+                    [ClientAttributeType::Text, ClientAttributeType::Email],
+                    isMultiple: true,
+                ),
+            ],
+            self::GeneralReminder, self::MonthlyReminder, self::ActionRequired,
+            self::StatusUpdate, self::Blank => [],
+        };
     }
 
     public function audience(): EmailTemplateAudience

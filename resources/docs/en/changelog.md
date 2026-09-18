@@ -3,6 +3,26 @@
 Every release of Belo Cadence, newest first. Add a new `##` heading with the release date
 for each one, and group the entries under **New features**, **Changes** or **Fixes**.
 
+## 18 September 2026
+
+### New features
+
+- **Clients can hold whatever else your team records about them.** Administration →
+  Client attributes is where you define the fields: text, numbers, dates, yes/no, a choice
+  from a list, web and email addresses, and repeating rows — a set of fields filled in as
+  many times as needed, which can themselves contain repeating rows. Every active
+  attribute appears on the client form, on the client's page, and in both CSV files.
+- **Attributes can be imported and exported.** Each one gets its own column, named after
+  its identifier. A column you do not match during an import is left untouched, so a file
+  that only corrects email addresses changes nothing else.
+- **Email templates can read them.** A template that leaves a blank — the annual reminder
+  now leaves two — offers a picker on the schedule form: fill it from one of the client's
+  attributes, including a single field inside repeating rows, or type a value used by that
+  notification alone. A blank pointed at an answer the client does not have records the
+  delivery as failed rather than sending an email with a hole in it.
+- **Retiring an attribute keeps its answers.** Deactivating hides it everywhere and loses
+  nothing; deleting says how many clients it would affect first.
+
 ## 21 August 2026
 
 ### New features

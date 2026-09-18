@@ -9,6 +9,7 @@ use App\Enums\NotificationTarget;
 use App\Models\Client;
 use App\Models\NotificationSchedule;
 use App\ValueObjects\EmailAddress;
+use App\ValueObjects\TemplateBindings;
 
 /**
  * One notification about to go out: which template, what it is about, and every address
@@ -31,6 +32,7 @@ final readonly class NotificationDispatch
         public ?string $recipientName = null,
         public ?string $subject = null,
         public ?string $message = null,
+        public TemplateBindings $templateBindings = new TemplateBindings,
     ) {}
 
     /**
@@ -48,6 +50,7 @@ final readonly class NotificationDispatch
             recipientName: $client instanceof Client ? $client->name : null,
             subject: $schedule->subject,
             message: $schedule->message,
+            templateBindings: $schedule->template_bindings,
         );
     }
 

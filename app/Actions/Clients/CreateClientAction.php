@@ -21,6 +21,7 @@ final class CreateClientAction
 {
     public function __construct(
         private readonly CreateNotificationScheduleAction $createSchedule,
+        private readonly SyncClientAttributeValuesAction $syncAttributeValues,
         private readonly RecordAuditAction $recordAudit,
     ) {}
 
@@ -33,6 +34,8 @@ final class CreateClientAction
                 'status' => $data->status,
                 'notes' => $data->notes,
             ]);
+
+            ($this->syncAttributeValues)($client, $data->attributeValues);
 
             // The client exists only now, so each default's target is filled in here.
             foreach ($data->notificationSchedules as $schedule) {
@@ -48,12 +51,7 @@ final class CreateClientAction
             ($this->recordAudit)(new RecordAuditData(
                 action: AuditAction::ClientCreated,
                 auditable: $client,
-                newValues: [
-                    'name' => $client->name,
-                    'email' => $client->email->value,
-                    'status' => $client->status->value,
-                    'notes' => $client->notes,
-                ],
+                newValues: $client->auditShape(),
                 metadata: [
                     'notification_schedules' => array_map(
                         static fn (NotificationScheduleData $schedule): string => $schedule->template->value,

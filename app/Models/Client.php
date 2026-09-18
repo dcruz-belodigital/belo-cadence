@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable|null $deleted_at
  * @property-read Collection<int, NotificationSchedule> $notificationSchedules
  * @property-read Collection<int, NotificationDelivery> $notificationDeliveries
+ * @property-read Collection<int, ClientAttributeValue> $attributeValues
  * @property-read int|null $notification_schedules_count
  */
 #[Fillable(['name', 'email', 'status', 'notes'])]
@@ -55,6 +56,44 @@ final class Client extends Model
     public function notificationDeliveries(): HasMany
     {
         return $this->hasMany(NotificationDelivery::class);
+    }
+
+    /**
+     * What this client answered for each custom attribute.
+     *
+     * There is no row for an unanswered attribute, so this is only ever the answers
+     * that exist — including answers to attributes that have since been retired.
+     *
+     * @return HasMany<ClientAttributeValue, $this>
+     */
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(ClientAttributeValue::class);
+    }
+
+    /**
+     * The client flattened to plain values for its audit entry, answers included.
+     *
+     * `load()` rather than a lazy read is what makes the before-and-after diff honest:
+     * the update action takes a snapshot, writes, and takes another, and a relation left
+     * loaded from the first call would make every attribute change read as a no-op.
+     *
+     * @return array<string, mixed>
+     */
+    public function auditShape(): array
+    {
+        $this->load('attributeValues.attribute');
+
+        return [
+            'name' => $this->name,
+            'email' => $this->email->value,
+            'status' => $this->status->value,
+            'notes' => $this->notes,
+            'attributes' => $this->attributeValues
+                ->sortBy(fn (ClientAttributeValue $value): int => $value->attribute->position)
+                ->mapWithKeys(fn (ClientAttributeValue $value): array => [$value->attribute->key => $value->value])
+                ->all(),
+        ];
     }
 
     public function isActive(): bool
@@ -90,7 +129,10 @@ final class Client extends Model
                     ->orWhere('email', 'like', "%{$search}%")
             ))
             ->when($filters->status, fn (Builder $clients, ClientStatus $status): Builder => $clients->where('status', $status))
-            ->orderBy($filters->sort, $filters->direction);
+            ->orderBy($filters->sort, $filters->direction)
+            // A second, unique key: the export pages by offset, so a non-unique sort
+            // such as status could otherwise repeat or skip a client between pages.
+            ->orderBy('id');
     }
 
     /**

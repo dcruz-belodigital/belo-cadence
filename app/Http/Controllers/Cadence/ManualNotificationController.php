@@ -9,8 +9,10 @@ use App\Enums\NotificationDeliveryStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Notifications\SendManualNotificationRequest;
 use App\Models\Client;
+use App\Models\ClientAttribute;
 use App\Models\NotificationDelivery;
 use App\Support\EmailTemplatePreview;
+use App\Support\TemplateSlots;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -34,6 +36,7 @@ final class ManualNotificationController extends Controller
             'clients' => Client::query()->active()->orderBy('name')->pluck('name', 'id'),
             'selectedClientId' => $request->filled('client') ? $request->integer('client') : null,
             'templatePreviews' => $templatePreviews->all(),
+            'slotOptions' => TemplateSlots::formOptions(ClientAttribute::query()->active()->get()),
         ]);
     }
 

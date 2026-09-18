@@ -16,6 +16,7 @@ return [
         'audit-log' => 'Registo de auditoria',
         'notifications' => 'Agendamentos de notificação',
         'clients' => 'Clientes',
+        'client-attributes' => 'Atributos de cliente',
         'dashboard' => 'Painel',
         'default-client-notifications' => 'Notificações predefinidas',
         'notification-deliveries' => 'Histórico de envios',
@@ -27,6 +28,14 @@ return [
 
         'dashboard' => [
             'view' => 'Ver o painel',
+        ],
+
+        'client-attributes' => [
+            'viewAny' => 'Listar atributos de cliente',
+            'view' => 'Ver um atributo de cliente',
+            'create' => 'Criar atributos de cliente',
+            'update' => 'Atualizar atributos de cliente',
+            'delete' => 'Eliminar atributos de cliente',
         ],
 
         'clients' => [

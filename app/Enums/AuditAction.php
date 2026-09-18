@@ -20,6 +20,10 @@ enum AuditAction: string
     case ClientRestored = 'client.restored';
     case ClientsImported = 'clients.imported';
 
+    case ClientAttributeCreated = 'client_attribute.created';
+    case ClientAttributeUpdated = 'client_attribute.updated';
+    case ClientAttributeDeleted = 'client_attribute.deleted';
+
     case NotificationScheduleCreated = 'notification_schedule.created';
     case NotificationScheduleUpdated = 'notification_schedule.updated';
     case NotificationScheduleEnabled = 'notification_schedule.enabled';
