@@ -159,7 +159,7 @@ final class ClientAttributeValueRule implements ValidationRule
         }
 
         foreach ($fields as $field) {
-            $names += $this->namesFor($prefix.'.*.'.$field->key, $field->name, $field->type, $field->fields);
+            $names += $this->namesFor($prefix.'.*.'.$field->key, $field->labelWithin($name), $field->type, $field->fields);
         }
 
         return $names;

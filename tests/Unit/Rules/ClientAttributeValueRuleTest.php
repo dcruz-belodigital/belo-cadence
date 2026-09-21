@@ -105,6 +105,18 @@ it('names the row a repeater went wrong on', function (): void {
         ->and(implode(' ', $failures))->toContain('Name')->toContain('Extension');
 });
 
+it('reports a field with no name under the name of the attribute holding it', function (): void {
+    $failures = failuresFor([
+        'name' => 'Domains',
+        'type' => ClientAttributeType::Repeater,
+        'fields' => [new ClientAttributeField('field_1', '', ClientAttributeType::Url, isRequired: true)],
+    ], [['field_1' => null]]);
+
+    expect($failures)->toHaveCount(1)
+        ->and($failures[0])->toStartWith('Row 1:')
+        ->and($failures[0])->toContain('Domains');
+});
+
 it('validates a repeater inside a repeater, and says which row of which', function (): void {
     $failures = failuresFor([
         'name' => 'Contacts',

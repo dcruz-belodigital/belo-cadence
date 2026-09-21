@@ -47,6 +47,10 @@ an email address, and **repeating rows** — a set of fields that can be filled 
 times as needed, such as a list of contacts. A repeating row can itself contain repeating
 rows, up to three levels deep.
 
+A field inside a repeating row needs a type, but not a name. Leave the name empty and its
+values are shown on their own rather than labelled, which turns a row of one field into a
+plain list — a list of domains, say.
+
 A few things worth knowing:
 
 - The **identifier** is set from the name when the attribute is created and never changes.

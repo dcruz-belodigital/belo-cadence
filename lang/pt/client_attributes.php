@@ -32,7 +32,7 @@ return [
     ],
 
     'hints' => [
-        'fields' => 'Cada linha deste atributo é composta por estes campos. Um campo pode, por sua vez, ser um conjunto de linhas repetíveis.',
+        'fields' => 'Cada linha deste atributo é composta por estes campos. Um campo pode, por sua vez, ser um conjunto de linhas repetíveis. Deixe um campo sem nome e os seus valores aparecem sozinhos, que é como uma linha se torna uma simples lista.',
         'hint' => 'Aparece por baixo do campo no formulário de cliente. Deixe vazio se o nome disser o suficiente.',
         'is_active' => 'Um atributo inativo desaparece do formulário de cliente, da página do cliente e de ambos os ficheiros CSV. Nada do que já foi registado se perde.',
         'is_required' => 'Um cliente não pode ser guardado sem ele. Os clientes criados antes de isto ser assinalado ficam como estão até alguém os editar.',
@@ -80,6 +80,7 @@ return [
         'fields' => 'Campos de cada linha',
         'options' => 'Opções',
         'retired' => 'já não é oferecida',
+        'unnamed' => 'Campo sem nome',
         'usage' => 'Registado em :count clientes.',
         'usage_none' => 'Ainda nenhum cliente registou um valor para este atributo.',
     ],

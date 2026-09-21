@@ -32,7 +32,7 @@ return [
     ],
 
     'hints' => [
-        'fields' => 'Each row of this attribute is made of these fields. A field can itself be a set of repeating rows.',
+        'fields' => 'Each row of this attribute is made of these fields. A field can itself be a set of repeating rows. Leave a field unnamed and its values are shown on their own, which is how a row becomes a plain list.',
         'hint' => 'Shown under the field on the client form. Leave it empty if the name says enough.',
         'is_active' => 'An inactive attribute disappears from the client form, the client page and both CSV files. Nothing already recorded is lost.',
         'is_required' => 'A client cannot be saved without it. Clients created before this was ticked stay as they are until somebody next edits them.',
@@ -80,6 +80,7 @@ return [
         'fields' => 'Fields in each row',
         'options' => 'Options',
         'retired' => 'no longer offered',
+        'unnamed' => 'Unnamed field',
         'usage' => 'Recorded on :count clients.',
         'usage_none' => 'No client has recorded a value for this yet.',
     ],

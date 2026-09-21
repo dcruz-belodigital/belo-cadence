@@ -41,7 +41,11 @@
                 </label>
 
                 <label class="block space-y-1.5">
-                    <span class="block text-label">{{ __('client_attributes.fields.field_type') }}</span>
+                    <span class="block text-label">
+                        {{ __('client_attributes.fields.field_type') }}
+                        <span class="text-danger" aria-hidden="true">*</span>
+                        <span class="sr-only">{{ __('common.form.required') }}</span>
+                    </span>
                     <select class="form-control" x-bind:name="{{ $nameFor('type') }}" x-model="{{ $row }}.type">
                         @foreach ($typeOptions as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>

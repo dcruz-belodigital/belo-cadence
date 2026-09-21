@@ -10,6 +10,7 @@ use App\Models\Client;
 use App\Models\ClientAttribute;
 use App\Models\ClientAttributeValue;
 use App\ValueObjects\ClientAttributeChoices;
+use App\ValueObjects\ClientAttributeField;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -139,18 +140,37 @@ describe('creating an attribute', function (): void {
             ->and($fields[1]->fields[0]->key)->toBe('city');
     });
 
-    it('drops a row somebody added and never filled in', function (): void {
+    it('numbers the identifier of a field nobody named', function (): void {
         actingAs(administrator())->post(route('admin.client-attributes.store'), [
-            'name' => 'Contacts',
+            'name' => 'Domains',
             'type' => ClientAttributeType::Repeater->value,
             'position' => 0,
+            // A row of one unnamed field is how a repeater becomes a plain list of values.
             'fields' => [
-                ['name' => 'Name', 'type' => ClientAttributeType::Text->value],
-                ['name' => '', 'type' => ClientAttributeType::Text->value],
+                ['name' => '', 'type' => ClientAttributeType::Url->value],
             ],
         ])->assertSessionHasNoErrors();
 
-        expect(ClientAttribute::query()->firstOrFail()->fields)->toHaveCount(1);
+        $fields = ClientAttribute::query()->firstOrFail()->fields;
+
+        expect($fields)->toHaveCount(1)
+            ->and($fields[0]->key)->toBe('field_1')
+            ->and($fields[0]->name)->toBe('')
+            ->and($fields[0]->isNamed())->toBeFalse();
+    });
+
+    it('keeps the rows of a type that is not made of them out of the definition', function (): void {
+        // The editor only hides the rows when another type is picked, so they still submit.
+        actingAs(administrator())->post(route('admin.client-attributes.store'), [
+            'name' => 'Account owner',
+            'type' => ClientAttributeType::Text->value,
+            'position' => 0,
+            'fields' => [
+                ['name' => 'Name', 'type' => ClientAttributeType::Text->value],
+            ],
+        ])->assertSessionHasNoErrors();
+
+        expect(ClientAttribute::query()->firstOrFail()->fields)->toBe([]);
     });
 
     it('refuses a definition that would not work', function (array $payload, string $field): void {
@@ -278,6 +298,27 @@ describe('editing an attribute', function (): void {
 
         expect($fields[0]->key)->toBe('name')
             ->and($fields[0]->name)->toBe('Full name');
+    });
+
+    it('never hands a new unnamed field the identifier an older one is stored under', function (): void {
+        $attribute = ClientAttribute::factory()->repeater([
+            new ClientAttributeField('field_1', '', ClientAttributeType::Url),
+        ])->create(['position' => 0]);
+
+        actingAs(administrator())->put(route('admin.client-attributes.update', $attribute), [
+            'name' => $attribute->name,
+            'position' => 0,
+            'is_active' => '1',
+            'fields' => [
+                // A second unnamed field, added above the one that already holds answers.
+                ['name' => '', 'type' => ClientAttributeType::Url->value],
+                ['key' => 'field_1', 'name' => '', 'type' => ClientAttributeType::Url->value],
+            ],
+        ])->assertRedirect();
+
+        // And they stay in the order they were submitted in, new one first.
+        expect(array_map(fn (ClientAttributeField $field): string => $field->key, $attribute->refresh()->fields))
+            ->toBe(['field_2', 'field_1']);
     });
 
     it('refuses somebody without permission to change one', function (): void {

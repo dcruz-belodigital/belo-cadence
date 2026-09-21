@@ -58,7 +58,7 @@ trait DefinesClientAttributes
         foreach ($this->fieldPrefixes() as $prefix) {
             $rules[$prefix] ??= ['array', 'max:'.self::MAX_FIELDS];
             $rules[$prefix.'.*.key'] = ['nullable', 'string', 'max:64', 'regex:/^[a-z][a-z0-9_]*$/'];
-            $rules[$prefix.'.*.name'] = ['required', 'string', 'max:255'];
+            $rules[$prefix.'.*.name'] = ['nullable', 'string', 'max:255'];
             $rules[$prefix.'.*.type'] = ['required', Rule::enum(ClientAttributeType::class)];
             $rules[$prefix.'.*.is_required'] = ['boolean'];
             $rules[$prefix.'.*.options'] = ['nullable', 'string', 'max:5000'];
@@ -91,13 +91,13 @@ trait DefinesClientAttributes
     }
 
     /**
-     * Rows the browser added and nobody filled in arrive empty, so they are dropped
-     * before validation rather than reported as mistakes.
+     * The rows arrive from a script, so they may have gaps and may hold anything at all.
+     * They are reduced to plain arrays and re-indexed before a rule looks at them.
      */
     protected function prepareDefinitionInput(): void
     {
         $this->merge([
-            'fields' => $this->pruneFields(is_array($this->input('fields')) ? $this->input('fields') : []),
+            'fields' => $this->fieldRows(is_array($this->input('fields')) ? $this->input('fields') : []),
         ]);
     }
 
@@ -113,10 +113,16 @@ trait DefinesClientAttributes
             type: $type,
             hint: $this->filled('hint') ? $this->string('hint')->trim()->toString() : null,
             options: $this->mergedChoices($existing?->options, $this->string('options')->toString()),
-            fields: $this->parseFields(
-                is_array($this->validated('fields')) ? $this->validated('fields') : [],
-                $existing?->fields ?? [],
-            ),
+            /*
+            | Only repeating rows are made of fields. The editor leaves the rows of a type
+            | that was tried and changed sitting in the form, and they are not definition.
+            */
+            fields: $type->usesFields()
+                ? $this->parseFields(
+                    is_array($this->validated('fields')) ? $this->validated('fields') : [],
+                    $existing?->fields ?? [],
+                )
+                : [],
             isRequired: $this->boolean('is_required'),
             isActive: $this->boolean('is_active'),
             position: $this->integer('position'),
@@ -129,6 +135,25 @@ trait DefinesClientAttributes
     public static function keyFor(string $name): string
     {
         return Str::limit(Str::slug($name, '_'), 64, '');
+    }
+
+    /**
+     * The identifier of a field nobody named.
+     *
+     * A field is filed under its key whatever it is called, so one with no name to derive
+     * a key from is numbered instead, skipping everything already spoken for.
+     *
+     * @param  list<string>  $taken
+     */
+    private static function numberedKey(array $taken): string
+    {
+        $number = 1;
+
+        while (in_array('field_'.$number, $taken, true)) {
+            $number++;
+        }
+
+        return 'field_'.$number;
     }
 
     /**
@@ -195,23 +220,23 @@ trait DefinesClientAttributes
      * @param  array<int, mixed>  $fields
      * @return list<array<string, mixed>>
      */
-    private function pruneFields(array $fields): array
+    private function fieldRows(array $fields): array
     {
-        $kept = [];
+        $rows = [];
 
         foreach ($fields as $field) {
-            if (! is_array($field) || trim((string) ($field['name'] ?? '')) === '') {
+            if (! is_array($field)) {
                 continue;
             }
 
             if (is_array($field['fields'] ?? null)) {
-                $field['fields'] = $this->pruneFields($field['fields']);
+                $field['fields'] = $this->fieldRows($field['fields']);
             }
 
-            $kept[] = $field;
+            $rows[] = $field;
         }
 
-        return $kept;
+        return $rows;
     }
 
     /**
@@ -228,8 +253,22 @@ trait DefinesClientAttributes
             return [];
         }
 
+        /*
+        | `validated()` hands the rows back in the order its rules matched them rather than
+        | the order they were submitted in, so a row carrying a key overtakes one that does
+        | not. The indexes are still the submitted order, so sorting by them restores it.
+        */
+        ksort($submitted);
+
         $fields = [];
         $taken = [];
+
+        /*
+        | Every key the payload already carries is spoken for before one is invented, so an
+        | unnamed field added above an existing one cannot be handed the key that one's
+        | answers are filed under.
+        */
+        $reserved = $this->submittedKeys($submitted);
 
         foreach ($submitted as $row) {
             if (! is_array($row)) {
@@ -239,14 +278,19 @@ trait DefinesClientAttributes
             $name = trim((string) ($row['name'] ?? ''));
             $type = ClientAttributeType::tryFrom((string) ($row['type'] ?? ''));
 
-            if ($name === '' || ! $type instanceof ClientAttributeType) {
+            if (! $type instanceof ClientAttributeType) {
                 continue;
             }
 
             $key = trim((string) ($row['key'] ?? '')) ?: self::keyFor($name);
 
+            if ($key === '') {
+                $key = self::numberedKey([...$reserved, ...$taken]);
+                $reserved[] = $key;
+            }
+
             // A row whose name collides with one above it would overwrite its answers.
-            if ($key === '' || in_array($key, $taken, true)) {
+            if (in_array($key, $taken, true)) {
                 continue;
             }
 
@@ -273,6 +317,27 @@ trait DefinesClientAttributes
         }
 
         return $fields;
+    }
+
+    /**
+     * The keys the browser sent back, which belong to fields that may already hold answers.
+     *
+     * @param  array<int, mixed>  $submitted
+     * @return list<string>
+     */
+    private function submittedKeys(array $submitted): array
+    {
+        $keys = [];
+
+        foreach ($submitted as $row) {
+            $key = is_array($row) ? trim((string) ($row['key'] ?? '')) : '';
+
+            if ($key !== '') {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
     }
 
     /**

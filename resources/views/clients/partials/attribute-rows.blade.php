@@ -23,7 +23,9 @@
                 @foreach ($fields as $field)
                     @if ($field->type->usesFields())
                         <div class="space-y-2 border-l-2 border-border pl-3 sm:col-span-2">
-                            <p class="text-label">{{ $field->name }}</p>
+                            @if ($field->isNamed())
+                                <p class="text-label">{{ $field->name }}</p>
+                            @endif
 
                             @include('clients.partials.attribute-rows', [
                                 'fields' => $field->fields,
@@ -45,12 +47,16 @@
                     @else
                         {{-- Labels wrap their input: an id would have to be unique across every branch. --}}
                         <label class="block space-y-1.5">
-                            <span class="block text-label">
-                                {{ $field->name }}
-                                @if ($field->isRequired)
-                                    <span class="text-danger" aria-hidden="true">*</span>
-                                @endif
-                            </span>
+                            {{-- A field nobody named is a bare value, so it gets no label of its own. --}}
+                            @if ($field->isNamed() || $field->isRequired)
+                                <span class="block text-label">
+                                    {{ $field->name }}
+                                    @if ($field->isRequired)
+                                        <span class="text-danger" aria-hidden="true">*</span>
+                                        <span class="sr-only">{{ __('common.form.required') }}</span>
+                                    @endif
+                                </span>
+                            @endif
 
                             @if ($field->type === ClientAttributeType::LongText)
                                 <textarea rows="3" class="form-control"

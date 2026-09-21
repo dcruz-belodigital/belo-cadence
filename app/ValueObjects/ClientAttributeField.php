@@ -15,6 +15,12 @@ use InvalidArgumentException;
  * fields, and every consumer — validation, the form, the detail page, the CSV and the
  * email slots — walks the tree with the same code at every level.
  *
+ * A field does not have to be named. An unnamed one is a bare value: the form draws its
+ * input with nothing above it and a recorded row reads as the value alone, which is what
+ * turns a repeater of one field into a plain list. It still has a key, because a key is
+ * what an answer is filed under — the definition form numbers one when nobody types a
+ * name to derive it from.
+ *
  * Depth is capped by `ClientAttribute::MAX_DEPTH`, which the definition form enforces.
  */
 final readonly class ClientAttributeField
@@ -30,8 +36,8 @@ final readonly class ClientAttributeField
         public ClientAttributeChoices $choices = new ClientAttributeChoices,
         public array $fields = [],
     ) {
-        if (trim($key) === '' || trim($name) === '') {
-            throw new InvalidArgumentException('A repeater field needs a key and a name.');
+        if (trim($key) === '') {
+            throw new InvalidArgumentException('A repeater field needs a key.');
         }
     }
 
@@ -44,7 +50,7 @@ final readonly class ClientAttributeField
         $name = is_string($raw['name'] ?? null) ? trim($raw['name']) : '';
         $type = ClientAttributeType::tryFrom(is_string($raw['type'] ?? null) ? $raw['type'] : '');
 
-        if ($key === '' || $name === '' || ! $type instanceof ClientAttributeType) {
+        if ($key === '' || ! $type instanceof ClientAttributeType) {
             return null;
         }
 
@@ -138,9 +144,12 @@ final readonly class ClientAttributeField
                     continue;
                 }
 
-                $cells[] = $field->name.': '.($field->type->usesFields()
+                $formatted = $field->type->usesFields()
                     ? '('.str_replace("\n", ' / ', $field->format($cell)).')'
-                    : $field->format($cell));
+                    : $field->format($cell);
+
+                // A field nobody named is read as its value alone, not as "name: value".
+                $cells[] = $field->isNamed() ? $field->name.': '.$formatted : $formatted;
             }
 
             if ($cells !== []) {
@@ -149,6 +158,24 @@ final readonly class ClientAttributeField
         }
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * Whether this field names itself.
+     */
+    public function isNamed(): bool
+    {
+        return $this->name !== '';
+    }
+
+    /**
+     * What to call this field where something has to be called something — a validation
+     * message, an email template slot. An unnamed field borrows the name of whatever
+     * contains it, because it has none of its own to point at.
+     */
+    public function labelWithin(string $container): string
+    {
+        return $this->isNamed() ? $this->name : $container;
     }
 
     public function find(string $key): ?self

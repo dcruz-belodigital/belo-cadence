@@ -100,6 +100,19 @@ it('reads a repeater the way a person does, at every depth', function (): void {
     expect($formatted)->toBe("Name: Ana, Addresses: (City: Porto / City: Lisboa)\nName: Rui");
 });
 
+it('reads a row of one unnamed field as a plain list of values', function (): void {
+    $attribute = new ClientAttribute([
+        'key' => 'domains',
+        'name' => 'Domains',
+        'type' => ClientAttributeType::Repeater,
+        'fields' => [new ClientAttributeField('field_1', '', ClientAttributeType::Url)],
+    ]);
+
+    // Nothing names the values, so nothing prefixes them either.
+    expect($attribute->formatValue([['field_1' => 'dcruz.com'], ['field_1' => 'dcruz.pt']]))
+        ->toBe("dcruz.com\ndcruz.pt");
+});
+
 it('reads a stored date in the reader format and a boolean as a word', function (): void {
     expect(attributeOfType(ClientAttributeType::Date)->formatValue('2026-03-01'))->toBe('01 Mar 2026')
         ->and(attributeOfType(ClientAttributeType::Boolean)->formatValue(true))->toBe('Yes')

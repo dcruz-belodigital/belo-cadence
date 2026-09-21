@@ -49,6 +49,10 @@ web, endereço de email e **linhas repetíveis** — um conjunto de campos que p
 preenchido as vezes que forem precisas, como uma lista de contactos. Uma linha repetível
 pode, por sua vez, conter linhas repetíveis, até três níveis.
 
+Um campo dentro de uma linha repetível precisa de um tipo, mas não de um nome. Deixe o
+nome vazio e os valores aparecem sozinhos, sem etiqueta, o que transforma uma linha de um
+só campo numa simples lista — de domínios, por exemplo.
+
 Vale a pena saber:
 
 - O **identificador** é definido a partir do nome quando o atributo é criado e nunca muda.

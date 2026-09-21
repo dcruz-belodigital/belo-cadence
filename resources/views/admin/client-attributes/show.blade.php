@@ -11,7 +11,9 @@
 
         foreach ($fields as $field) {
             /** @var ClientAttributeField $field */
-            $lines[] = str_repeat('    ', $depth).$field->name.' — '.$field->type->label()
+            $name = $field->isNamed() ? $field->name : __('client_attributes.show.unnamed');
+
+            $lines[] = str_repeat('    ', $depth).$name.' — '.$field->type->label()
                 .($field->isRequired ? ' ('.__('client_attributes.fields.field_required').')' : '');
 
             if ($field->fields !== []) {

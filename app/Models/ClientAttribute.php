@@ -259,7 +259,9 @@ final class ClientAttribute extends Model
 
         foreach ($fields as $field) {
             $path = [...$prefix, $field->key];
-            $name = $label.' → '.$field->name;
+            // An unnamed field is the only thing in its row worth naming, so it is offered
+            // under the name of whatever holds it rather than as "Domains → ".
+            $name = $field->isNamed() ? $label.' → '.$field->name : $label;
 
             $paths[] = [
                 'path' => $path,
