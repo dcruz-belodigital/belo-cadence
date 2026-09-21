@@ -125,7 +125,7 @@
                 </x-nav-item>
             </li>
             <li>
-                <x-nav-item :href="route('support.changelog')" icon="scroll" :active="request()->routeIs('support.changelog')">
+                <x-nav-item :href="route('support.changelog')" icon="clipboard-lines" :active="request()->routeIs('support.changelog')">
                     {{ __('navigation.changelog') }}
                 </x-nav-item>
             </li>

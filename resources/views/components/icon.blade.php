@@ -263,12 +263,13 @@
             <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
             @break
 
-        {{-- A scroll of dated entries: the changelog, kept distinct from the audit log's clipboard. --}}
-        @case('scroll')
-            <path d="M15 12h-5" />
-            <path d="M15 8h-5" />
-            <path d="M19 17V5a2 2 0 0 0-2-2H4" />
-            <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3" />
+        {{-- A written-up clipboard: the changelog, kept distinct from the audit log's bulleted one. --}}
+        @case('clipboard-lines')
+            <rect width="8" height="4" x="8" y="2" rx="1" />
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <path d="M8 10h8" />
+            <path d="M8 14h8" />
+            <path d="M8 18h5" />
             @break
 
         @case('sparkles')

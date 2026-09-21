@@ -1,9 +1,5 @@
 # Registo de alterações
 
-Todas as versões do Belo Cadence, da mais recente para a mais antiga. Para cada uma,
-acrescente um título `##` com a data da versão e agrupe as entradas em **Novidades**,
-**Alterações** ou **Correções**.
-
 ## 18 de setembro de 2026
 
 ### Novidades

@@ -1,8 +1,5 @@
 # Changelog
 
-Every release of Belo Cadence, newest first. Add a new `##` heading with the release date
-for each one, and group the entries under **New features**, **Changes** or **Fixes**.
-
 ## 18 September 2026
 
 ### New features
