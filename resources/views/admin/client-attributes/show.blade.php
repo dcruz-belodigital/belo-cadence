@@ -1,30 +1,3 @@
-@php
-    use App\ValueObjects\ClientAttributeChoice;
-    use App\ValueObjects\ClientAttributeField;
-
-    /*
-    | The field tree is read here rather than written, so a plain recursive closure draws
-    | it — no bounded depth needed on this side.
-    */
-    $describeFields = function (array $fields, int $depth = 0) use (&$describeFields): string {
-        $lines = [];
-
-        foreach ($fields as $field) {
-            /** @var ClientAttributeField $field */
-            $name = $field->isNamed() ? $field->name : __('client_attributes.show.unnamed');
-
-            $lines[] = str_repeat('    ', $depth).$name.' — '.$field->type->label()
-                .($field->isRequired ? ' ('.__('client_attributes.fields.field_required').')' : '');
-
-            if ($field->fields !== []) {
-                $lines[] = $describeFields($field->fields, $depth + 1);
-            }
-        }
-
-        return implode("\n", array_filter($lines));
-    };
-@endphp
-
 <x-app-layout :heading="$attribute->name"
                :back="route('admin.client-attributes.index')"
                :back-label="__('client_attributes.title')" width="narrow">
@@ -105,7 +78,7 @@
 
         @if ($attribute->type->usesFields())
             <x-card :title="__('client_attributes.show.fields')">
-                <p class="whitespace-pre-line text-body">{{ $describeFields($attribute->fields) }}</p>
+                @include('admin.client-attributes.partials.field-tree', ['fields' => $attribute->fields])
             </x-card>
         @endif
     </div>

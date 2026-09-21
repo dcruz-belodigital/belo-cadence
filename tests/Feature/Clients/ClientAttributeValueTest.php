@@ -9,6 +9,7 @@ use App\Models\Audit;
 use App\Models\Client;
 use App\Models\ClientAttribute;
 use App\Models\ClientAttributeValue;
+use App\ValueObjects\ClientAttributeField;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -185,22 +186,64 @@ describe('an attribute that has been deactivated', function (): void {
 });
 
 describe('the client page', function (): void {
-    it('reads a repeater the way a person does', function (): void {
-        $contacts = ClientAttribute::factory()->repeater()->create(['name' => 'Contacts', 'position' => 1]);
+    it('reads a repeater as rows rather than as one line of text', function (): void {
+        $contacts = ClientAttribute::factory()->nestedRepeater()->create(['name' => 'Contacts', 'position' => 1]);
         $owner = ClientAttribute::factory()->create(['name' => 'Account owner', 'position' => 2]);
 
         $client = Client::factory()->create();
 
         // Two answers, because Eloquent only guards a result set of more than one row.
         ClientAttributeValue::factory()->for($client)->of($contacts, [
-            ['name' => 'Ana', 'extension' => 22],
+            ['name' => 'Ana', 'addresses' => [['city' => 'Porto'], ['city' => 'Lisboa']]],
         ])->create();
         ClientAttributeValue::factory()->for($client)->of($owner, 'Rui Silva')->create();
 
         actingAs(administrator())
             ->get(route('clients.show', $client))
             ->assertOk()
-            ->assertSee('Name: Ana, Extension: 22')
+            // The one-line reading is for a CSV cell and an email; a page has the room.
+            ->assertDontSee('Name: Ana')
+            ->assertSee('Addresses')
+            ->assertSee('Ana')
+            ->assertSee('Porto')
+            ->assertSee('Lisboa')
+            ->assertSee('Rui Silva');
+    });
+
+    it('reads a row of one unnamed field as a plain list of values', function (): void {
+        $domains = ClientAttribute::factory()->repeater([
+            new ClientAttributeField('field_1', '', ClientAttributeType::Url),
+        ])->create(['name' => 'Domains', 'position' => 1]);
+        $owner = ClientAttribute::factory()->create(['name' => 'Account owner', 'position' => 2]);
+
+        $client = Client::factory()->create();
+
+        ClientAttributeValue::factory()->for($client)->of($domains, [
+            ['field_1' => 'https://dcruz.com'],
+            ['field_1' => 'https://dcruz.pt'],
+        ])->create();
+        ClientAttributeValue::factory()->for($client)->of($owner, 'Rui Silva')->create();
+
+        actingAs(administrator())
+            ->get(route('clients.show', $client))
+            ->assertOk()
+            ->assertSee('https://dcruz.com')
+            ->assertSee('https://dcruz.pt');
+    });
+
+    it('leaves out an attribute whose rows were all removed', function (): void {
+        $contacts = ClientAttribute::factory()->repeater()->create(['name' => 'Contacts', 'position' => 1]);
+        $owner = ClientAttribute::factory()->create(['name' => 'Account owner', 'position' => 2]);
+
+        $client = Client::factory()->create();
+
+        ClientAttributeValue::factory()->for($client)->of($contacts, [])->create();
+        ClientAttributeValue::factory()->for($client)->of($owner, 'Rui Silva')->create();
+
+        actingAs(administrator())
+            ->get(route('clients.show', $client))
+            ->assertOk()
+            ->assertDontSee('Contacts')
             ->assertSee('Rui Silva');
     });
 });

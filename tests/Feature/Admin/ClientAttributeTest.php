@@ -379,4 +379,16 @@ describe('the pages themselves', function (): void {
         actingAs(administrator())->get(route('admin.client-attributes.edit', $attribute))->assertOk();
         actingAs(administrator())->get(route('admin.client-attributes.show', $attribute))->assertOk();
     })->with(ClientAttributeType::cases());
+
+    it('lists what a row is made of, at every depth, identifiers and all', function (): void {
+        $attribute = ClientAttribute::factory()->nestedRepeater()->create();
+
+        actingAs(administrator())
+            ->get(route('admin.client-attributes.show', $attribute))
+            ->assertOk()
+            ->assertSee('Addresses')
+            // The field inside the field: a tree rather than a line of indented text.
+            ->assertSee('City')
+            ->assertSee('city');
+    });
 });
