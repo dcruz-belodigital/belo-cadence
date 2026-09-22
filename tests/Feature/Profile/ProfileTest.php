@@ -151,13 +151,17 @@ describe('changing your own password', function (): void {
         expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
     });
 
-    it('refuses a weak new password', function (): void {
-        actingAs(administrator())
+    it('accepts a short new password, because no strength rule is enforced', function (): void {
+        $user = administrator();
+
+        actingAs($user)
             ->put(route('profile.password.update'), [
                 'current_password' => 'password',
-                'password' => 'short',
-                'password_confirmation' => 'short',
+                'password' => 'x',
+                'password_confirmation' => 'x',
             ])
-            ->assertSessionHasErrors('password');
+            ->assertRedirect();
+
+        expect(Hash::check('x', $user->fresh()->password))->toBeTrue();
     });
 });

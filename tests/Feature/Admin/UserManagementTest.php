@@ -92,7 +92,7 @@ describe('creating a user', function (): void {
     })->with([
         'missing name' => [['email' => 'a@b.test', 'password' => 'a-strong-password-1', 'password_confirmation' => 'a-strong-password-1'], 'name'],
         'invalid email' => [['name' => 'A', 'email' => 'nope', 'password' => 'a-strong-password-1', 'password_confirmation' => 'a-strong-password-1'], 'email'],
-        'short password' => [['name' => 'A', 'email' => 'a@b.test', 'password' => 'short', 'password_confirmation' => 'short'], 'password'],
+        'missing password' => [['name' => 'A', 'email' => 'a@b.test', 'password' => '', 'password_confirmation' => ''], 'password'],
         'mismatched confirmation' => [['name' => 'A', 'email' => 'a@b.test', 'password' => 'a-strong-password-1', 'password_confirmation' => 'different-password-1'], 'password'],
         'unknown role' => [['name' => 'A', 'email' => 'a@b.test', 'password' => 'a-strong-password-1', 'password_confirmation' => 'a-strong-password-1', 'roles' => ['Wizard']], 'roles.0'],
     ]);

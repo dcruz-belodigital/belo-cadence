@@ -134,11 +134,13 @@ it('requires a password for a new user', function (): void {
     expect(User::query()->where('email', 'bruno@example.test')->exists())->toBeFalse();
 });
 
-it('rejects a weak password', function (): void {
-    $csv = "name,email,password\nBruno Demo,bruno@example.test,short\n";
+it('accepts a short password, because no strength rule is enforced', function (): void {
+    $csv = "name,email,password\nBruno Demo,bruno@example.test,x\n";
 
     uploadUsers($csv);
-    importUsers(userIdentityMapping($csv))->assertSessionHasErrors('file');
+    importUsers(userIdentityMapping($csv))->assertSessionHasNoErrors();
+
+    expect(Hash::check('x', User::query()->where('email', 'bruno@example.test')->sole()->password))->toBeTrue();
 });
 
 it('rejects a role that does not exist', function (): void {

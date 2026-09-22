@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Validation\Rules\Password;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -59,8 +58,6 @@ final class AppServiceProvider extends ServiceProvider
             'role' => Role::class,
             'user' => User::class,
         ]);
-
-        Password::defaults(fn (): Password => Password::min(12)->letters()->numbers());
 
         Vite::prefetch(concurrency: 3);
     }

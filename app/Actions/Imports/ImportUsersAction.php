@@ -22,7 +22,6 @@ use App\ValueObjects\EmailAddress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -140,7 +139,7 @@ final class ImportUsersAction
                     Rule::unique('users', 'email')->ignore($values['id'] === '' ? null : $values['id']),
                 ],
                 // An existing account keeps its password when the column is left empty.
-                'password' => [$isUpdate ? 'nullable' : 'required', 'string', Password::defaults()],
+                'password' => [$isUpdate ? 'nullable' : 'required', 'string'],
                 'is_active' => ['boolean'],
                 'roles' => ['array'],
                 'roles.*' => ['string', Rule::exists('roles', 'name')],

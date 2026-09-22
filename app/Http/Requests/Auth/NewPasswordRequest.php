@@ -7,19 +7,18 @@ namespace App\Http\Requests\Auth;
 use App\Rules\EmailAddressRule;
 use App\ValueObjects\EmailAddress;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
 final class NewPasswordRequest extends FormRequest
 {
     /**
-     * @return array<string, list<string|EmailAddressRule|Password>>
+     * @return array<string, list<string|EmailAddressRule>>
      */
     public function rules(): array
     {
         return [
             'token' => ['required', 'string'],
             'email' => ['required', 'string', new EmailAddressRule],
-            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            'password' => ['required', 'string', 'confirmed'],
         ];
     }
 

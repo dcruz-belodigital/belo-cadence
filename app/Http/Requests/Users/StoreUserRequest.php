@@ -9,7 +9,6 @@ use App\Rules\EmailAddressRule;
 use App\ValueObjects\EmailAddress;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
 final class StoreUserRequest extends FormRequest
 {
@@ -21,7 +20,7 @@ final class StoreUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'max:255', new EmailAddressRule, Rule::unique('users', 'email')],
-            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            'password' => ['required', 'string', 'confirmed'],
             'is_active' => ['boolean'],
             'roles' => ['array'],
             'roles.*' => ['string', Rule::exists('roles', 'name')],

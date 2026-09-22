@@ -74,7 +74,7 @@ return [
         'title' => 'Importar utilizadores',
         'description' => 'Criar ou atualizar contas de utilizador a partir de um ficheiro CSV.',
         'submit' => 'Continuar',
-        'password_hint' => 'Os novos utilizadores precisam de uma palavra-passe com pelo menos 12 caracteres, contendo letras e números. Deixe a palavra-passe vazia ao atualizar um utilizador existente para manter a atual.',
+        'password_hint' => 'Os novos utilizadores precisam de uma palavra-passe. Deixe a palavra-passe vazia ao atualizar um utilizador existente para manter a atual.',
         'roles_hint' => 'Indique os perfis de acesso separados por ponto e vírgula, por exemplo "Administrator;Viewer". Os perfis têm de já existir.',
     ],
 

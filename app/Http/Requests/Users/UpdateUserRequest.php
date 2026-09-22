@@ -12,7 +12,6 @@ use App\ValueObjects\EmailAddress;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
 final class UpdateUserRequest extends FormRequest
 {
@@ -30,7 +29,7 @@ final class UpdateUserRequest extends FormRequest
                 new EmailAddressRule,
                 Rule::unique('users', 'email')->ignore($this->targetUser()->getKey()),
             ],
-            'password' => ['nullable', 'string', 'confirmed', Password::defaults()],
+            'password' => ['nullable', 'string', 'confirmed'],
             'roles' => ['array', $this->keepsAnAdministrator()],
             'roles.*' => ['string', Rule::exists('roles', 'name')],
         ];

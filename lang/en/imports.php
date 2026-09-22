@@ -74,7 +74,7 @@ return [
         'title' => 'Import users',
         'description' => 'Create or update user accounts from a CSV file.',
         'submit' => 'Continue',
-        'password_hint' => 'New users need a password of at least 12 characters containing letters and numbers. Leave the password empty when updating an existing user to keep their current one.',
+        'password_hint' => 'New users need a password. Leave the password empty when updating an existing user to keep their current one.',
         'roles_hint' => 'List roles separated by a semicolon, for example "Administrator;Coordinator". Roles must already exist.',
     ],
 
