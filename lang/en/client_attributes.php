@@ -32,6 +32,7 @@ return [
     ],
 
     'hints' => [
+        'file' => 'Up to :size MB. Accepted types: :types.',
         'fields' => 'Each row of this attribute is made of these fields. A field can itself be a set of repeating rows. Leave a field unnamed and its values are shown on their own, which is how a row becomes a plain list.',
         'hint' => 'Shown under the field on the client form. Leave it empty if the name says enough.',
         'is_active' => 'An inactive attribute disappears from the client form, the client page and both CSV files. Nothing already recorded is lost.',
@@ -49,6 +50,7 @@ return [
         'create' => 'New attribute',
         'delete' => 'Delete',
         'remove_field' => 'Remove',
+        'remove_file' => 'Remove file',
         'remove_row' => 'Remove',
     ],
 

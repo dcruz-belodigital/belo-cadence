@@ -1,6 +1,7 @@
 @php
     use App\Enums\ClientAttributeType;
     use App\ValueObjects\ClientAttributeField;
+    use App\ValueObjects\StoredFile;
 
     /*
     | One level of a repeater's answer, as a person reads it on the client page.
@@ -69,7 +70,13 @@
             @php ($value = $row[$fields[0]->key] ?? null)
 
             @if ($holdsSomething($value))
-                <li class="{{ $valueClass($fields[0]) }}">{{ $fields[0]->format($value) }}</li>
+                <li class="{{ $valueClass($fields[0]) }}">
+                    @if ($fields[0]->type->usesFile())
+                        @include('clients.partials.attribute-file', ['file' => StoredFile::fromValue($value)])
+                    @else
+                        {{ $fields[0]->format($value) }}
+                    @endif
+                </li>
             @endif
         @endforeach
     </ul>
@@ -106,7 +113,13 @@
                                 @endif
 
                                 {{-- A field nobody named stands on its own, the way it was typed. --}}
-                                <p class="{{ $valueClass($field) }}">{{ $field->format($cell) }}</p>
+                                @if ($field->type->usesFile())
+                                    <div class="{{ $valueClass($field) }}">
+                                        @include('clients.partials.attribute-file', ['file' => StoredFile::fromValue($cell)])
+                                    </div>
+                                @else
+                                    <p class="{{ $valueClass($field) }}">{{ $field->format($cell) }}</p>
+                                @endif
                             </div>
                         @endif
                     @endforeach

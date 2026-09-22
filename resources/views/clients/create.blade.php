@@ -1,7 +1,7 @@
 <x-app-layout :heading="__('clients.create.title')" :back="route('clients.index')" :back-label="__('clients.title')" width="narrow">
     <x-page-header :description="__('clients.create.description')" />
 
-    <form method="POST" action="{{ route('clients.store') }}" class="space-y-6">
+    <form method="POST" action="{{ route('clients.store') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
         <x-card :title="__('clients.create.details')">

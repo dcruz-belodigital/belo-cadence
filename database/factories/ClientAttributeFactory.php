@@ -83,6 +83,18 @@ final class ClientAttributeFactory extends Factory
         ]);
     }
 
+    /**
+     * A repeater whose rows each hold a file, which is what an email attaches one of per
+     * row.
+     */
+    public function repeaterOfFiles(): static
+    {
+        return $this->repeater([
+            new ClientAttributeField('label', 'Label', ClientAttributeType::Text),
+            new ClientAttributeField('document', 'Document', ClientAttributeType::File),
+        ]);
+    }
+
     public function required(): static
     {
         return $this->state(fn (array $attributes): array => ['is_required' => true]);

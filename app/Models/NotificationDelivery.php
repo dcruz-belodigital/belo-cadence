@@ -47,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $sender_name
  * @property string $subject
  * @property string $body_html
+ * @property list<array{name: string, size: int}>|null $attachments
  * @property CarbonImmutable $scheduled_for
  * @property CarbonImmutable $attempted_at
  * @property CarbonImmutable|null $sent_at
@@ -73,6 +74,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'sender_name',
     'subject',
     'body_html',
+    'attachments',
     'scheduled_for',
     'attempted_at',
     'sent_at',
@@ -230,6 +232,8 @@ final class NotificationDelivery extends Model
             'sender_email' => AsEmailAddress::class,
             'status' => NotificationDeliveryStatus::class,
             'is_manual' => 'boolean',
+            // A snapshot of what went out, so history survives the files being replaced.
+            'attachments' => 'array',
             'scheduled_for' => 'immutable_datetime',
             'attempted_at' => 'immutable_datetime',
             'sent_at' => 'immutable_datetime',

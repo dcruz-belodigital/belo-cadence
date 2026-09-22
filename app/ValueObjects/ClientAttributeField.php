@@ -104,10 +104,35 @@ final readonly class ClientAttributeField
         $row = [];
 
         foreach ($fields as $field) {
-            $row[$field->key] = $field->type->usesFields() ? [] : '';
+            $row[$field->key] = match (true) {
+                $field->type->usesFields() => [],
+                /*
+                | A file cell is not a value the browser holds: `keep` is the id of a file
+                | already uploaded, and the upload itself is a file input beside it, which
+                | nothing can bind to. `name` is only there so a row can say what it holds.
+                */
+                $field->type->usesFile() => ['keep' => '', 'name' => ''],
+                default => '',
+            };
         }
 
         return $row;
+    }
+
+    /**
+     * Whether any of these fields, or anything inside them, is a file.
+     *
+     * @param  list<self>  $fields
+     */
+    public static function anyHoldsFile(array $fields): bool
+    {
+        foreach ($fields as $field) {
+            if ($field->type->usesFile() || self::anyHoldsFile($field->fields)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

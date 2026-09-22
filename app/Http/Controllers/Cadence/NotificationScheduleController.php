@@ -106,6 +106,11 @@ final class NotificationScheduleController extends Controller
 
         return view('cadence.schedules.show', [
             'schedule' => $schedule,
+            // Retired attributes are included, so a schedule still names what it attaches.
+            'attachmentLabels' => TemplateSlots::attachmentLabels(
+                $schedule->attachment_bindings,
+                ClientAttribute::query()->ordered()->get(),
+            ),
             'deliveries' => $request->user()->can(PermissionName::NotificationDeliveriesViewAny->value)
                 ? $schedule->deliveries()->latest('scheduled_for')->limit(20)->get()
                 : null,

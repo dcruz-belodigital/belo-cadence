@@ -8,6 +8,7 @@ use App\Enums\EmailTemplate;
 use App\Enums\NotificationFrequency;
 use App\Enums\NotificationTarget;
 use App\ValueObjects\EmailAddress;
+use App\ValueObjects\TemplateAttachments;
 use App\ValueObjects\TemplateBindings;
 use Carbon\CarbonImmutable;
 
@@ -41,6 +42,7 @@ final readonly class NotificationScheduleData
         public ?string $subject = null,
         public ?string $message = null,
         public TemplateBindings $templateBindings = new TemplateBindings,
+        public TemplateAttachments $attachments = new TemplateAttachments,
     ) {}
 
     public function target(): NotificationTarget

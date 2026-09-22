@@ -35,6 +35,7 @@ final class CreateNotificationScheduleAction
                 'subject' => $data->subject,
                 'message' => $data->message,
                 'template_bindings' => $data->templateBindings,
+                'attachment_bindings' => $data->attachments,
                 'template' => $data->template,
                 'frequency' => $data->frequency,
                 'starts_at' => $data->startsAt,

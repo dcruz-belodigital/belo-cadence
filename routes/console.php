@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Console\Commands\ProcessDueNotificationsCommand;
 use App\Console\Commands\PruneAbandonedImportFilesCommand;
+use App\Console\Commands\PruneOrphanedAttributeFilesCommand;
 use Illuminate\Support\Facades\Schedule;
 
 /*
@@ -24,3 +25,10 @@ Schedule::command(ProcessDueNotificationsCommand::class)
 | same person starts another one. This clears up after imports that were abandoned.
 */
 Schedule::command(PruneAbandonedImportFilesCommand::class)->daily();
+
+/*
+| A file uploaded against a client attribute is deleted the moment no answer points at
+| it. This clears up the one case that cannot be: bytes written inside a transaction
+| that then rolled back, so the row claiming them was never committed.
+*/
+Schedule::command(PruneOrphanedAttributeFilesCommand::class)->daily();

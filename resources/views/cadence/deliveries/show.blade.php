@@ -83,6 +83,24 @@
                 </x-detail-item>
 
                 <x-detail-item :label="__('deliveries.columns.subject')" wide>{{ $delivery->subject }}</x-detail-item>
+
+                @if ($delivery->attachments)
+                    {{--
+                        Names only, and no link: a delivery is a snapshot, and the file it
+                        names may since have been replaced or deleted. What history has to
+                        answer is what went out, not where it is now.
+                    --}}
+                    <x-detail-item :label="__('deliveries.columns.attachments')" wide>
+                        <ul class="space-y-1">
+                            @foreach ($delivery->attachments as $attachment)
+                                <li class="flex items-center gap-2">
+                                    <x-icon name="document" size="size-4" class="shrink-0 text-foreground-subtle" />
+                                    <span class="truncate">{{ $attachment['name'] ?? '' }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </x-detail-item>
+                @endif
             </x-detail-list>
         </x-card>
 

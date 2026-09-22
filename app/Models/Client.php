@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read Collection<int, NotificationSchedule> $notificationSchedules
  * @property-read Collection<int, NotificationDelivery> $notificationDeliveries
  * @property-read Collection<int, ClientAttributeValue> $attributeValues
+ * @property-read Collection<int, ClientAttributeFile> $attributeFiles
  * @property-read int|null $notification_schedules_count
  */
 #[Fillable(['name', 'email', 'status', 'notes'])]
@@ -69,6 +70,19 @@ final class Client extends Model
     public function attributeValues(): HasMany
     {
         return $this->hasMany(ClientAttributeValue::class);
+    }
+
+    /**
+     * Every file this client has uploaded for a file attribute.
+     *
+     * Which of them an answer still points at is a separate question, asked when a
+     * client is saved: whatever is left unreferenced is deleted, bytes and all.
+     *
+     * @return HasMany<ClientAttributeFile, $this>
+     */
+    public function attributeFiles(): HasMany
+    {
+        return $this->hasMany(ClientAttributeFile::class);
     }
 
     /**

@@ -67,8 +67,14 @@ return [
         'value' => 'Value',
     ],
 
+    'attachments' => [
+        'title' => 'Attachments',
+        'description' => 'The client files this notification sends with it. Each one is whatever the client has uploaded when the email goes out, not a fixed copy.',
+    ],
+
     'errors' => [
         'unresolved_slot' => 'The template value :slot could not be filled in for this client.',
+        'unresolved_attachment' => 'The attachment :attachment could not be found for this client.',
     ],
 
     'hints' => [

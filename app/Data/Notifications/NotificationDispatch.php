@@ -9,6 +9,7 @@ use App\Enums\NotificationTarget;
 use App\Models\Client;
 use App\Models\NotificationSchedule;
 use App\ValueObjects\EmailAddress;
+use App\ValueObjects\TemplateAttachments;
 use App\ValueObjects\TemplateBindings;
 
 /**
@@ -33,6 +34,7 @@ final readonly class NotificationDispatch
         public ?string $subject = null,
         public ?string $message = null,
         public TemplateBindings $templateBindings = new TemplateBindings,
+        public TemplateAttachments $attachments = new TemplateAttachments,
     ) {}
 
     /**
@@ -51,6 +53,7 @@ final readonly class NotificationDispatch
             subject: $schedule->subject,
             message: $schedule->message,
             templateBindings: $schedule->template_bindings,
+            attachments: $schedule->attachment_bindings,
         );
     }
 

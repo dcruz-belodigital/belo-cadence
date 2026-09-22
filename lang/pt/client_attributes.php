@@ -32,6 +32,7 @@ return [
     ],
 
     'hints' => [
+        'file' => 'Até :size MB. Tipos aceites: :types.',
         'fields' => 'Cada linha deste atributo é composta por estes campos. Um campo pode, por sua vez, ser um conjunto de linhas repetíveis. Deixe um campo sem nome e os seus valores aparecem sozinhos, que é como uma linha se torna uma simples lista.',
         'hint' => 'Aparece por baixo do campo no formulário de cliente. Deixe vazio se o nome disser o suficiente.',
         'is_active' => 'Um atributo inativo desaparece do formulário de cliente, da página do cliente e de ambos os ficheiros CSV. Nada do que já foi registado se perde.',
@@ -49,6 +50,7 @@ return [
         'create' => 'Novo atributo',
         'delete' => 'Eliminar',
         'remove_field' => 'Remover',
+        'remove_file' => 'Remover ficheiro',
         'remove_row' => 'Remover',
     ],
 

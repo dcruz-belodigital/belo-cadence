@@ -19,6 +19,7 @@ return [
         'url' => 'Web address',
         'email' => 'Email address',
         'repeater' => 'Repeating rows',
+        'file' => 'File',
     ],
 
     'notification_frequency' => [

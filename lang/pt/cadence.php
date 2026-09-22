@@ -67,8 +67,14 @@ return [
         'value' => 'Valor',
     ],
 
+    'attachments' => [
+        'title' => 'Anexos',
+        'description' => 'Os ficheiros do cliente que esta notificação leva consigo. Cada um é aquilo que o cliente tiver carregado no momento em que o email sai, e não uma cópia fixa.',
+    ],
+
     'errors' => [
         'unresolved_slot' => 'Não foi possível preencher o valor :slot do modelo para este cliente.',
+        'unresolved_attachment' => 'Não foi possível encontrar o anexo :attachment para este cliente.',
     ],
 
     'hints' => [

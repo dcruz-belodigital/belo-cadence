@@ -148,6 +148,8 @@
 
     @include('cadence.partials.template-slots')
 
+    @include('cadence.partials.template-attachments')
+
     <div>
         <p class="mb-3 text-meta text-foreground-muted">{{ __('cadence.hints.starts_at_anchor') }}</p>
 

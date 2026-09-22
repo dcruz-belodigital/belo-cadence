@@ -19,6 +19,7 @@ return [
         'url' => 'Endereço web',
         'email' => 'Endereço de email',
         'repeater' => 'Linhas repetíveis',
+        'file' => 'Ficheiro',
     ],
 
     'notification_frequency' => [

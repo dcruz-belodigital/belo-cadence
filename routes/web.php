@@ -27,6 +27,7 @@ use App\Http\Controllers\Cadence\NotificationScheduleController;
 use App\Http\Controllers\Cadence\NotificationScheduleExportController;
 use App\Http\Controllers\Cadence\SendNotificationScheduleController;
 use App\Http\Controllers\Cadence\UpcomingNotificationController;
+use App\Http\Controllers\Clients\ClientAttributeFileController;
 use App\Http\Controllers\Clients\ClientController;
 use App\Http\Controllers\Clients\ClientExportController;
 use App\Http\Controllers\Clients\ClientImportController;
@@ -71,6 +72,14 @@ Route::middleware(['auth', 'active'])->group(function (): void {
     | Clients. The import and export routes are declared before the resource so they
     | are not mistaken for a client identifier.
     */
+    /*
+    | A file uploaded against a client attribute. It lives on the private disk, so this
+    | is the only way to reach one, and it asks the client policy before it answers.
+    | Declared outside the clients resource: the file names itself, and a client that has
+    | since been archived still has files to read.
+    */
+    Route::get('client-files/{file}', ClientAttributeFileController::class)->name('clients.files.show');
+
     Route::get('clients/export', ClientExportController::class)->name('clients.export');
     // Importing is two steps: upload the file, then confirm how its columns are matched.
     Route::get('clients/import', [ClientImportController::class, 'create'])->name('clients.import.create');

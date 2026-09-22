@@ -23,6 +23,7 @@ final readonly class NotificationMailData
 {
     /**
      * @param  array<string, string>  $slotValues  What each of the template's blanks was filled with.
+     * @param  list<NotificationAttachment>  $attachments  The client files travelling with it.
      */
     public function __construct(
         public EmailTemplate $template,
@@ -37,6 +38,7 @@ final readonly class NotificationMailData
         public Locale $locale,
         public ?string $message = null,
         public array $slotValues = [],
+        public array $attachments = [],
     ) {}
 
     /**

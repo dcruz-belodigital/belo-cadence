@@ -66,6 +66,7 @@ trait ConfiguresNotificationSchedules
             name: $isClient ? null : $this->string('name')->trim()->value(),
             recipients: $isClient ? [] : $this->recipientAddresses(),
             templateBindings: $this->templateBindings(),
+            attachments: $this->templateAttachments(),
             subject: $template->hasOwnCopy() ? null : $this->string('subject')->trim()->value(),
             message: $template->hasOwnCopy() ? null : $this->string('message')->trim()->value(),
         );
@@ -100,6 +101,7 @@ trait ConfiguresNotificationSchedules
             'is_enabled' => ['boolean'],
 
             ...$this->templateSlotRules(),
+            ...$this->attachmentRules(),
         ];
 
         if (! $this->targetIsFixed()) {
@@ -150,6 +152,7 @@ trait ConfiguresNotificationSchedules
             'subject' => __('cadence.fields.subject'),
             'message' => __('cadence.fields.message'),
             ...$this->templateSlotNames(),
+            ...$this->attachmentNames(),
         ];
     }
 

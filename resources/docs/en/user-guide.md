@@ -43,9 +43,9 @@ filled in. Every active attribute then appears on the client form, in the order 
 them.
 
 The types are text, long text, number, date, yes/no, a choice from a list, a web address,
-an email address, and **repeating rows** — a set of fields that can be filled in as many
-times as needed, such as a list of contacts. A repeating row can itself contain repeating
-rows, up to three levels deep.
+an email address, a **file**, and **repeating rows** — a set of fields that can be filled
+in as many times as needed, such as a list of contacts. A repeating row can itself contain
+repeating rows, up to three levels deep, and a row can hold a file of its own.
 
 A field inside a repeating row needs a type, but not a name. Leave the name empty and its
 values are shown on their own rather than labelled, which turns a row of one field into a
@@ -67,6 +67,22 @@ A few things worth knowing:
 
 Marking an attribute required stops a client being saved without it. Clients created
 before that was ticked are left alone until somebody next edits them.
+
+### Files
+
+A **file** attribute takes an upload of up to 10 MB — documents, spreadsheets,
+presentations, plain data files, images and zip archives. Choosing a new file replaces the
+one that was there, and **Remove file** clears it; either way the file that is no longer
+used is deleted for good, from the record and from storage alike.
+
+Uploaded files are never reachable by a link on their own. They are served only through
+Belo Cadence, to somebody signed in who may read that client — share the address with
+anybody else and they get a login page, not a file. Deleting a file attribute deletes
+every file uploaded for it, on every client.
+
+Files cannot be imported: a spreadsheet has no bytes to carry, so an attribute that holds
+one is simply left out of the import. Both exports name the file so a reader knows what is
+there.
 
 ## Notification schedules
 
@@ -160,6 +176,21 @@ If a blank is pointed at an attribute the client has no answer for, the notifica
 **not** sent: the attempt is recorded in delivery history as failed, with the reason, so
 nobody receives an email with a hole in it.
 
+### Attachments
+
+Any notification about a client can also carry that client's files. Tick them under
+**Attachments** on the schedule form, or on the send-by-hand form — the list offers every
+file attribute, including a file inside repeating rows, which attaches one file per row.
+
+An attachment is a pointer, not a copy: each email carries whatever that client holds at
+the moment it goes out, so replacing a client's contract updates every notification that
+attaches it without anybody editing a schedule. A file that cannot be found fails the
+delivery in the same way an unfilled blank does, and delivery history records the name of
+everything that went out.
+
+A schedule sending to a recipient list has no client whose files could be read, so it
+offers no attachments.
+
 ## Sending by hand
 
 Sometimes something needs to go out now, and no schedule covers it. There are two ways.
@@ -248,7 +279,8 @@ record of what happened.
 Custom attributes get a column each, named `attribute_` followed by the attribute's
 identifier. A column you do not match is left alone, so a file that only corrects email
 addresses never touches anything else. Repeating rows travel as JSON in a single cell,
-which is why the **raw** export is the one that can be imported straight back.
+which is why the **raw** export is the one that can be imported straight back. An
+attribute holding an uploaded file is exported by name and cannot be imported.
 
 ## Users and roles
 

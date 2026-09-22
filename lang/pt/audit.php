@@ -47,6 +47,7 @@ return [
         'audit' => 'Entrada de auditoria',
         'client' => 'Cliente',
         'client_attribute' => 'Atributo de cliente',
+        'client_attribute_file' => 'Ficheiro de atributo de cliente',
         'client_attribute_value' => 'Valor de atributo de cliente',
         'notification_delivery' => 'Envio',
         'notification_schedule' => 'Agendamento de notificação',

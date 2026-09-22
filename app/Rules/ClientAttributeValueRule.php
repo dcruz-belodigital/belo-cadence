@@ -137,6 +137,7 @@ final class ClientAttributeValueRule implements ValidationRule
             ClientAttributeType::Select => ['string', 'in:'.implode(',', $choices->values())],
             ClientAttributeType::Url => ['string', 'max:2048', 'url'],
             ClientAttributeType::Email => ['string', 'max:255', new EmailAddressRule],
+            ClientAttributeType::File => [new ClientAttributeFileRule],
             ClientAttributeType::Repeater => ['array'],
         };
     }

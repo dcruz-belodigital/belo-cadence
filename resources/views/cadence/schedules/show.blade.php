@@ -124,6 +124,24 @@
                 <x-detail-item :label="__('cadence.columns.state')">
                     @include('cadence.partials.schedule-state', ['schedule' => $schedule])
                 </x-detail-item>
+
+                @if (! $schedule->attachment_bindings->isEmpty())
+                    {{--
+                        What this schedule attaches, named by where it reads them from
+                        rather than by filename: the file itself is whatever the client
+                        answers with at the moment each email goes out.
+                    --}}
+                    <x-detail-item :label="__('cadence.attachments.title')" wide>
+                        <ul class="space-y-1">
+                            @foreach ($attachmentLabels as $label)
+                                <li class="flex items-center gap-2">
+                                    <x-icon name="document" size="size-4" class="shrink-0 text-foreground-subtle" />
+                                    <span class="truncate">{{ $label }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </x-detail-item>
+                @endif
             </x-detail-list>
         </x-card>
 

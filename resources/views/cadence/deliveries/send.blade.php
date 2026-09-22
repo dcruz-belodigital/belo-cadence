@@ -138,6 +138,8 @@
                 </div>
 
                 @include('cadence.partials.template-slots')
+
+                @include('cadence.partials.template-attachments')
             </div>
 
             <x-template-preview-dialog :previews="$templatePreviews" />

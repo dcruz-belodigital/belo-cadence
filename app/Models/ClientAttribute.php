@@ -120,6 +120,18 @@ final class ClientAttribute extends Model
     }
 
     /**
+     * Whether an answer to this attribute can hold a file, at any depth.
+     *
+     * A file is bytes on a disk rather than a cell, so an attribute that holds one is
+     * left out of the CSV import: there would be nothing in the file to import, and a
+     * cell naming a file id would be a way to claim somebody else's upload.
+     */
+    public function holdsFiles(): bool
+    {
+        return $this->type->usesFile() || ClientAttributeField::anyHoldsFile($this->fields);
+    }
+
+    /**
      * The sub-field a binding path points at, or null when the path has gone stale.
      *
      * @param  list<string>  $path
@@ -336,6 +348,8 @@ final class ClientAttribute extends Model
             ClientAttributeType::Select => $this->options->activeValues()[0] ?? '',
             ClientAttributeType::Url => 'https://example.com',
             ClientAttributeType::Email => 'person@example.com',
+            // Never reached: an attribute that holds a file is not offered for import.
+            ClientAttributeType::File => '',
             ClientAttributeType::Repeater => (string) json_encode([ClientAttributeField::blankRow($this->fields)]),
         };
     }

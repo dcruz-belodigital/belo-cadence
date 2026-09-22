@@ -1,5 +1,25 @@
 # Registo de alterações
 
+## 22 de setembro de 2026
+
+### Novidades
+
+- **Os atributos de cliente podem guardar um ficheiro.** O novo tipo **Ficheiro** aceita um
+  carregamento até 10 MB — documentos, folhas de cálculo, apresentações, ficheiros de dados
+  simples, imagens e arquivos zip. Uma linha repetível também pode guardar um, por isso
+  "um ficheiro por certificado" é um único atributo. Substituir ou remover um ficheiro
+  apaga o anterior em definitivo, tanto do registo como do armazenamento, e apagar um
+  atributo de ficheiro leva consigo todos os ficheiros carregados para ele.
+- **Os ficheiros carregados nunca são alcançáveis por uma ligação isolada.** São servidos
+  apenas através do Belo Cadence, a quem tenha sessão iniciada e possa ler esse cliente.
+  Partilhe o endereço e qualquer outra pessoa recebe uma página de início de sessão.
+- **As notificações podem levar anexos.** Assinale os atributos de ficheiro do cliente em
+  **Anexos**, num agendamento ou no envio manual; um ficheiro dentro de linhas repetíveis
+  anexa um ficheiro por linha. Cada email leva aquilo que o cliente tiver no momento em que
+  sai, por isso substituir um contrato atualiza todas as notificações que o anexam. Um
+  ficheiro que não seja encontrado faz falhar o envio em vez de enviar um email sem ele, e
+  o histórico de envios regista o nome de tudo o que seguiu.
+
 ## 18 de setembro de 2026
 
 ### Novidades

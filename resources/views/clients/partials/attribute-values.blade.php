@@ -1,4 +1,6 @@
 @php
+    use App\ValueObjects\StoredFile;
+
     /*
     | What a client has answered, on its own page.
     |
@@ -36,6 +38,8 @@
                             'rows' => $value,
                             'level' => 1,
                         ])
+                    @elseif ($attribute->type->usesFile())
+                        @include('clients.partials.attribute-file', ['file' => StoredFile::fromValue($value)])
                     @else
                         <p class="whitespace-pre-line">{{ $attribute->formatValue($value) }}</p>
                     @endif

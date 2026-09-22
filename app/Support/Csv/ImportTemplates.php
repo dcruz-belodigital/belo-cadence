@@ -32,7 +32,15 @@ final class ImportTemplates
 
     public static function clients(): ImportTemplate
     {
-        $attributes = ClientAttribute::query()->active()->get();
+        /*
+        | An attribute that can hold a file is left out entirely. A spreadsheet carries no
+        | bytes, so there would be nothing for the column to import — and a cell naming a
+        | file that already exists would be a way to claim one belonging to somebody else.
+        */
+        $attributes = ClientAttribute::query()
+            ->active()
+            ->get()
+            ->reject(fn (ClientAttribute $attribute): bool => $attribute->holdsFiles());
 
         return new ImportTemplate([
             new ImportColumn('id', __('imports.columns.id'), false, ''),

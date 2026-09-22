@@ -37,6 +37,7 @@ final class UpdateNotificationScheduleAction
                 'subject' => $data->subject,
                 'message' => $data->message,
                 'template_bindings' => $data->templateBindings,
+                'attachment_bindings' => $data->attachments,
             ]);
 
             // A schedule never changes what it targets: the form that edits a client

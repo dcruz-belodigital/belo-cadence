@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Notifications;
 
+use App\Data\Notifications\NotificationAttachment;
 use App\Data\Notifications\NotificationDispatch;
 use App\Data\Notifications\PreparedNotificationMail;
 use App\Enums\NotificationDeliveryStatus;
@@ -139,6 +140,10 @@ final class SendScheduledNotificationAction
                         'sender_name' => $message->data->senderName,
                         'subject' => $message->data->subject,
                         'body_html' => $message->bodyHtml,
+                        'attachments' => array_map(
+                            static fn (NotificationAttachment $attachment): array => $attachment->toSnapshot(),
+                            $message->data->attachments,
+                        ),
                         'scheduled_for' => $occurrence,
                         'attempted_at' => CarbonImmutable::now(),
                         'status' => NotificationDeliveryStatus::Pending,

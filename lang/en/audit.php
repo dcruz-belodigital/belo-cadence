@@ -47,6 +47,7 @@ return [
         'audit' => 'Audit entry',
         'client' => 'Client',
         'client_attribute' => 'Client attribute',
+        'client_attribute_file' => 'Client attribute file',
         'client_attribute_value' => 'Client attribute value',
         'notification_delivery' => 'Delivery',
         'notification_schedule' => 'Notification schedule',

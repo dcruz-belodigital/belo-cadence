@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Notifications;
 
+use App\Data\Notifications\NotificationAttachment;
 use App\Data\Notifications\NotificationDispatch;
 use App\Enums\NotificationDeliveryStatus;
 use App\Models\NotificationDelivery;
@@ -64,6 +65,10 @@ final class SendManualNotificationAction
                 'sender_name' => $message->data->senderName,
                 'subject' => $message->data->subject,
                 'body_html' => $message->bodyHtml,
+                'attachments' => array_map(
+                    static fn (NotificationAttachment $attachment): array => $attachment->toSnapshot(),
+                    $message->data->attachments,
+                ),
                 // Nothing scheduled this, so the occurrence is the moment it was asked for.
                 'scheduled_for' => $sentAt,
                 'attempted_at' => $sentAt,

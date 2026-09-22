@@ -45,9 +45,10 @@ Atributos de cliente** é onde a sua equipa o define: um nome, um tipo, e se é 
 Cada atributo ativo passa a aparecer no formulário de cliente, pela ordem que lhes der.
 
 Os tipos são texto, texto longo, número, data, sim/não, escolha de uma lista, endereço
-web, endereço de email e **linhas repetíveis** — um conjunto de campos que pode ser
-preenchido as vezes que forem precisas, como uma lista de contactos. Uma linha repetível
-pode, por sua vez, conter linhas repetíveis, até três níveis.
+web, endereço de email, **ficheiro** e **linhas repetíveis** — um conjunto de campos que
+pode ser preenchido as vezes que forem precisas, como uma lista de contactos. Uma linha
+repetível pode, por sua vez, conter linhas repetíveis, até três níveis, e uma linha pode
+guardar um ficheiro próprio.
 
 Um campo dentro de uma linha repetível precisa de um tipo, mas não de um nome. Deixe o
 nome vazio e os valores aparecem sozinhos, sem etiqueta, o que transforma uma linha de um
@@ -69,6 +70,24 @@ Vale a pena saber:
 
 Marcar um atributo como obrigatório impede que um cliente seja guardado sem ele. Os
 clientes criados antes disso ficam como estão até alguém os editar.
+
+### Ficheiros
+
+Um atributo do tipo **ficheiro** aceita um carregamento até 10 MB — documentos, folhas de
+cálculo, apresentações, ficheiros de dados simples, imagens e arquivos zip. Escolher um
+ficheiro novo substitui o que lá estava e **Remover ficheiro** limpa-o; em qualquer dos
+casos o ficheiro que deixa de ser usado é apagado em definitivo, tanto do registo como do
+armazenamento.
+
+Os ficheiros carregados nunca são alcançáveis por uma ligação isolada. São servidos apenas
+através do Belo Cadence, a quem tenha sessão iniciada e possa ler esse cliente — partilhe o
+endereço com outra pessoa e ela recebe uma página de início de sessão, não o ficheiro.
+Apagar um atributo de ficheiro apaga todos os ficheiros carregados para ele, em todos os
+clientes.
+
+Os ficheiros não podem ser importados: uma folha de cálculo não transporta bytes, por isso
+um atributo que guarde um ficheiro fica simplesmente de fora da importação. As duas
+exportações indicam o nome do ficheiro, para que quem as leia saiba o que lá está.
 
 ## Agendamentos de notificação
 
@@ -163,6 +182,22 @@ notificação.
 Se um espaço apontar para um atributo sem resposta nesse cliente, a notificação **não** é
 enviada: a tentativa fica registada no histórico de envios como falhada, com o motivo,
 para que ninguém receba um email incompleto.
+
+### Anexos
+
+Qualquer notificação sobre um cliente pode também levar consigo os ficheiros desse cliente.
+Assinale-os em **Anexos**, no formulário do agendamento ou no de envio manual — a lista
+oferece todos os atributos de ficheiro, incluindo um ficheiro dentro de linhas repetíveis,
+que anexa um ficheiro por linha.
+
+Um anexo é um apontador, não uma cópia: cada email leva aquilo que o cliente tiver no
+momento em que sai, por isso substituir o contrato de um cliente atualiza todas as
+notificações que o anexam sem ninguém editar um agendamento. Um ficheiro que não seja
+encontrado faz falhar o envio da mesma forma que um espaço por preencher, e o histórico de
+envios regista o nome de tudo o que seguiu.
+
+Um agendamento que envia para uma lista de destinatários não tem cliente cujos ficheiros
+possam ser lidos, por isso não oferece anexos.
 
 ## Enviar manualmente
 
@@ -259,7 +294,8 @@ Os atributos personalizados recebem uma coluna cada um, chamada `attribute_` seg
 identificador do atributo. Uma coluna que não associe fica intocada, por isso um ficheiro
 que apenas corrige endereços de email nunca mexe em mais nada. As linhas repetíveis viajam
 em JSON numa única célula, e é por isso que a exportação **em bruto** é a que pode ser
-importada de volta tal como está.
+importada de volta tal como está. Um atributo que guarde um ficheiro carregado é exportado
+pelo nome e não pode ser importado.
 
 ## Utilizadores e perfis de acesso
 

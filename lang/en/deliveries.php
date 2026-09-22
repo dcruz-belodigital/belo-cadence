@@ -8,6 +8,7 @@ return [
     'description' => 'Every email this application attempted to send, exactly as it was produced.',
 
     'columns' => [
+        'attachments' => 'Attachments',
         'attempted_at' => 'Attempted',
         'client' => 'Client',
         'failure' => 'Failure',

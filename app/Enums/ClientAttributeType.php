@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Models\ClientAttributeFile;
+use App\ValueObjects\StoredFile;
 use Carbon\CarbonImmutable;
 
 /**
@@ -16,6 +18,11 @@ use Carbon\CarbonImmutable;
  *
  * A repeater is the one composite: it holds a list of rows whose cells are themselves
  * fields, and one of those may be another repeater.
+ *
+ * A file is the one type whose answer is not typed. It is uploaded, its bytes live on a
+ * disk, and the answer is a reference to the {@see ClientAttributeFile} row that owns
+ * them. Everything reading such an answer goes through {@see StoredFile} rather than
+ * casting the value to a string.
  */
 enum ClientAttributeType: string
 {
@@ -28,17 +35,18 @@ enum ClientAttributeType: string
     case Url = 'url';
     case Email = 'email';
     case Repeater = 'repeater';
+    case File = 'file';
 
     /**
-     * The types that hold a single value, which is everything a template slot can print.
+     * Everything a template slot can print: one value, and one that reads as text.
      *
      * @return list<self>
      */
-    public static function basicCases(): array
+    public static function printableCases(): array
     {
         return array_values(array_filter(
             self::cases(),
-            static fn (self $type): bool => $type->isBasic(),
+            static fn (self $type): bool => $type->isBasic() && $type->isPrintable(),
         ));
     }
 
@@ -56,6 +64,18 @@ enum ClientAttributeType: string
     }
 
     /**
+     * Whether a value of this type can be written into an email's wording.
+     *
+     * A file cannot. It is attached rather than printed, and putting its name where a
+     * person expected a value would read as a mistake — so a file fills an attachment
+     * and nothing else.
+     */
+    public function isPrintable(): bool
+    {
+        return $this !== self::File;
+    }
+
+    /**
      * Which partial renders the field on the client form.
      */
     public function partial(): string
@@ -66,6 +86,7 @@ enum ClientAttributeType: string
             self::Boolean => 'checkbox',
             self::Select => 'select',
             self::Repeater => 'repeater',
+            self::File => 'file',
         };
     }
 
@@ -84,6 +105,7 @@ enum ClientAttributeType: string
             self::Date => 'date',
             self::Url => 'url',
             self::Email => 'email',
+            self::File => 'file',
         };
     }
 
@@ -95,6 +117,14 @@ enum ClientAttributeType: string
     public function usesFields(): bool
     {
         return $this === self::Repeater;
+    }
+
+    /**
+     * Whether an answer of this type is bytes on a disk rather than something typed.
+     */
+    public function usesFile(): bool
+    {
+        return $this === self::File;
     }
 
     /**
@@ -113,6 +143,13 @@ enum ClientAttributeType: string
             self::Number => $this->normaliseNumber($value),
             self::Boolean => $this->normaliseBoolean($value),
             self::Repeater => is_array($value) ? array_values($value) : null,
+            /*
+            | A file is uploaded, never typed, so there is nothing here to normalise: the
+            | client form reads the upload out of the request itself (see
+            | `ValidatesClientAttributes`). Answering null is also what keeps a file out
+            | of the CSV import, which has no bytes to offer.
+            */
+            self::File => null,
         };
     }
 
@@ -128,6 +165,8 @@ enum ClientAttributeType: string
             self::Text, self::LongText, self::Select, self::Url, self::Email, self::Date => (string) $value,
             self::Number => $this->numberToString($value),
             self::Boolean => $value === true ? '1' : '0',
+            // Its name is all a spreadsheet can say about a file; the bytes stay here.
+            self::File => StoredFile::fromValue($value)?->name ?? '',
             self::Repeater => '',
         };
     }

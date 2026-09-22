@@ -37,7 +37,11 @@ final readonly class EmailTemplateSlot
 
     public function acceptsType(ClientAttributeType $type): bool
     {
-        return $this->accepts === [] ? $type->isBasic() : in_array($type, $this->accepts, true);
+        // A slot that names no types takes anything a template can print, which is every
+        // single-valued type but a file — a file is attached, never written into wording.
+        return $this->accepts === []
+            ? $type->isBasic() && $type->isPrintable()
+            : in_array($type, $this->accepts, true);
     }
 
     /**

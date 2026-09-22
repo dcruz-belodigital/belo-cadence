@@ -89,6 +89,9 @@ final class ClientController extends Controller
     {
         $this->authorize('update', $client);
 
+        // The form names the files already uploaded, and lazy loading is prevented.
+        $client->load('attributeFiles');
+
         return view('clients.edit', [
             'client' => $client,
             'clientAttributes' => ClientAttribute::query()->active()->get(),

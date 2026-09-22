@@ -8,6 +8,7 @@ use App\Models\ApplicationSettings;
 use App\Models\Audit;
 use App\Models\Client;
 use App\Models\ClientAttribute;
+use App\Models\ClientAttributeFile;
 use App\Models\ClientAttributeValue;
 use App\Models\DefaultClientNotification;
 use App\Models\NotificationDelivery;
@@ -50,6 +51,7 @@ final class AppServiceProvider extends ServiceProvider
             'audit' => Audit::class,
             'client' => Client::class,
             'client_attribute' => ClientAttribute::class,
+            'client_attribute_file' => ClientAttributeFile::class,
             'client_attribute_value' => ClientAttributeValue::class,
             'notification_delivery' => NotificationDelivery::class,
             'notification_schedule' => NotificationSchedule::class,

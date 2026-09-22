@@ -1,5 +1,24 @@
 # Changelog
 
+## 22 September 2026
+
+### New features
+
+- **Client attributes can hold a file.** A new **File** type takes an upload of up to
+  10 MB — documents, spreadsheets, presentations, plain data files, images and zip
+  archives. A repeating row can hold one too, so "one file per certificate" is a single
+  attribute. Replacing or removing a file deletes the old one for good, from the record
+  and from storage alike, and deleting a file attribute takes every file uploaded for it.
+- **Uploaded files are never reachable by a link on their own.** They are served only
+  through Belo Cadence, to somebody signed in who may read that client. Share the address
+  and anybody else gets a login page.
+- **Notifications can carry attachments.** Tick a client's file attributes under
+  **Attachments** on a schedule, or when sending by hand; a file inside repeating rows
+  attaches one file per row. Each email carries whatever the client holds at the moment it
+  goes out, so replacing a contract updates every notification that attaches it. A file
+  that cannot be found fails the delivery rather than sending an email without it, and
+  delivery history records the name of everything that went out.
+
 ## 18 September 2026
 
 ### New features

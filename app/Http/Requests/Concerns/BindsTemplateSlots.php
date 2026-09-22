@@ -8,6 +8,7 @@ use App\Data\Notifications\EmailTemplateSlot;
 use App\Enums\EmailTemplate;
 use App\Models\ClientAttribute;
 use App\Support\TemplateSlots;
+use App\ValueObjects\TemplateAttachments;
 use App\ValueObjects\TemplateBinding;
 use App\ValueObjects\TemplateBindings;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,6 +20,10 @@ use Illuminate\Validation\Rule;
  * What a slot may be bound to depends on the template chosen, on the attributes that
  * exist, and on whether this notification is about a client at all — a recipient list has
  * no client whose answers could be read, so its slots offer only a literal.
+ *
+ * Attachments are the same question asked of files instead of wording, and are handled
+ * here for the same reason: both forms ask it, and neither may offer a client's files to
+ * a notification that is not about that client.
  */
 trait BindsTemplateSlots
 {
@@ -95,6 +100,54 @@ trait BindsTemplateSlots
         }
 
         return $names;
+    }
+
+    /**
+     * The rules for the files this notification attaches.
+     *
+     * Only the tokens this very form offered are accepted, and a send with no client
+     * offers none — so a tampered payload cannot attach a file the form never showed.
+     *
+     * @return array<string, mixed>
+     */
+    public function attachmentRules(): array
+    {
+        return [
+            'attachments' => ['array', 'max:'.TemplateAttachments::MAX],
+            'attachments.*' => ['string', Rule::in(array_keys($this->attachmentChoices()))],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attachmentNames(): array
+    {
+        return [
+            'attachments' => (string) __('cadence.attachments.title'),
+            'attachments.*' => (string) __('cadence.attachments.title'),
+        ];
+    }
+
+    /**
+     * Every file this notification could attach: token => label.
+     *
+     * @return array<string, string>
+     */
+    public function attachmentChoices(): array
+    {
+        if ($this->boundClientId() === null) {
+            return [];
+        }
+
+        return TemplateSlots::attachmentSlot()->choicesFrom($this->bindableAttributes());
+    }
+
+    public function templateAttachments(): TemplateAttachments
+    {
+        $submitted = $this->validated('attachments');
+
+        return TemplateAttachments::fromTokens(is_array($submitted) ? $submitted : []);
     }
 
     public function templateBindings(): TemplateBindings

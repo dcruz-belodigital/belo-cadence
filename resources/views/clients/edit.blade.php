@@ -4,7 +4,7 @@
     <x-page-header :description="__('clients.edit.description')" />
 
 
-    <form method="POST" action="{{ route('clients.update', $client) }}" class="space-y-6">
+    <form method="POST" action="{{ route('clients.update', $client) }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 

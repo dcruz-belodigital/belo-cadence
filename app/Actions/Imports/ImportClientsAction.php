@@ -119,6 +119,8 @@ final class ImportClientsAction
         $attributes = ClientAttribute::query()
             ->active()
             ->get()
+            // An attribute holding a file has no column to be mapped to; see ImportTemplates.
+            ->reject(fn (ClientAttribute $attribute): bool => $attribute->holdsFiles())
             ->filter(fn (ClientAttribute $attribute): bool => $mapping->isMapped(ImportTemplates::ATTRIBUTE_PREFIX.$attribute->key));
 
         $errors = [];

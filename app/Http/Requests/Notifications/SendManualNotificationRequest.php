@@ -61,6 +61,7 @@ final class SendManualNotificationRequest extends FormRequest
             ))],
 
             ...$this->templateSlotRules(),
+            ...$this->attachmentRules(),
         ];
 
         if ($isClient) {
@@ -101,6 +102,7 @@ final class SendManualNotificationRequest extends FormRequest
             'subject' => __('cadence.fields.subject'),
             'message' => __('cadence.fields.message'),
             ...$this->templateSlotNames(),
+            ...$this->attachmentNames(),
         ];
     }
 
@@ -129,6 +131,7 @@ final class SendManualNotificationRequest extends FormRequest
             subject: $template->hasOwnCopy() ? null : $this->string('subject')->trim()->value(),
             message: $template->hasOwnCopy() ? null : $this->string('message')->trim()->value(),
             templateBindings: $this->templateBindings(),
+            attachments: $this->templateAttachments(),
         );
     }
 

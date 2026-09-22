@@ -14,6 +14,9 @@
     $index = 'n'.$level;
     $nameFor = fn (string $key): string => "{$prefix} + '[' + {$index} + '][{$key}]'";
     $cellOf = fn (string $key): string => "{$row}['{$key}']";
+
+    // See `attribute-fields`: the id is a placeholder because the rows are drawn here.
+    $fileUrlTemplate = route('clients.files.show', ['file' => '__file__']);
 @endphp
 
 <div class="space-y-3">
@@ -34,6 +37,42 @@
                                 'level' => $level + 1,
                             ])
                         </div>
+                    @elseif ($field->type->usesFile())
+                        {{--
+                            A file cell submits two things: which file to keep, and a new
+                            upload that replaces it. Nothing binds the upload itself — a
+                            file input is the one control a script may not fill — so a
+                            failed save loses the choice and keeps whatever was there.
+                        --}}
+                        <label class="block space-y-1.5">
+                            @if ($field->isNamed() || $field->isRequired)
+                                <span class="block text-label">
+                                    {{ $field->name }}
+                                    @if ($field->isRequired)
+                                        <span class="text-danger" aria-hidden="true">*</span>
+                                        <span class="sr-only">{{ __('common.form.required') }}</span>
+                                    @endif
+                                </span>
+                            @endif
+
+                            <input type="hidden" x-bind:name="{{ $nameFor($field->key)." + '[keep]'" }}" x-model="{{ $cellOf($field->key) }}.keep">
+
+                            <div class="flex flex-wrap items-center gap-2" x-show="{{ $cellOf($field->key) }}.keep !== ''" x-cloak>
+                                <x-icon name="document" size="size-4" class="shrink-0 text-foreground-subtle" />
+
+                                <a class="focus-ring truncate rounded-control text-body underline decoration-border-strong underline-offset-4"
+                                   x-bind:href="@js($fileUrlTemplate).replace('__file__', {{ $cellOf($field->key) }}.keep)"
+                                   x-text="{{ $cellOf($field->key) }}.name"></a>
+
+                                <button type="button"
+                                        class="btn btn-ghost btn-sm text-danger"
+                                        x-on:click="{{ $cellOf($field->key) }}.keep = ''; {{ $cellOf($field->key) }}.name = ''">
+                                    {{ __('client_attributes.actions.remove_file') }}
+                                </button>
+                            </div>
+
+                            <input type="file" class="form-file" x-bind:name="{{ $nameFor($field->key)." + '[file]'" }}">
+                        </label>
                     @elseif ($field->type === ClientAttributeType::Boolean)
                         <label class="flex items-center gap-2.5 text-body">
                             {{-- The hidden twin means an unticked box still submits a value. --}}

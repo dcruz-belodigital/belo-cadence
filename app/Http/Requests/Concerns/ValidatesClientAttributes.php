@@ -6,10 +6,13 @@ namespace App\Http\Requests\Concerns;
 
 use App\Data\Clients\ClientAttributeValuesData;
 use App\Enums\ClientAttributeType;
+use App\Models\Client;
 use App\Models\ClientAttribute;
+use App\Models\ClientAttributeFile;
 use App\Rules\ClientAttributeValueRule;
 use App\ValueObjects\ClientAttributeField;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
 
 /**
  * The custom attributes half of the client form, shared by creating and editing.
@@ -22,6 +25,11 @@ use Illuminate\Database\Eloquent\Collection;
  * The input is named `client_attributes` rather than `attributes`: `Illuminate\Http\Request`
  * already has a public `$attributes` property and `FormRequest` already has an
  * `attributes()` method, and a rule key sitting between the two would be a trap.
+ *
+ * A file attribute is the one answer that is not typed. Its cell submits two things — the
+ * upload, and the id of a file already held — and normalisation reduces them to one
+ * value: the `UploadedFile`, the id, or null. Everything downstream then treats a file
+ * like any other answer, at any depth.
  */
 trait ValidatesClientAttributes
 {
@@ -29,6 +37,13 @@ trait ValidatesClientAttributes
      * @var Collection<int, ClientAttribute>|null
      */
     private ?Collection $activeClientAttributes = null;
+
+    /**
+     * Which file this client holds, keyed by id: `id => client_attribute_id`.
+     *
+     * @var array<int, int>|null
+     */
+    private ?array $heldFiles = null;
 
     /**
      * Every rule the attributes half of this form can produce.
@@ -73,6 +88,26 @@ trait ValidatesClientAttributes
     }
 
     /**
+     * The payload the rules actually run against.
+     *
+     * `Request::all()` lays the uploaded files back over the input at the position they
+     * were submitted in. The answers have already been normalised by the time a rule sees
+     * them — empty rows dropped, the remaining ones renumbered and every upload read in
+     * where it belongs — so letting that happen a second time would drop a file back at a
+     * row index that no longer exists. Nothing else on these forms uploads anything, so
+     * only this one key is held back from the overlay.
+     *
+     * @return array<string, mixed>
+     */
+    public function validationData(): array
+    {
+        return [
+            ...parent::validationData(),
+            'client_attributes' => $this->input('client_attributes'),
+        ];
+    }
+
+    /**
      * Normalises the submitted answers before anything is validated.
      *
      * Every active attribute ends up present, missing ones as null, so this form always
@@ -89,9 +124,11 @@ trait ValidatesClientAttributes
 
         foreach ($this->activeClientAttributes() as $attribute) {
             $answers[$attribute->getKey()] = $this->normaliseAnswer(
+                $attribute,
                 $attribute->type,
                 $attribute->fields,
                 $submitted[$attribute->getKey()] ?? null,
+                'client_attributes.'.$attribute->getKey(),
             );
         }
 
@@ -110,9 +147,20 @@ trait ValidatesClientAttributes
 
     /**
      * @param  list<ClientAttributeField>  $fields
+     * @param  string  $path  Where this value sits in the submitted payload, so an upload
+     *                        can be read from the request at the position it arrived in.
      */
-    private function normaliseAnswer(ClientAttributeType $type, array $fields, mixed $value): mixed
-    {
+    private function normaliseAnswer(
+        ClientAttribute $attribute,
+        ClientAttributeType $type,
+        array $fields,
+        mixed $value,
+        string $path,
+    ): mixed {
+        if ($type->usesFile()) {
+            return $this->fileAnswer($attribute, $value, $path);
+        }
+
         if (! $type->usesFields()) {
             return $type->normalise($value);
         }
@@ -123,7 +171,7 @@ trait ValidatesClientAttributes
 
         $rows = [];
 
-        foreach ($value as $row) {
+        foreach ($value as $index => $row) {
             if (! is_array($row)) {
                 continue;
             }
@@ -131,7 +179,13 @@ trait ValidatesClientAttributes
             $cells = [];
 
             foreach ($fields as $field) {
-                $cells[$field->key] = $this->normaliseAnswer($field->type, $field->fields, $row[$field->key] ?? null);
+                $cells[$field->key] = $this->normaliseAnswer(
+                    $attribute,
+                    $field->type,
+                    $field->fields,
+                    $row[$field->key] ?? null,
+                    $path.'.'.$index.'.'.$field->key,
+                );
             }
 
             // A row the browser added and nobody typed in is not a row.
@@ -141,6 +195,60 @@ trait ValidatesClientAttributes
         }
 
         return $rows;
+    }
+
+    /**
+     * What one file cell comes to: a new upload, a file already held, or nothing.
+     *
+     * A fresh upload always wins, because choosing a file is how somebody replaces one.
+     */
+    private function fileAnswer(ClientAttribute $attribute, mixed $value, string $path): UploadedFile|int|null
+    {
+        $upload = $this->file($path.'.file');
+
+        if ($upload instanceof UploadedFile) {
+            return $upload;
+        }
+
+        $keep = is_array($value) ? ($value['keep'] ?? null) : null;
+
+        if (! is_numeric($keep)) {
+            return null;
+        }
+
+        /*
+        | Resolved against what this client actually holds, so an id typed into the form
+        | by hand reaches nothing: a file belongs to one client and one attribute, and
+        | anything else simply reads as an unanswered field.
+        */
+        return ($this->heldFiles()[(int) $keep] ?? null) === $attribute->getKey()
+            ? (int) $keep
+            : null;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function heldFiles(): array
+    {
+        if ($this->heldFiles !== null) {
+            return $this->heldFiles;
+        }
+
+        $client = $this->route('client');
+
+        // A client being created holds nothing yet, so there is nothing it could keep.
+        if (! $client instanceof Client) {
+            return $this->heldFiles = [];
+        }
+
+        /** @var array<int, int> $held */
+        $held = ClientAttributeFile::query()
+            ->where('client_id', $client->getKey())
+            ->pluck('client_attribute_id', 'id')
+            ->all();
+
+        return $this->heldFiles = $held;
     }
 
     /**
