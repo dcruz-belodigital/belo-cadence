@@ -84,6 +84,22 @@ return [
             'label' => 'Cathode',
             'description' => 'A terminal: monospaced, square, phosphor green',
         ],
+        'meridian' => [
+            'label' => 'Meridian',
+            'description' => 'Cool and precise, in deep marine blue',
+        ],
+        'ember' => [
+            'label' => 'Ember',
+            'description' => 'Warm and loud, embers on charcoal',
+        ],
+        'folio' => [
+            'label' => 'Folio',
+            'description' => 'Bookish and serifed, oxblood on ivory',
+        ],
+        'manuscript' => [
+            'label' => 'Manuscript',
+            'description' => 'Hand-written and overstated, blue-black ink on cream',
+        ],
     ],
 
     'color_scheme' => [

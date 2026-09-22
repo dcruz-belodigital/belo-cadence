@@ -335,13 +335,24 @@ Your roles and whether your account is active are managed by an administrator.
 A theme decides colour, corner shape and lettering together. Each one is drawn in both
 light and dark, so a theme and a colour scheme are separate choices.
 
+They are offered plainest first, so the further down the list you go the more the theme
+has to say for itself.
+
 - **Iris** — minimal and modern, in soft violet. The default.
-- **Cappuccino** — classic and square-cut: warm paper, espresso ink and a serif for
-  headings.
-- **Bubblegum** — loud, round and cheerful.
 - **Graphite** — sober near-monochrome, ink on paper, with colour kept for the things that
   report a state.
+- **Meridian** — cool and precise: deep marine blue, crisp corners and a technical
+  grotesque.
+- **Ember** — warm and loud: a near-neutral charcoal page with the colour saved for the
+  accent.
+- **Cappuccino** — classic and square-cut: warm paper, espresso ink and a serif for
+  headings.
+- **Folio** — bookish: ivory paper, a serif for the whole page and an oxblood accent.
 - **Cathode** — a terminal: monospaced throughout, square, phosphor green.
+- **Bubblegum** — loud, round and cheerful.
+- **Manuscript** — written out by hand: cream stock, blue-black ink, corners cut square,
+  and the whole page — titles, body and labels alike — set in longhand. Figures stay
+  monospaced so columns of them still line up.
 
 The mark in the sidebar — a folded paper plane — is drawn in the theme's own colour and
 corner shape, so you can tell at a glance which theme you are wearing.

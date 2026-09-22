@@ -4,6 +4,13 @@
 
 ### New features
 
+- **Four more themes.** **Meridian** is cool and precise, in deep marine blue; **Ember**
+  keeps a near-neutral charcoal page and saves the colour for the accent; **Folio** is
+  bookish, setting the whole page in a serif on ivory paper with an oxblood accent; and
+  **Manuscript** is written out by hand — cream stock, blue-black ink, square corners and
+  the whole page in longhand. Like the five before them, each is drawn in both
+  light and dark. Pick one under your profile, or set the default for everyone under
+  Settings.
 - **Client attributes can hold a file.** A new **File** type takes an upload of up to
   10 MB — documents, spreadsheets, presentations, plain data files, images and zip
   archives. A repeating row can hold one too, so "one file per certificate" is a single

@@ -85,6 +85,22 @@ return [
             'label' => 'Cathode',
             'description' => 'Um terminal: monoespaçado, direito, verde de fósforo',
         ],
+        'meridian' => [
+            'label' => 'Meridian',
+            'description' => 'Frio e preciso, em azul-marinho profundo',
+        ],
+        'ember' => [
+            'label' => 'Ember',
+            'description' => 'Quente e vistoso, brasa sobre carvão',
+        ],
+        'folio' => [
+            'label' => 'Folio',
+            'description' => 'Livresco e serifado, vinho sobre marfim',
+        ],
+        'manuscript' => [
+            'label' => 'Manuscript',
+            'description' => 'Manuscrito e exagerado, tinta azul-preta sobre creme',
+        ],
     ],
 
     'color_scheme' => [

@@ -4,6 +4,13 @@
 
 ### Novidades
 
+- **Mais quatro temas.** O **Meridian** é frio e preciso, em azul-marinho profundo; o
+  **Ember** mantém uma página de carvão quase neutra e reserva a cor para o destaque; o
+  **Folio** é livresco, compondo a página toda numa serifa sobre papel marfim, com um
+  destaque cor de vinho; e o **Manuscript** é escrito à mão — papel creme, tinta
+  azul-preta, cantos direitos e a página toda em letra manuscrita. Como os cinco
+  anteriores, cada um é desenhado em claro e em escuro. Escolha o seu no perfil ou defina
+  o predefinido para todos em Definições.
 - **Os atributos de cliente podem guardar um ficheiro.** O novo tipo **Ficheiro** aceita um
   carregamento até 10 MB — documentos, folhas de cálculo, apresentações, ficheiros de dados
   simples, imagens e arquivos zip. Uma linha repetível também pode guardar um, por isso

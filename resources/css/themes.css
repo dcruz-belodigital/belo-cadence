@@ -536,3 +536,531 @@
     --cadence-weight-title: 700;
     --cadence-overline-transform: uppercase;
 }
+
+/* Meridian — cool and precise: deep marine blue, crisp corners, a technical grotesque. */
+:root[data-theme='meridian'] {
+    --cadence-background: oklch(0.966 0.008 245);
+    --cadence-surface: oklch(0.992 0.004 245);
+    --cadence-surface-elevated: oklch(1 0 0);
+    --cadence-surface-sunken: oklch(0.942 0.014 245);
+    --cadence-surface-muted: oklch(0.945 0.013 245);
+    --cadence-surface-hover: oklch(0.955 0.011 245);
+
+    --cadence-sidebar: oklch(0.935 0.016 246);
+    --cadence-sidebar-border: oklch(0.875 0.024 246);
+
+    --cadence-foreground: oklch(0.235 0.036 255);
+    --cadence-foreground-muted: oklch(0.495 0.032 252);
+    --cadence-foreground-subtle: oklch(0.622 0.028 250);
+
+    --cadence-border: oklch(0.888 0.016 246);
+    --cadence-border-strong: oklch(0.792 0.03 248);
+
+    --cadence-primary: oklch(0.485 0.155 252);
+    --cadence-primary-hover: oklch(0.415 0.145 252);
+    --cadence-primary-foreground: oklch(0.99 0.004 245);
+    --cadence-primary-soft: oklch(0.918 0.05 248);
+    --cadence-primary-soft-foreground: oklch(0.408 0.142 252);
+
+    --cadence-success: oklch(0.505 0.105 162);
+    --cadence-success-soft: oklch(0.932 0.04 162);
+    --cadence-success-soft-foreground: oklch(0.41 0.088 162);
+
+    --cadence-warning: oklch(0.625 0.12 72);
+    --cadence-warning-soft: oklch(0.938 0.045 76);
+    --cadence-warning-soft-foreground: oklch(0.45 0.098 68);
+
+    --cadence-danger: oklch(0.518 0.19 22);
+    --cadence-danger-hover: oklch(0.45 0.18 22);
+    --cadence-danger-foreground: oklch(0.99 0.004 245);
+    --cadence-danger-soft: oklch(0.934 0.04 22);
+    --cadence-danger-soft-foreground: oklch(0.452 0.172 22);
+
+    /* Cyan rather than the usual teal, so a note is never taken for the marine primary. */
+    --cadence-info: oklch(0.552 0.098 196);
+    --cadence-info-soft: oklch(0.932 0.042 196);
+    --cadence-info-soft-foreground: oklch(0.442 0.085 196);
+
+    --cadence-neutral-soft: oklch(0.932 0.012 246);
+    --cadence-neutral-soft-foreground: oklch(0.418 0.03 250);
+
+    --cadence-ring: oklch(0.565 0.152 252);
+    --cadence-overlay: oklch(0.2 0.05 252 / 0.5);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 16px 40px -22px oklch(0.2 0.06 252 / 0.4), 0 2px 8px -4px oklch(0.2 0.06 252 / 0.18);
+
+    --cadence-font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --cadence-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+    --cadence-radius-control: 0.375rem;
+    --cadence-radius-card: 0.625rem;
+
+    --cadence-tracking-title: -0.015em;
+    --cadence-tracking-overline: 0.14em;
+    --cadence-weight-title: 600;
+    --cadence-overline-transform: uppercase;
+}
+
+:root.dark[data-theme='meridian'] {
+    --cadence-background: oklch(0.175 0.024 250);
+    --cadence-surface: oklch(0.215 0.028 250);
+    --cadence-surface-elevated: oklch(0.248 0.031 250);
+    --cadence-surface-sunken: oklch(0.145 0.02 250);
+    --cadence-surface-muted: oklch(0.255 0.031 250);
+    --cadence-surface-hover: oklch(0.282 0.034 250);
+
+    --cadence-sidebar: oklch(0.132 0.022 250);
+    --cadence-sidebar-border: oklch(0.245 0.03 250);
+
+    --cadence-foreground: oklch(0.955 0.01 240);
+    --cadence-foreground-muted: oklch(0.728 0.028 244);
+    --cadence-foreground-subtle: oklch(0.605 0.03 246);
+
+    --cadence-border: oklch(0.302 0.032 250);
+    --cadence-border-strong: oklch(0.418 0.04 250);
+
+    --cadence-primary: oklch(0.715 0.135 240);
+    --cadence-primary-hover: oklch(0.782 0.115 238);
+    --cadence-primary-foreground: oklch(0.16 0.04 250);
+    --cadence-primary-soft: oklch(0.312 0.07 248);
+    --cadence-primary-soft-foreground: oklch(0.865 0.085 240);
+
+    --cadence-success: oklch(0.672 0.115 162);
+    --cadence-success-soft: oklch(0.295 0.05 162);
+    --cadence-success-soft-foreground: oklch(0.855 0.085 162);
+
+    --cadence-warning: oklch(0.762 0.125 76);
+    --cadence-warning-soft: oklch(0.308 0.055 72);
+    --cadence-warning-soft-foreground: oklch(0.878 0.1 78);
+
+    --cadence-danger: oklch(0.638 0.195 22);
+    --cadence-danger-hover: oklch(0.695 0.18 22);
+    --cadence-danger-foreground: oklch(0.16 0.04 22);
+    --cadence-danger-soft: oklch(0.315 0.078 22);
+    --cadence-danger-soft-foreground: oklch(0.868 0.095 24);
+
+    --cadence-info: oklch(0.742 0.105 196);
+    --cadence-info-soft: oklch(0.298 0.05 196);
+    --cadence-info-soft-foreground: oklch(0.862 0.072 196);
+
+    --cadence-neutral-soft: oklch(0.285 0.03 250);
+    --cadence-neutral-soft-foreground: oklch(0.838 0.022 246);
+
+    --cadence-ring: oklch(0.748 0.13 242);
+    --cadence-overlay: oklch(0.085 0.025 250 / 0.66);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 18px 44px -22px oklch(0 0 0 / 0.72), 0 2px 8px -4px oklch(0 0 0 / 0.5);
+
+    --cadence-font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --cadence-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+    --cadence-radius-control: 0.375rem;
+    --cadence-radius-card: 0.625rem;
+
+    --cadence-tracking-title: -0.015em;
+    --cadence-tracking-overline: 0.14em;
+    --cadence-weight-title: 600;
+    --cadence-overline-transform: uppercase;
+}
+
+/* Ember — warm and loud: a near-neutral charcoal ground with the colour kept for the accent. */
+:root[data-theme='ember'] {
+    --cadence-background: oklch(0.968 0.006 62);
+    --cadence-surface: oklch(0.995 0.003 62);
+    --cadence-surface-elevated: oklch(1 0 0);
+    --cadence-surface-sunken: oklch(0.944 0.009 62);
+    --cadence-surface-muted: oklch(0.947 0.009 62);
+    --cadence-surface-hover: oklch(0.957 0.008 62);
+
+    --cadence-sidebar: oklch(0.938 0.011 60);
+    --cadence-sidebar-border: oklch(0.878 0.015 58);
+
+    --cadence-foreground: oklch(0.212 0.014 52);
+    --cadence-foreground-muted: oklch(0.482 0.014 54);
+    --cadence-foreground-subtle: oklch(0.618 0.013 56);
+
+    --cadence-border: oklch(0.886 0.01 60);
+    --cadence-border-strong: oklch(0.788 0.015 58);
+
+    --cadence-primary: oklch(0.492 0.162 46);
+    --cadence-primary-hover: oklch(0.422 0.15 44);
+    --cadence-primary-foreground: oklch(0.992 0.004 62);
+    --cadence-primary-soft: oklch(0.925 0.058 56);
+    --cadence-primary-soft-foreground: oklch(0.432 0.152 46);
+
+    --cadence-success: oklch(0.498 0.098 155);
+    --cadence-success-soft: oklch(0.932 0.038 155);
+    --cadence-success-soft-foreground: oklch(0.408 0.085 155);
+
+    /* Gold rather than amber, and scarlet rather than red: both are held off the ember primary. */
+    --cadence-warning: oklch(0.658 0.13 88);
+    --cadence-warning-soft: oklch(0.94 0.05 90);
+    --cadence-warning-soft-foreground: oklch(0.462 0.1 84);
+
+    --cadence-danger: oklch(0.512 0.2 14);
+    --cadence-danger-hover: oklch(0.442 0.19 14);
+    --cadence-danger-foreground: oklch(0.992 0.004 62);
+    --cadence-danger-soft: oklch(0.934 0.042 14);
+    --cadence-danger-soft-foreground: oklch(0.448 0.18 14);
+
+    --cadence-info: oklch(0.528 0.095 222);
+    --cadence-info-soft: oklch(0.932 0.038 222);
+    --cadence-info-soft-foreground: oklch(0.432 0.082 222);
+
+    --cadence-neutral-soft: oklch(0.932 0.008 60);
+    --cadence-neutral-soft-foreground: oklch(0.412 0.014 54);
+
+    --cadence-ring: oklch(0.585 0.17 48);
+    --cadence-overlay: oklch(0.19 0.02 50 / 0.5);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 16px 40px -22px oklch(0.19 0.03 50 / 0.42), 0 2px 8px -4px oklch(0.19 0.03 50 / 0.18);
+
+    --cadence-font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    --cadence-font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+    --cadence-radius-control: 0.5rem;
+    --cadence-radius-card: 0.75rem;
+
+    --cadence-tracking-title: -0.02em;
+    --cadence-tracking-overline: 0.1em;
+    --cadence-weight-title: 600;
+    --cadence-overline-transform: uppercase;
+}
+
+:root.dark[data-theme='ember'] {
+    --cadence-background: oklch(0.172 0.01 58);
+    --cadence-surface: oklch(0.212 0.012 58);
+    --cadence-surface-elevated: oklch(0.245 0.013 58);
+    --cadence-surface-sunken: oklch(0.142 0.009 58);
+    --cadence-surface-muted: oklch(0.252 0.013 58);
+    --cadence-surface-hover: oklch(0.28 0.015 58);
+
+    --cadence-sidebar: oklch(0.128 0.009 58);
+    --cadence-sidebar-border: oklch(0.242 0.013 58);
+
+    --cadence-foreground: oklch(0.958 0.006 70);
+    --cadence-foreground-muted: oklch(0.725 0.014 64);
+    --cadence-foreground-subtle: oklch(0.602 0.015 60);
+
+    --cadence-border: oklch(0.298 0.015 58);
+    --cadence-border-strong: oklch(0.415 0.02 58);
+
+    --cadence-primary: oklch(0.742 0.165 56);
+    --cadence-primary-hover: oklch(0.798 0.145 60);
+    --cadence-primary-foreground: oklch(0.168 0.035 50);
+    --cadence-primary-soft: oklch(0.322 0.07 48);
+    --cadence-primary-soft-foreground: oklch(0.878 0.105 62);
+
+    --cadence-success: oklch(0.668 0.115 155);
+    --cadence-success-soft: oklch(0.292 0.05 155);
+    --cadence-success-soft-foreground: oklch(0.855 0.088 155);
+
+    --cadence-warning: oklch(0.822 0.14 92);
+    --cadence-warning-soft: oklch(0.308 0.058 88);
+    --cadence-warning-soft-foreground: oklch(0.898 0.115 92);
+
+    --cadence-danger: oklch(0.648 0.21 14);
+    --cadence-danger-hover: oklch(0.705 0.19 14);
+    --cadence-danger-foreground: oklch(0.168 0.04 14);
+    --cadence-danger-soft: oklch(0.318 0.085 14);
+    --cadence-danger-soft-foreground: oklch(0.872 0.1 16);
+
+    --cadence-info: oklch(0.715 0.105 222);
+    --cadence-info-soft: oklch(0.298 0.05 222);
+    --cadence-info-soft-foreground: oklch(0.858 0.072 222);
+
+    --cadence-neutral-soft: oklch(0.282 0.014 58);
+    --cadence-neutral-soft-foreground: oklch(0.838 0.012 64);
+
+    --cadence-ring: oklch(0.768 0.16 54);
+    --cadence-overlay: oklch(0.082 0.012 58 / 0.68);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 18px 44px -22px oklch(0 0 0 / 0.72), 0 2px 8px -4px oklch(0 0 0 / 0.5);
+
+    --cadence-font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    --cadence-font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+    --cadence-radius-control: 0.5rem;
+    --cadence-radius-card: 0.75rem;
+
+    --cadence-tracking-title: -0.02em;
+    --cadence-tracking-overline: 0.1em;
+    --cadence-weight-title: 600;
+    --cadence-overline-transform: uppercase;
+}
+
+/* Folio — bookish: ivory paper, an oxblood accent, and a serif for the whole page. */
+:root[data-theme='folio'] {
+    --cadence-background: oklch(0.972 0.012 90);
+    --cadence-surface: oklch(0.99 0.007 90);
+    --cadence-surface-elevated: oklch(1 0 0);
+    --cadence-surface-sunken: oklch(0.948 0.016 90);
+    --cadence-surface-muted: oklch(0.951 0.015 90);
+    --cadence-surface-hover: oklch(0.96 0.013 90);
+
+    --cadence-sidebar: oklch(0.942 0.018 90);
+    --cadence-sidebar-border: oklch(0.882 0.022 88);
+
+    --cadence-foreground: oklch(0.212 0.012 70);
+    --cadence-foreground-muted: oklch(0.478 0.014 72);
+    --cadence-foreground-subtle: oklch(0.612 0.014 76);
+
+    --cadence-border: oklch(0.888 0.016 88);
+    --cadence-border-strong: oklch(0.79 0.022 86);
+
+    /* Oxblood sits dark and dull; the scarlet danger below is lighter and hotter, so the two never trade places. */
+    --cadence-primary: oklch(0.402 0.115 8);
+    --cadence-primary-hover: oklch(0.338 0.105 8);
+    --cadence-primary-foreground: oklch(0.988 0.008 90);
+    --cadence-primary-soft: oklch(0.918 0.042 8);
+    --cadence-primary-soft-foreground: oklch(0.375 0.11 8);
+
+    --cadence-success: oklch(0.472 0.09 148);
+    --cadence-success-soft: oklch(0.928 0.035 148);
+    --cadence-success-soft-foreground: oklch(0.392 0.08 148);
+
+    --cadence-warning: oklch(0.612 0.11 72);
+    --cadence-warning-soft: oklch(0.935 0.045 76);
+    --cadence-warning-soft-foreground: oklch(0.445 0.092 68);
+
+    --cadence-danger: oklch(0.515 0.19 32);
+    --cadence-danger-hover: oklch(0.448 0.18 32);
+    --cadence-danger-foreground: oklch(0.988 0.008 90);
+    --cadence-danger-soft: oklch(0.932 0.045 32);
+    --cadence-danger-soft-foreground: oklch(0.452 0.172 32);
+
+    --cadence-info: oklch(0.488 0.075 232);
+    --cadence-info-soft: oklch(0.928 0.03 232);
+    --cadence-info-soft-foreground: oklch(0.41 0.068 232);
+
+    --cadence-neutral-soft: oklch(0.932 0.014 90);
+    --cadence-neutral-soft-foreground: oklch(0.408 0.014 74);
+
+    --cadence-ring: oklch(0.468 0.125 10);
+    --cadence-overlay: oklch(0.2 0.02 60 / 0.5);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 16px 40px -22px oklch(0.2 0.03 60 / 0.4), 0 2px 8px -4px oklch(0.2 0.03 60 / 0.16);
+
+    --cadence-font-sans: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --cadence-font-display: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+    --cadence-radius-control: 0.125rem;
+    --cadence-radius-card: 0.25rem;
+
+    --cadence-tracking-title: -0.005em;
+    --cadence-tracking-overline: 0.16em;
+    --cadence-weight-title: 600;
+    --cadence-overline-transform: uppercase;
+}
+
+:root.dark[data-theme='folio'] {
+    --cadence-background: oklch(0.188 0.008 66);
+    --cadence-surface: oklch(0.228 0.009 66);
+    --cadence-surface-elevated: oklch(0.258 0.01 66);
+    --cadence-surface-sunken: oklch(0.158 0.007 66);
+    --cadence-surface-muted: oklch(0.265 0.01 66);
+    --cadence-surface-hover: oklch(0.292 0.011 66);
+
+    --cadence-sidebar: oklch(0.148 0.007 66);
+    --cadence-sidebar-border: oklch(0.252 0.01 66);
+
+    --cadence-foreground: oklch(0.948 0.01 88);
+    --cadence-foreground-muted: oklch(0.722 0.014 80);
+    --cadence-foreground-subtle: oklch(0.602 0.014 76);
+
+    --cadence-border: oklch(0.308 0.012 66);
+    --cadence-border-strong: oklch(0.422 0.016 66);
+
+    --cadence-primary: oklch(0.702 0.145 12);
+    --cadence-primary-hover: oklch(0.762 0.125 14);
+    --cadence-primary-foreground: oklch(0.175 0.03 10);
+    --cadence-primary-soft: oklch(0.318 0.075 10);
+    --cadence-primary-soft-foreground: oklch(0.868 0.085 12);
+
+    --cadence-success: oklch(0.652 0.105 148);
+    --cadence-success-soft: oklch(0.292 0.048 148);
+    --cadence-success-soft-foreground: oklch(0.852 0.082 148);
+
+    --cadence-warning: oklch(0.755 0.12 76);
+    --cadence-warning-soft: oklch(0.305 0.052 72);
+    --cadence-warning-soft-foreground: oklch(0.875 0.098 78);
+
+    --cadence-danger: oklch(0.662 0.19 32);
+    --cadence-danger-hover: oklch(0.718 0.172 32);
+    --cadence-danger-foreground: oklch(0.175 0.035 32);
+    --cadence-danger-soft: oklch(0.322 0.078 32);
+    --cadence-danger-soft-foreground: oklch(0.872 0.095 34);
+
+    --cadence-info: oklch(0.698 0.085 232);
+    --cadence-info-soft: oklch(0.295 0.042 232);
+    --cadence-info-soft-foreground: oklch(0.855 0.062 232);
+
+    --cadence-neutral-soft: oklch(0.292 0.011 66);
+    --cadence-neutral-soft-foreground: oklch(0.835 0.012 80);
+
+    --cadence-ring: oklch(0.732 0.135 12);
+    --cadence-overlay: oklch(0.092 0.01 66 / 0.66);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 18px 44px -22px oklch(0 0 0 / 0.72), 0 2px 8px -4px oklch(0 0 0 / 0.5);
+
+    --cadence-font-sans: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --cadence-font-display: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+    --cadence-radius-control: 0.125rem;
+    --cadence-radius-card: 0.25rem;
+
+    --cadence-tracking-title: -0.005em;
+    --cadence-tracking-overline: 0.16em;
+    --cadence-weight-title: 600;
+    --cadence-overline-transform: uppercase;
+}
+
+/*
+| Manuscript — written out by hand: cream stock, blue-black ink, corners cut square and
+| the whole page — titles, body, labels and all — set in longhand. The labels are tracked
+| like a title page, which is the joke: it is the loudest lettering in the catalogue and
+| the quietest palette. Figures stay in mono, or no column of them would line up.
+*/
+:root[data-theme='manuscript'] {
+    --cadence-background: oklch(0.951 0.015 88);
+    --cadence-surface: oklch(0.982 0.009 88);
+    --cadence-surface-elevated: oklch(0.995 0.005 88);
+    --cadence-surface-sunken: oklch(0.928 0.019 86);
+    --cadence-surface-muted: oklch(0.932 0.018 86);
+    --cadence-surface-hover: oklch(0.942 0.017 87);
+
+    --cadence-sidebar: oklch(0.922 0.021 84);
+    --cadence-sidebar-border: oklch(0.858 0.026 82);
+
+    --cadence-foreground: oklch(0.228 0.016 78);
+    --cadence-foreground-muted: oklch(0.488 0.018 80);
+    --cadence-foreground-subtle: oklch(0.618 0.018 82);
+
+    --cadence-border: oklch(0.872 0.018 84);
+    --cadence-border-strong: oklch(0.772 0.024 82);
+
+    /* Ink from the bottle: near-black, with just enough blue in it to be seen as a choice. */
+    --cadence-primary: oklch(0.302 0.058 265);
+    --cadence-primary-hover: oklch(0.232 0.052 265);
+    --cadence-primary-foreground: oklch(0.982 0.01 88);
+    --cadence-primary-soft: oklch(0.902 0.028 262);
+    --cadence-primary-soft-foreground: oklch(0.312 0.06 265);
+
+    --cadence-success: oklch(0.462 0.085 150);
+    --cadence-success-soft: oklch(0.922 0.034 150);
+    --cadence-success-soft-foreground: oklch(0.385 0.075 150);
+
+    --cadence-warning: oklch(0.602 0.108 68);
+    --cadence-warning-soft: oklch(0.928 0.044 72);
+    --cadence-warning-soft-foreground: oklch(0.438 0.09 64);
+
+    --cadence-danger: oklch(0.482 0.172 28);
+    --cadence-danger-hover: oklch(0.415 0.162 28);
+    --cadence-danger-foreground: oklch(0.982 0.01 88);
+    --cadence-danger-soft: oklch(0.922 0.042 28);
+    --cadence-danger-soft-foreground: oklch(0.425 0.155 28);
+
+    /* Teal, held well away from the blue-black so a note never reads as the primary. */
+    --cadence-info: oklch(0.482 0.08 200);
+    --cadence-info-soft: oklch(0.922 0.034 200);
+    --cadence-info-soft-foreground: oklch(0.402 0.072 200);
+
+    --cadence-neutral-soft: oklch(0.918 0.018 84);
+    --cadence-neutral-soft-foreground: oklch(0.412 0.02 80);
+
+    --cadence-ring: oklch(0.402 0.075 265);
+    --cadence-overlay: oklch(0.22 0.03 268 / 0.52);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 16px 40px -22px oklch(0.22 0.04 268 / 0.4), 0 2px 8px -4px oklch(0.22 0.04 268 / 0.18);
+
+    --cadence-font-sans: 'Caveat', 'Bradley Hand', 'Segoe Script', ui-rounded, cursive;
+    --cadence-font-display: 'Caveat', 'Bradley Hand', 'Segoe Script', ui-rounded, cursive;
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+    /* Paper is guillotined, not rounded: the only theme with no radius at all. */
+    --cadence-radius-control: 0rem;
+    --cadence-radius-card: 0rem;
+
+    --cadence-tracking-title: 0em;
+    --cadence-tracking-overline: 0.28em;
+    --cadence-weight-title: 700;
+    --cadence-overline-transform: uppercase;
+}
+
+:root.dark[data-theme='manuscript'] {
+    --cadence-background: oklch(0.182 0.012 80);
+    --cadence-surface: oklch(0.222 0.013 80);
+    --cadence-surface-elevated: oklch(0.252 0.014 80);
+    --cadence-surface-sunken: oklch(0.152 0.01 80);
+    --cadence-surface-muted: oklch(0.258 0.014 80);
+    --cadence-surface-hover: oklch(0.286 0.015 80);
+
+    --cadence-sidebar: oklch(0.142 0.01 80);
+    --cadence-sidebar-border: oklch(0.248 0.014 80);
+
+    --cadence-foreground: oklch(0.944 0.014 88);
+    --cadence-foreground-muted: oklch(0.718 0.016 84);
+    --cadence-foreground-subtle: oklch(0.598 0.016 82);
+
+    --cadence-border: oklch(0.302 0.016 80);
+    --cadence-border-strong: oklch(0.418 0.02 80);
+
+    /* The page inverted: the same ink lifted off the black until it reads pale. */
+    --cadence-primary: oklch(0.788 0.075 262);
+    --cadence-primary-hover: oklch(0.845 0.06 262);
+    --cadence-primary-foreground: oklch(0.182 0.03 265);
+    --cadence-primary-soft: oklch(0.312 0.05 264);
+    --cadence-primary-soft-foreground: oklch(0.878 0.06 262);
+
+    --cadence-success: oklch(0.648 0.1 150);
+    --cadence-success-soft: oklch(0.288 0.045 150);
+    --cadence-success-soft-foreground: oklch(0.848 0.08 150);
+
+    --cadence-warning: oklch(0.748 0.115 72);
+    --cadence-warning-soft: oklch(0.298 0.05 68);
+    --cadence-warning-soft-foreground: oklch(0.872 0.095 76);
+
+    --cadence-danger: oklch(0.622 0.18 28);
+    --cadence-danger-hover: oklch(0.682 0.165 28);
+    --cadence-danger-foreground: oklch(0.182 0.032 28);
+    --cadence-danger-soft: oklch(0.308 0.075 28);
+    --cadence-danger-soft-foreground: oklch(0.858 0.092 28);
+
+    --cadence-info: oklch(0.698 0.088 200);
+    --cadence-info-soft: oklch(0.292 0.045 200);
+    --cadence-info-soft-foreground: oklch(0.852 0.065 200);
+
+    --cadence-neutral-soft: oklch(0.288 0.015 80);
+    --cadence-neutral-soft-foreground: oklch(0.832 0.014 84);
+
+    --cadence-ring: oklch(0.812 0.07 262);
+    --cadence-overlay: oklch(0.088 0.012 80 / 0.68);
+
+    --cadence-shadow-card: none;
+    --cadence-shadow-popover: 0 18px 44px -22px oklch(0 0 0 / 0.72), 0 2px 8px -4px oklch(0 0 0 / 0.5);
+
+    --cadence-font-sans: 'Caveat', 'Bradley Hand', 'Segoe Script', ui-rounded, cursive;
+    --cadence-font-display: 'Caveat', 'Bradley Hand', 'Segoe Script', ui-rounded, cursive;
+    --cadence-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+    --cadence-radius-control: 0rem;
+    --cadence-radius-card: 0rem;
+
+    --cadence-tracking-title: 0em;
+    --cadence-tracking-overline: 0.28em;
+    --cadence-weight-title: 700;
+    --cadence-overline-transform: uppercase;
+}

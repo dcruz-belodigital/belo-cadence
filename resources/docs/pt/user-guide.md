@@ -356,13 +356,25 @@ Um tema decide em conjunto a cor, o formato dos cantos e o tipo de letra. Cada u
 desenhado em claro e em escuro, por isso o tema e o esquema de cores são escolhas
 separadas.
 
+São apresentados do mais sóbrio ao mais vistoso, por isso quanto mais descer na lista
+mais o tema tem para dizer.
+
 - **Iris** — minimalista e moderno, em violeta suave. O predefinido.
-- **Cappuccino** — clássico e de cantos direitos: papel quente, tinta de café e uma
-  serifa para os títulos.
-- **Bubblegum** — vistoso, redondo e bem-disposto.
 - **Graphite** — sóbrio e quase monocromático, tinta sobre papel, com a cor reservada
   para o que comunica um estado.
+- **Meridian** — frio e preciso: azul-marinho profundo, cantos direitos e uma grotesca
+  técnica.
+- **Ember** — quente e vistoso: uma página de carvão quase neutra, com a cor reservada
+  para o destaque.
+- **Cappuccino** — clássico e de cantos direitos: papel quente, tinta de café e uma
+  serifa para os títulos.
+- **Folio** — livresco: papel marfim, uma serifa para a página toda e um destaque cor de
+  vinho.
 - **Cathode** — um terminal: monoespaçado do princípio ao fim, direito, verde de fósforo.
+- **Bubblegum** — vistoso, redondo e bem-disposto.
+- **Manuscript** — escrito à mão: papel creme, tinta azul-preta, cantos cortados a
+  direito e a página toda — títulos, texto e etiquetas — em letra manuscrita. Os números
+  continuam monoespaçados, para que as colunas se mantenham alinhadas.
 
 O símbolo na barra lateral — um avião de papel dobrado — é desenhado com a cor e o
 formato de cantos do próprio tema, para que perceba num relance qual está a usar.
